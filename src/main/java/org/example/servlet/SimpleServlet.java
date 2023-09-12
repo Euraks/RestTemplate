@@ -22,6 +22,8 @@ public class SimpleServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+
         UUID uuid = UUID.randomUUID();// Our Id from request
         SimpleEntity byId = service.findById(uuid);
         OutGoingDto outGoingDto = dtomapper.map(byId);
@@ -35,4 +37,5 @@ public class SimpleServlet extends HttpServlet {
         OutGoingDto map = dtomapper.map(saved);
         // return our DTO, not necessary
     }
+
 }
