@@ -19,10 +19,7 @@ class SimpleEntityDTOImplTest {
 
     @BeforeAll
     static void init() {
-       simpleEntityDTO = new SimpleEntityDTOImpl( Arrays.asList(
-                new SimpleEntity( UUID.randomUUID(), "First Entity" ),
-                new SimpleEntity( UUID.randomUUID(), "Second Entity" ),
-                new SimpleEntity( UUID.randomUUID(), "Third Entity" ) ) );
+       simpleEntityDTO = new SimpleEntityDTOImpl();
     }
 
     @Test

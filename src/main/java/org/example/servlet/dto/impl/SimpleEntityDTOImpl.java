@@ -12,9 +12,17 @@ public class SimpleEntityDTOImpl implements SimpleEntityDTO {
 
     private List<SimpleEntity> list;
 
+    public SimpleEntityDTOImpl() {
+        this.list = Arrays.asList(
+                new SimpleEntity( UUID.randomUUID(), "First Entity" ),
+                new SimpleEntity( UUID.randomUUID(), "Second Entity" ),
+                new SimpleEntity( UUID.randomUUID(), "Third Entity" ) );
+    }
+
     public SimpleEntityDTOImpl(List<SimpleEntity> list) {
         this.list = list;
     }
+
 
     @Override
     public SimpleEntity getSimpleEntityForId(UUID uuid) {
