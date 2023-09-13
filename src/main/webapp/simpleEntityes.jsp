@@ -7,7 +7,13 @@
 </head>
 <body>
 
-
+<table>
+    <c:forEach items="${simpleEntityes}" var="simpleEntityes">
+        <tr>
+            <td><c:out value="${simpleEntityes.description}" /></td>
+        </tr>
+    </c:forEach>
+</table>
 
 </body>
 </html>
