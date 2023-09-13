@@ -32,6 +32,7 @@ public class SimpleServlet extends HttpServlet {
     }
 
     @Override
+
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         SimpleEntity simpleEntity = dtomapper.INSTANCE.map( new IncomingDto() );
         SimpleEntity saved = service.save( simpleEntity );
