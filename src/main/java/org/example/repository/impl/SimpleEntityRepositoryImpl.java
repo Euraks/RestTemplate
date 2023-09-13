@@ -1,6 +1,7 @@
 package org.example.repository.impl;
 
 import org.example.db.ConnectionManager;
+import org.example.db.HikariCPDataSource;
 import org.example.model.SimpleEntity;
 import org.example.repository.SimpleEntityRepository;
 import org.example.repository.mapper.SimpleResultSetMapper;
@@ -11,9 +12,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
+
 public class SimpleEntityRepositoryImpl implements SimpleEntityRepository {
+
     private SimpleResultSetMapper resultSetMapper;
-    private ConnectionManager connectionManager;
+    private final ConnectionManager connectionManager = (ConnectionManager) new HikariCPDataSource().getConnection();
 
     @Override
     public SimpleEntity findById(UUID id) {

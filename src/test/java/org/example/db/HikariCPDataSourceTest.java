@@ -1,5 +1,6 @@
 package org.example.db;
 
+import com.zaxxer.hikari.HikariDataSource;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
@@ -11,7 +12,7 @@ class HikariCPDataSourceTest {
 
     @Test
     void getConnection() throws SQLException {
-        Connection connection = HikariCPDataSource.getConnection();
+        Connection connection = new HikariCPDataSource().getConnection();
         assertNotNull( connection );
     }
 }

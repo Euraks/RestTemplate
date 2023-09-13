@@ -7,9 +7,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 @Mapper
-public interface SimpleDtomapper {
+public interface SimpleDtoMapper {
 
-    SimpleDtomapper INSTANCE = Mappers.getMapper( SimpleDtomapper.class );
+    SimpleDtoMapper INSTANCE = Mappers.getMapper( SimpleDtoMapper.class );
 
     SimpleEntity map(IncomingDto incomingDto);
 

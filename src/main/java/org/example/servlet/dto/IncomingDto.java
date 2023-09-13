@@ -13,7 +13,7 @@ public class IncomingDto implements ID, Descriprion {
     public IncomingDto() {
     }
 
-    public IncomingDto(UUID uuid, String description) {
+    public IncomingDto(String description) {
         this.uuid = uuid;
         this.description = description;
     }
