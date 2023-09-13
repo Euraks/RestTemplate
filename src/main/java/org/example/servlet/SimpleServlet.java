@@ -21,7 +21,7 @@ public class SimpleServlet extends HttpServlet {
 
     private static final Logger LOGGER = Logger.getLogger( Main.class.getName() );
 
-    private SimpleServiceImpl service;
+    private SimpleServiceImpl service = new SimpleServiceImpl();
 
 
 

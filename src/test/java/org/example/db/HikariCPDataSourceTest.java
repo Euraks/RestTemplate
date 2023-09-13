@@ -1,6 +1,5 @@
 package org.example.db;
 
-import com.zaxxer.hikari.HikariDataSource;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;

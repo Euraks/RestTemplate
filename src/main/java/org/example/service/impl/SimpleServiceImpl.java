@@ -8,9 +8,10 @@ import org.example.service.SimpleService;
 import java.util.UUID;
 
 public class SimpleServiceImpl implements SimpleService {
-    private SimpleEntityRepositoryImpl repository;
+    private SimpleEntityRepositoryImpl repository ;
     @Override
     public SimpleEntity save(SimpleEntity simpleEntity) {
+        repository = new SimpleEntityRepositoryImpl();
         repository.save( simpleEntity );
         return simpleEntity;
     }

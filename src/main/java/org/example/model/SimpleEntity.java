@@ -6,24 +6,24 @@ import java.util.UUID;
 
 
 public class SimpleEntity {
-    private UUID id;
+    private UUID uuid;
     private String description;
 
     public SimpleEntity() {
-        this.id = UUID.randomUUID();
+        this.uuid = UUID.randomUUID();
     }
 
     public SimpleEntity(String description) {
-        this.id = UUID.randomUUID();
+        this.uuid = UUID.randomUUID();
         this.description = description;
     }
 
-    public UUID getId() {
-        return id;
+    public UUID getUuid() {
+        return uuid;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public String getDescription() {
@@ -37,7 +37,7 @@ public class SimpleEntity {
     @Override
     public String toString() {
         return "SimpleEntity{" +
-                "id=" + id +
+                "id=" + uuid +
                 ", description='" + description + '\'' +
                 '}';
     }

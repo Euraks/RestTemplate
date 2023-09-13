@@ -21,8 +21,7 @@ public class SimpleEntityRepositoryImpl implements SimpleEntityRepository {
     @Override
     public SimpleEntity findById(UUID id) {
         // Здесь используем try with resources
-        try {
-            Connection connection = connectionManager.getConnection();
+        try(Connection connection = connectionManager.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement("");
             ResultSet resultSet = preparedStatement.executeQuery();
             return resultSetMapper.map(resultSet);
@@ -44,6 +43,16 @@ public class SimpleEntityRepositoryImpl implements SimpleEntityRepository {
 
     @Override
     public SimpleEntity save(SimpleEntity simpleEntity) {
-        return null;
+        try(Connection connection = connectionManager.getConnection()) {
+            String sql = "INSERT INTO simpleentity (uuid, description) Values (?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setObject( 1,simpleEntity.getUuid() );
+            preparedStatement.setString( 2,simpleEntity.getDescription() );
+            ResultSet resultSet = preparedStatement.executeQuery();
+            return resultSetMapper.map(resultSet);
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
