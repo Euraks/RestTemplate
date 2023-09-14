@@ -6,13 +6,19 @@
     <title>Simple Entitys</title>
 </head>
 <body>
+
 <br>
+<p> <a href="simple?action=create">Add Simple Entity's Page</a> </p>
+<br />
+<br>
+
 <p>Table SimpleEntity's</p>
 <table border="1" cellpadding="8" cellspacing="0">
     <thead>
     <tr>
         <th>UUid</th>
         <th>Description</th>
+        <th></th>
         <th></th>
     </tr>
     </thead>
@@ -21,18 +27,10 @@
         <tr>
             <td>${simpleEntityes.uuid}</td>
             <td>${simpleEntityes.description}</td>
+            <td><a href="simple?action=update&id=${simpleEntityes.uuid}">Update</a></td>
             <td><a href="simple?action=delete&id=${simpleEntityes.uuid}">Delete</a></td>
         </tr>
     </c:forEach>
 </table>
-<br>
-<p> Add new SimpleEntity</p>
-<br />
-<form method="post" action="<c:url value='/simple'/>">
-    <label>Description:  <input type="text" name="description" required /></label>
-    <br>
-    <br>
-    <input type="submit" value="Ok" name="Ok"><br>
-</form>
 </body>
 </html>

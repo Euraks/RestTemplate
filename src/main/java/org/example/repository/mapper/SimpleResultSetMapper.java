@@ -17,7 +17,7 @@ public interface SimpleResultSetMapper {
 
     default SimpleEntity map(ResultSet resultSet) throws SQLException {
         SimpleEntity simpleEntity = new SimpleEntity();
-        simpleEntity.setUuid( resultSet.getObject( 1, UUID.class ) );
+        simpleEntity.setUuid( resultSet.getObject( "uuid", UUID.class ) );
         simpleEntity.setDescription( resultSet.getString( "description" ) );
         return simpleEntity;
     }

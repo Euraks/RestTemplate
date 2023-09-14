@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -30,22 +32,45 @@ public class SimpleServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String action = "";
-        if (req.getParameter("action")!=null) {
-            action = req.getParameter("action");
+        String action = req.getParameter("action");
+
+        switch (action == null ? "all" : action) {
+            case "delete":
+                UUID uuid = getUuid( req );
+                service.delete(uuid);
+                resp.sendRedirect( "/simple" );
+                break;
+            case "create":
+                SimpleEntity newEntity = new SimpleEntity();
+                req.setAttribute( "action",action );
+                req.setAttribute("simpleEntity", newEntity);
+                req.getRequestDispatcher("simpleEntityForm.jsp").forward(req, resp);
+                break;
+            case "update":
+                SimpleEntity simpleEntity = service.findById(getUuid( req )  );
+                req.setAttribute( "action",action );
+                req.setAttribute("simpleEntity", simpleEntity);
+                req.getRequestDispatcher("simpleEntityForm.jsp").forward(req, resp);
+                break;
+            case "all":
+            default:
+                List<SimpleEntity> simpleEntityList = service.findAll();
+                req.setAttribute( "simpleEntityes",simpleEntityList );
+                req.getRequestDispatcher( "simpleEntityes.jsp" ).forward( req,resp );
+                break;
         }
-        if (action.equals( "delete" )){
-            String stringUUID = Objects.requireNonNull(req.getParameter("id"));;
-            UUID uuid =  UUID.fromString( stringUUID );
-            service.delete(uuid);
-        }
-        List<SimpleEntity> simpleEntityList = service.findAll();
-        req.setAttribute( "simpleEntityes",simpleEntityList );
-        req.getRequestDispatcher( "simpleEntityes.jsp" ).forward( req,resp );
+
 //        UUID uuid = UUID.randomUUID();// Our Id from request
 //        SimpleEntity byId = service.findById(uuid);
 //        OutGoingDto outGoingDto = dtomapper.map(byId);
         // return our DTO
+    }
+
+    private UUID getUuid(HttpServletRequest req) {
+        String stringUUID = Objects.requireNonNull( req.getParameter("id"));
+        ;
+        UUID uuid =  UUID.fromString( stringUUID );
+        return uuid;
     }
 
     @Override

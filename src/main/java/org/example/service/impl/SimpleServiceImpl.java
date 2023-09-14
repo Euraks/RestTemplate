@@ -18,7 +18,7 @@ public class SimpleServiceImpl implements SimpleService {
 
     @Override
     public SimpleEntity findById(UUID uuid) {
-        return null;
+        return repository.findById( uuid );
     }
 
     @Override
