@@ -2,13 +2,13 @@ package org.example.service.impl;
 
 import org.example.model.SimpleEntity;
 import org.example.repository.impl.SimpleEntityRepositoryImpl;
-import org.example.service.SimpleService;
+import org.example.service.Service;
 
 
 import java.util.List;
 import java.util.UUID;
 
-public class SimpleServiceImpl implements SimpleService {
+public class SimpleServiceImpl implements Service<SimpleEntity,UUID> {
     private final SimpleEntityRepositoryImpl repository = new SimpleEntityRepositoryImpl();;
     @Override
     public SimpleEntity save(SimpleEntity simpleEntity) {

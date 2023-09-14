@@ -1,10 +1,8 @@
 package org.example.repository;
 
-import org.example.model.SimpleEntity;
-
 import java.util.List;
 
-public interface OneToMoneyEntityRepository<T,K> {
+public interface AuthorEntityRepository<T,K> {
     T findById(K id);
 
     boolean deleteById(K id);
@@ -13,5 +11,5 @@ public interface OneToMoneyEntityRepository<T,K> {
 
     T save(T t);
 
-    T update(SimpleEntity simpleEntity);
+    T update(T t);
 }

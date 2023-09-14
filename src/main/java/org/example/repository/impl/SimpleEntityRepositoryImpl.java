@@ -16,7 +16,6 @@ import java.util.UUID;
 
 public class SimpleEntityRepositoryImpl implements SimpleEntityRepository {
 
-    private SimpleResultSetMapper resultSetMapper;
     private final HikariCPDataSource connectionManager = new HikariCPDataSource();
 
     @Override
