@@ -73,12 +73,20 @@ public class SimpleServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        String action = req.getParameter("action");
+
         String description = req.getParameter( "description" );
         IncomingDto incomingDto = new IncomingDto();
         incomingDto.setUuid( getUuid( req ) );
         incomingDto.setDescription( description );
         SimpleEntity simpleEntity = SimpleDtoMapper.INSTANCE.map( incomingDto);
-        service.save( simpleEntity );
-        doGet( req,resp );
+
+        if (action.equals( "create" )){
+            service.save( simpleEntity );
+        } else {
+            service.update(simpleEntity);
+        }
+        resp.sendRedirect( "/simple" );
     }
 }

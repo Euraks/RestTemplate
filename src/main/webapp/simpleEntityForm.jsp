@@ -8,9 +8,7 @@
     <h3><a href="index.jsp">Home</a></h3>
     <br>
     <h2>${action == 'create' ? 'Create SimpleEntity' : 'Update SimpleEntity'}</h2>
-
-    <%--    <jsp:useBean id="simpleEntity" type="org.example.model.SimpleEntity"/>--%>
-    <form method="post" action="${pageContext.request.contextPath}/simple">
+    <form method="post" action="${pageContext.request.contextPath}/simple?action=${action}">
         <dl>
             <label>UUid: ${simpleEntity.uuid}
                 <input type="hidden" name="uuid" value="${simpleEntity.uuid}" required></label>

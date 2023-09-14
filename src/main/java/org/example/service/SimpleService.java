@@ -15,4 +15,6 @@ public interface SimpleService {
     List<SimpleEntity> findAll();
 
     void delete(UUID uuid);
+
+    void update(SimpleEntity simpleEntity);
 }

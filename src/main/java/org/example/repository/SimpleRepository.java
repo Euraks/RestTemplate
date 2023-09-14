@@ -12,4 +12,6 @@ public interface SimpleRepository<T, K> {
     List<T> findAll();
 
     T save(T t);
+
+    T update(SimpleEntity simpleEntity);
 }

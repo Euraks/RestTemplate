@@ -83,4 +83,19 @@ public class SimpleEntityRepositoryImpl implements SimpleEntityRepository {
             throw new RuntimeException( e );
         }
     }
+
+    @Override
+    public SimpleEntity update(SimpleEntity simpleEntity) {
+        String sql = "UPDATE simpleentity " +
+                "SET description='"+simpleEntity.getDescription()+"' " +
+                "WHERE uuid='"+simpleEntity.getUuid()+"';";
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement( sql )){
+            preparedStatement.executeUpdate();
+            return simpleEntity;
+
+        } catch(SQLException e){
+            throw new RuntimeException( e );
+        }
+    }
 }

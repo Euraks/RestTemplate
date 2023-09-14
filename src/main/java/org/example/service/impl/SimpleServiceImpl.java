@@ -30,4 +30,9 @@ public class SimpleServiceImpl implements SimpleService {
     public void delete(UUID uuid) {
         repository.deleteById( uuid );
     }
+
+    @Override
+    public void update(SimpleEntity simpleEntity) {
+        repository.update(simpleEntity);
+    }
 }
