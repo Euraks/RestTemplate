@@ -22,11 +22,11 @@ public class SimpleEntityRepositoryImpl implements SimpleEntityRepository {
     @Override
     public SimpleEntity findById(UUID uuid) {
         String sql = "SELECT uuid,description FROM simpleentity WHERE uuid='"+uuid.toString()+"'";
-        // Здесь используем try with resources
         try (Connection connection = connectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement( sql )){
             ResultSet resultSet = preparedStatement.executeQuery();
             List<SimpleEntity> simpleEntityList = getSimpleEntiysList( resultSet );
+
             return simpleEntityList.get( 0 );
 
         } catch(SQLException e){
