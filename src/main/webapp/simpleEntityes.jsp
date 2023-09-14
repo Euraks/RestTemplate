@@ -27,8 +27,8 @@
         <tr>
             <td>${simpleEntityes.uuid}</td>
             <td>${simpleEntityes.description}</td>
-            <td><a href="simple?action=update&id=${simpleEntityes.uuid}">Update</a></td>
-            <td><a href="simple?action=delete&id=${simpleEntityes.uuid}">Delete</a></td>
+            <td><a href="simple?action=update&uuid=${simpleEntityes.uuid}">Update</a></td>
+            <td><a href="simple?action=delete&uuid=${simpleEntityes.uuid}">Delete</a></td>
         </tr>
     </c:forEach>
 </table>

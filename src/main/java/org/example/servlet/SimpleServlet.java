@@ -67,16 +67,16 @@ public class SimpleServlet extends HttpServlet {
     }
 
     private UUID getUuid(HttpServletRequest req) {
-        String stringUUID = Objects.requireNonNull( req.getParameter("id"));
-        ;
-        UUID uuid =  UUID.fromString( stringUUID );
-        return uuid;
+        String stringUUID = Objects.requireNonNull( req.getParameter("uuid"));
+        return UUID.fromString( stringUUID );
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String description = req.getParameter( "description" );
-        IncomingDto incomingDto = new IncomingDto(description);
+        IncomingDto incomingDto = new IncomingDto();
+        incomingDto.setUuid( getUuid( req ) );
+        incomingDto.setDescription( description );
         SimpleEntity simpleEntity = SimpleDtoMapper.INSTANCE.map( incomingDto);
         service.save( simpleEntity );
         doGet( req,resp );

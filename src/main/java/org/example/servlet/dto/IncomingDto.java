@@ -13,26 +13,22 @@ public class IncomingDto implements ID, Descriprion {
     public IncomingDto() {
     }
 
-    public IncomingDto(String description) {
-        this.uuid = uuid;
-        this.description = description;
-    }
-
     @Override
     public String getDescription() {
         return this.description;
     }
 
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
-    public UUID getID() {
-        return this.uuid;
+    public UUID getUuid() {
+        return uuid;
     }
 
     public void setUuid(UUID uuid) {
         this.uuid = uuid;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 }

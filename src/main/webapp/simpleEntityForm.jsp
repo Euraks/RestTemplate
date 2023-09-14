@@ -12,9 +12,10 @@
     <%--    <jsp:useBean id="simpleEntity" type="org.example.model.SimpleEntity"/>--%>
     <form method="post" action="${pageContext.request.contextPath}/simple">
         <dl>
-            <label>UUid: ${simpleEntity.uuid}</label>
+            <label>UUid: ${simpleEntity.uuid}
+                <input type="hidden" name="uuid" value="${simpleEntity.uuid}" required></label>
             <label>Description:
-                <input type="text" value="${simpleEntity.description}" name="description"required/></label>
+                <input type="text" value="${simpleEntity.description}" name="description" required/></label>
         </dl>
         <button type="submit">Save</button>
         <button onclick="window.history.back()" type="button">Cancel</button>
