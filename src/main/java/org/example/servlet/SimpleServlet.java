@@ -1,10 +1,9 @@
 package org.example.servlet;
 
-import org.example.Main;
 import org.example.model.SimpleEntity;
 import org.example.service.impl.SimpleServiceImpl;
-import org.example.servlet.dto.IncomingDto;
-import org.example.servlet.dto.OutGoingDto;
+import org.example.servlet.dto.IncomingSimplyDto;
+import org.example.servlet.dto.OutGoingSimplyDto;
 import org.example.servlet.mapper.SimpleDtoMapper;
 
 import javax.servlet.ServletException;
@@ -13,22 +12,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 
 @WebServlet(urlPatterns = "/simple")
 public class SimpleServlet extends HttpServlet {
 
-    private static final Logger LOGGER = Logger.getLogger( Main.class.getName() );
-
-    private SimpleServiceImpl service = new SimpleServiceImpl();
-
-
+    private final SimpleServiceImpl service = new SimpleServiceImpl();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -42,28 +34,26 @@ public class SimpleServlet extends HttpServlet {
                 break;
             case "create":
                 SimpleEntity newEntity = new SimpleEntity();
+                OutGoingSimplyDto outGoingSimplyDto = SimpleDtoMapper.INSTANCE.map( newEntity );
                 req.setAttribute( "action",action );
-                req.setAttribute("simpleEntity", newEntity);
+                req.setAttribute("simpleEntity", outGoingSimplyDto );
                 req.getRequestDispatcher("simpleEntityForm.jsp").forward(req, resp);
                 break;
             case "update":
                 SimpleEntity simpleEntity = service.findById(getUuid( req )  );
+                OutGoingSimplyDto updateOutGoingSimplyDto = SimpleDtoMapper.INSTANCE.map( simpleEntity );
                 req.setAttribute( "action",action );
-                req.setAttribute("simpleEntity", simpleEntity);
+                req.setAttribute("simpleEntity", updateOutGoingSimplyDto );
                 req.getRequestDispatcher("simpleEntityForm.jsp").forward(req, resp);
                 break;
             case "all":
             default:
                 List<SimpleEntity> simpleEntityList = service.findAll();
-                req.setAttribute( "simpleEntityes",simpleEntityList );
+                OutGoingSimplyDto simpleEntityDTO = SimpleDtoMapper.INSTANCE.mapListToDto( simpleEntityList );
+                req.setAttribute( "simpleEntityes",simpleEntityDTO );
                 req.getRequestDispatcher( "simpleEntityes.jsp" ).forward( req,resp );
                 break;
         }
-
-//        UUID uuid = UUID.randomUUID();// Our Id from request
-//        SimpleEntity byId = service.findById(uuid);
-//        OutGoingDto outGoingDto = dtomapper.map(byId);
-        // return our DTO
     }
 
     private UUID getUuid(HttpServletRequest req) {
@@ -77,10 +67,10 @@ public class SimpleServlet extends HttpServlet {
         String action = req.getParameter("action");
 
         String description = req.getParameter( "description" );
-        IncomingDto incomingDto = new IncomingDto();
-        incomingDto.setUuid( getUuid( req ) );
-        incomingDto.setDescription( description );
-        SimpleEntity simpleEntity = SimpleDtoMapper.INSTANCE.map( incomingDto);
+        IncomingSimplyDto incomingSimplyDto = new IncomingSimplyDto();
+        incomingSimplyDto.setUuid( getUuid( req ) );
+        incomingSimplyDto.setDescription( description );
+        SimpleEntity simpleEntity = SimpleDtoMapper.INSTANCE.map( incomingSimplyDto );
 
         if (action.equals( "create" )){
             service.save( simpleEntity );

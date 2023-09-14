@@ -22,7 +22,7 @@
         <th></th>
     </tr>
     </thead>
-    <c:forEach items="${simpleEntityes}" var="simpleEntityes">
+    <c:forEach items="${simpleEntityes.simpleEntityList}" var="simpleEntityes">
         <jsp:useBean id="simpleEntityes" type="org.example.model.SimpleEntity"/>
         <tr>
             <td>${simpleEntityes.uuid}</td>

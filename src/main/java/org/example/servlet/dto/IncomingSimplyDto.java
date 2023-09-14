@@ -5,12 +5,12 @@ import org.example.servlet.dto.intereace.ID;
 
 import java.util.UUID;
 
-public class OutGoingDto implements ID, Descriprion {
+public class IncomingSimplyDto implements ID, Descriprion {
 
     private UUID uuid;
     private String description;
 
-    public OutGoingDto() {
+    public IncomingSimplyDto() {
     }
 
     @Override
@@ -19,10 +19,6 @@ public class OutGoingDto implements ID, Descriprion {
     }
 
 
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
-    }
-
     public void setDescription(String description) {
         this.description = description;
     }
@@ -30,5 +26,9 @@ public class OutGoingDto implements ID, Descriprion {
     @Override
     public UUID getUuid() {
         return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 }
