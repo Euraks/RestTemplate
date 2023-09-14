@@ -13,6 +13,7 @@
     <tr>
         <th>UUid</th>
         <th>Description</th>
+        <th></th>
     </tr>
     </thead>
     <c:forEach items="${simpleEntityes}" var="simpleEntityes">
@@ -20,10 +21,12 @@
         <tr>
             <td>${simpleEntityes.uuid}</td>
             <td>${simpleEntityes.description}</td>
+            <td><a href="simple?action=delete&id=${simpleEntityes.uuid}">Delete</a></td>
         </tr>
     </c:forEach>
 </table>
 <br>
+<p> Add new SimpleEntity</p>
 <br />
 <form method="post" action="<c:url value='/simple'/>">
     <label>Description:  <input type="text" name="description" required /></label>

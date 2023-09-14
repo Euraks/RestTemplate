@@ -13,4 +13,6 @@ public interface SimpleService {
     SimpleEntity findById(UUID uuid);
 
     List<SimpleEntity> findAll();
+
+    void delete(UUID uuid);
 }

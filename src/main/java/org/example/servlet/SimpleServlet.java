@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 
@@ -28,6 +30,15 @@ public class SimpleServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String action = "";
+        if (req.getParameter("action")!=null) {
+            action = req.getParameter("action");
+        }
+        if (action.equals( "delete" )){
+            String stringUUID = Objects.requireNonNull(req.getParameter("id"));;
+            UUID uuid =  UUID.fromString( stringUUID );
+            service.delete(uuid);
+        }
         List<SimpleEntity> simpleEntityList = service.findAll();
         req.setAttribute( "simpleEntityes",simpleEntityList );
         req.getRequestDispatcher( "simpleEntityes.jsp" ).forward( req,resp );

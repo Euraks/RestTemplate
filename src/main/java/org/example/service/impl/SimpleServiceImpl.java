@@ -25,4 +25,9 @@ public class SimpleServiceImpl implements SimpleService {
     public List<SimpleEntity> findAll() {
         return repository.findAll();
     }
+
+    @Override
+    public void delete(UUID uuid) {
+        repository.deleteById( uuid );
+    }
 }

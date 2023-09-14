@@ -17,43 +17,52 @@ import java.util.UUID;
 public class SimpleEntityRepositoryImpl implements SimpleEntityRepository {
 
     private SimpleResultSetMapper resultSetMapper;
-    private final HikariCPDataSource connectionManager =  new HikariCPDataSource();
+    private final HikariCPDataSource connectionManager = new HikariCPDataSource();
 
     @Override
     public SimpleEntity findById(UUID id) {
         // Здесь используем try with resources
-        try(Connection connection = connectionManager.getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement("");
+        try (Connection connection = connectionManager.getConnection()){
+            PreparedStatement preparedStatement = connection.prepareStatement( "" );
             ResultSet resultSet = preparedStatement.executeQuery();
-            return resultSetMapper.map(resultSet);
+            return resultSetMapper.map( resultSet );
 
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch(SQLException e){
+            throw new RuntimeException( e );
         }
     }
 
     @Override
-    public boolean deleteById(UUID id) {
-        return false;
+    public boolean deleteById(UUID uuid) {
+        int result;
+        String sql = "DELETE FROM simpleentity\n" +
+                "WHERE uuid = '" + uuid.toString() + "';";
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement( sql )){
+            result = preparedStatement.executeUpdate();
+        } catch(SQLException e){
+            throw new RuntimeException( e );
+        }
+        return result > 0;
     }
 
     @Override
     public List<SimpleEntity> findAll() {
         String sql = "SELECT * FROM simpleentity;";
-        try(Connection connection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement( sql )){
             ResultSet resultSet = preparedStatement.executeQuery();
-            return getSimpleEntiysList(resultSet);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            return getSimpleEntiysList( resultSet );
+        } catch(SQLException e){
+            throw new RuntimeException( e );
         }
     }
 
     private List<SimpleEntity> getSimpleEntiysList(ResultSet resultSet) throws SQLException {
         List<SimpleEntity> simpleEntityList = new ArrayList<>();
         while (resultSet.next()) {
-            SimpleEntity simpleEntity = SimpleResultSetMapper.INSTANCE.map(resultSet);
-            simpleEntityList.add(simpleEntity);
+            SimpleEntity simpleEntity = SimpleResultSetMapper.INSTANCE.map( resultSet );
+            simpleEntityList.add( simpleEntity );
         }
         return simpleEntityList;
     }
@@ -61,15 +70,15 @@ public class SimpleEntityRepositoryImpl implements SimpleEntityRepository {
     @Override
     public SimpleEntity save(SimpleEntity simpleEntity) {
         String sql = "INSERT INTO simpleentity (uuid, description) Values (?, ?)";
-        try(Connection connection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setObject( 1,simpleEntity.getUuid() );
-            preparedStatement.setString( 2,simpleEntity.getDescription() );
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement( sql )){
+            preparedStatement.setObject( 1, simpleEntity.getUuid() );
+            preparedStatement.setString( 2, simpleEntity.getDescription() );
             preparedStatement.executeUpdate();
             return simpleEntity;
 
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch(SQLException e){
+            throw new RuntimeException( e );
         }
     }
 }
