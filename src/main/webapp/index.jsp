@@ -8,6 +8,5 @@
 <br>
 <p> <a href="/simple"> Simple Entity's Page</a> </p>
 <br><br>
-<p><a href="addSimplyEntity.jsp">ADD Simple Entity`s</a> </p>
 </body>
 </html>

@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -27,9 +28,9 @@ public class SimpleServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
-        //req.setAttribute( "simpleEntityes",simpleEntityes );
-        //req.getRequestDispatcher( "simpleEntityes.jsp" ).forward( req,resp );
+        List<SimpleEntity> simpleEntityList = service.findAll();
+        req.setAttribute( "simpleEntityes",simpleEntityList );
+        req.getRequestDispatcher( "simpleEntityes.jsp" ).forward( req,resp );
 //        UUID uuid = UUID.randomUUID();// Our Id from request
 //        SimpleEntity byId = service.findById(uuid);
 //        OutGoingDto outGoingDto = dtomapper.map(byId);
@@ -42,7 +43,6 @@ public class SimpleServlet extends HttpServlet {
         IncomingDto incomingDto = new IncomingDto(description);
         SimpleEntity simpleEntity = SimpleDtoMapper.INSTANCE.map( incomingDto);
         service.save( simpleEntity );
-        req.getRequestDispatcher( "/simple" ).forward( req,resp );
+        doGet( req,resp );
     }
-
 }

@@ -1,6 +1,5 @@
 package org.example.repository.impl;
 
-import org.example.db.ConnectionManager;
 import org.example.db.HikariCPDataSource;
 import org.example.model.SimpleEntity;
 import org.example.repository.SimpleEntityRepository;
@@ -10,13 +9,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 
 public class SimpleEntityRepositoryImpl implements SimpleEntityRepository {
 
     private SimpleResultSetMapper resultSetMapper;
-    private final ConnectionManager connectionManager = (ConnectionManager) new HikariCPDataSource().getConnection();
+    private final HikariCPDataSource connectionManager =  new HikariCPDataSource();
 
     @Override
     public SimpleEntity findById(UUID id) {
@@ -37,19 +38,35 @@ public class SimpleEntityRepositoryImpl implements SimpleEntityRepository {
     }
 
     @Override
-    public SimpleEntity findAll() {
-        return null;
+    public List<SimpleEntity> findAll() {
+        String sql = "SELECT * FROM simpleentity;";
+        try(Connection connection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            return getSimpleEntiysList(resultSet);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private List<SimpleEntity> getSimpleEntiysList(ResultSet resultSet) throws SQLException {
+        List<SimpleEntity> simpleEntityList = new ArrayList<>();
+        while (resultSet.next()) {
+            SimpleEntity simpleEntity = SimpleResultSetMapper.INSTANCE.map(resultSet);
+            simpleEntityList.add(simpleEntity);
+        }
+        return simpleEntityList;
     }
 
     @Override
     public SimpleEntity save(SimpleEntity simpleEntity) {
-        try(Connection connection = connectionManager.getConnection()) {
-            String sql = "INSERT INTO simpleentity (uuid, description) Values (?, ?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        String sql = "INSERT INTO simpleentity (uuid, description) Values (?, ?)";
+        try(Connection connection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setObject( 1,simpleEntity.getUuid() );
             preparedStatement.setString( 2,simpleEntity.getDescription() );
-            ResultSet resultSet = preparedStatement.executeQuery();
-            return resultSetMapper.map(resultSet);
+            preparedStatement.executeUpdate();
+            return simpleEntity;
 
         } catch (SQLException e) {
             throw new RuntimeException(e);

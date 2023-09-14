@@ -6,14 +6,30 @@
     <title>Simple Entitys</title>
 </head>
 <body>
-
-<table>
+<br>
+<p>Table SimpleEntity's</p>
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+    <tr>
+        <th>UUid</th>
+        <th>Description</th>
+    </tr>
+    </thead>
     <c:forEach items="${simpleEntityes}" var="simpleEntityes">
+        <jsp:useBean id="simpleEntityes" type="org.example.model.SimpleEntity"/>
         <tr>
-            <td><c:out value="${simpleEntityes.description}" /></td>
+            <td>${simpleEntityes.uuid}</td>
+            <td>${simpleEntityes.description}</td>
         </tr>
     </c:forEach>
 </table>
-
+<br>
+<br />
+<form method="post" action="<c:url value='/simple'/>">
+    <label>Description:  <input type="text" name="description" required /></label>
+    <br>
+    <br>
+    <input type="submit" value="Ok" name="Ok"><br>
+</form>
 </body>
 </html>
