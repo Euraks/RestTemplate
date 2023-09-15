@@ -2,6 +2,8 @@ package org.example.db;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -9,11 +11,9 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class HikariCPDataSource {
-    private static final Logger LOGGER = Logger.getLogger( HikariCPDataSource.class.getName() );
+    private static final Logger LOGGER = LoggerFactory.getLogger(  HikariCPDataSource.class );
 
 
     private static HikariConfig config;
@@ -28,7 +28,7 @@ public class HikariCPDataSource {
             properties.load( input );
             config = new HikariConfig( properties );
         } catch(IOException e){
-            LOGGER.log( Level.WARNING,"Loading file properties failed" );
+            LOGGER.info( "Message  {}",11 );
         }
         ds = new HikariDataSource( config );
     }
@@ -37,8 +37,6 @@ public class HikariCPDataSource {
         try{
             return ds.getConnection();
         } catch(SQLException e){
-            LOGGER.log( Level.WARNING, "Connection Failed" );
-            LOGGER.log( Level.WARNING, e.getMessage() );
         }
         return null;
     }
