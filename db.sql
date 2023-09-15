@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS AuthorEntity (
 
 CREATE TABLE IF NOT EXISTS Article (
                          id uuid PRIMARY KEY,
-                         author_id INT NOT NULL,
+                         author_id uuid NOT NULL,
                          text TEXT NOT NULL,
                          CONSTRAINT fk_author FOREIGN KEY(author_id) REFERENCES AuthorEntity(id)
 );

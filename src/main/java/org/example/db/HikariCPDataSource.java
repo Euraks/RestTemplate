@@ -2,28 +2,34 @@ package org.example.db;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import org.example.Main;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class HikariCPDataSource  {
-    private static final Logger LOGGER = Logger.getLogger( Main.class.getName() );
+public class HikariCPDataSource {
+    private static final Logger LOGGER = Logger.getLogger( HikariCPDataSource.class.getName() );
 
 
-    private static HikariConfig config = new HikariConfig();
-    private static HikariDataSource ds;
+    private static HikariConfig config;
+    private static final HikariDataSource ds;
 
     static {
-        config.setDriverClassName( "org.postgresql.ds.PGSimpleDataSource" );
-        config.setJdbcUrl( "jdbc:postgresql://localhost:5432/mydb" );
-        config.setUsername( "user" );
-        config.setPassword( "password" );
-//        config.setJdbcUrl( "jdbc:postgresql://localhost:5432/mydb" );
-        config.setConnectionTimeout( 50000 );
-        config.setMaximumPoolSize( 100 );
+        Properties properties = new Properties();
+        try (InputStream input = HikariCPDataSource.class.getClassLoader().getResourceAsStream( "db.properties" )){
+            if (input == null) {
+                throw new FileNotFoundException( "db.properties not found" );
+            }
+            properties.load( input );
+            config = new HikariConfig( properties );
+        } catch(IOException e){
+            LOGGER.log( Level.WARNING,"Loading file properties failed" );
+        }
         ds = new HikariDataSource( config );
     }
 

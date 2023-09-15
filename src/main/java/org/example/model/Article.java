@@ -9,6 +9,11 @@ public class Article {
     public Article() {
     }
 
+    public Article(UUID uuid, String text) {
+        this.uuid = uuid;
+        this.text = text;
+    }
+
     public UUID getUuid() {
         return uuid;
     }
