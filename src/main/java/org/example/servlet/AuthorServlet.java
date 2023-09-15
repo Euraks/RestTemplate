@@ -22,10 +22,23 @@ public class AuthorServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        List<AuthorEntity> authorEntities = service.findAll();
-        req.setAttribute( "authors", authorEntities );
-        req.getRequestDispatcher( "AuthorsandArticles.jsp" ).forward( req,resp );
+        String action = req.getParameter("action");
 
+        if ("update".equals(action)) {
+            UUID authorId = UUID.fromString(req.getParameter("authorId"));
+            AuthorEntity authorEntity = service.findById(authorId);
+            req.setAttribute("authorEntity", authorEntity);
+            req.getRequestDispatcher("AuthorArticlesForm.jsp").forward(req, resp);
+        } else if ("delete".equals(action)) {
+            UUID authorId = UUID.fromString(req.getParameter("authorId"));
+            service.delete(authorId);
+            resp.sendRedirect("/AuthorServlet");
+        } else {
+            // По умолчанию просто отображаем всех авторов
+            List<AuthorEntity> authors = service.findAll();
+            req.setAttribute("authors", authors);
+            req.getRequestDispatcher("AuthorsandArticles.jsp").forward(req, resp);
+        }
     }
 
     @Override

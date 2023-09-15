@@ -30,8 +30,8 @@
                     </c:forEach>
                 </ul>
             </td>
-            <td><a href="/AuthorServlet?action=update?authorId=${author.uuid}">Update</a></td>
-            <td><a href="/AuthorServlet?action=delete?authorId=${author.uuid}">Delete</a></td>
+            <td><a href="/AuthorServlet?action=update&authorId=${author.uuid}">Update</a></td>
+            <td><a href="/AuthorServlet?action=delete&authorId=${author.uuid}">Delete</a></td>
         </tr>
     </c:forEach>
 </table>
@@ -51,8 +51,8 @@
             <tr>
                 <td>${article.uuid}</td>
                 <td>${article.text}</td>
-                <td><a href="editArticle?action=update?articleId=${article.uuid}">Update</a></td>
-                <td><a href="deleteArticle?action=delete?articleId=${article.uuid}">Delete</a></td>
+                <td><a href="/AuthorServlet?action=updateArticle&articleId=${article.uuid}&authorId=${author.uuid}">Update</a></td>
+                <td><a href="/AuthorServlet?action=deleteArticle&articleId=${article.uuid}&authorId=${author.uuid}">Delete</a></td>
             </tr>
         </c:forEach>
     </table>

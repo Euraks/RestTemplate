@@ -1,3 +1,4 @@
+<jsp:useBean id="authorEntity" scope="request" type="org.example.model.AuthorEntity"/>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
@@ -10,10 +11,10 @@
 
 <h1>Create Author and Articles</h1>
 
-<form action="AuthorServlet" method="post">
+<form action="${pageContext.request.contextPath}/AuthorServlet?action=${action}" method="post">
   <input type="hidden" name="action" value="create">
-  Author ID: <input type="text" name="authorId"><br>
-  Author Name: <input type="text" name="authorName"><br>
+  Author ID: <input type="text" value="${authorEntity.uuid}" name="authorId"><br>
+  Author Name: <input type="text" value="${authorEntity.authorName}" name="authorName"><br>
 
   Articles: <br>
   <div id="articles">

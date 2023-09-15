@@ -13,7 +13,7 @@
 <br>
 
 <p>Table SimpleEntity's</p>
-<table border="1" cellpadding="8" cellspacing="0">
+<table border="1">
     <thead>
     <tr>
         <th>UUid</th>
