@@ -25,6 +25,11 @@ public class AuthorEntityService implements Service<AuthorEntity, UUID> {
         return repository.findById( uuid );
     }
 
+
+    public Article findArticleById(UUID uuid) {
+        return repository.findArticleById( uuid );
+    }
+
     @Override
     public List<AuthorEntity> findAll() {
         return repository.findAll();

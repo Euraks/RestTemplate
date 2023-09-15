@@ -7,6 +7,9 @@
 </head>
 <body>
 
+<h1>Simple Entitys</h1>
+<br>
+<h3><a href="index.jsp">Home</a></h3>
 <br>
 <p> <a href="simple?action=create">Add Simple Entity's Page</a> </p>
 <br />

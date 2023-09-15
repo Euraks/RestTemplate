@@ -1,4 +1,3 @@
-<jsp:useBean id="authorEntity" scope="request" type="org.example.model.AuthorEntity"/>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
@@ -8,19 +7,21 @@
   <title>Create Author and Articles</title>
 </head>
 <body>
-
 <h1>Create Author and Articles</h1>
+<br>
+<h3><a href="index.jsp">Home</a></h3>
+<br>
 
+<p>New Author and article</p>
 <form action="${pageContext.request.contextPath}/AuthorServlet?action=${action}" method="post">
-  <input type="hidden" name="action" value="create">
-  Author ID: <input type="text" value="${authorEntity.uuid}" name="authorId"><br>
-  Author Name: <input type="text" value="${authorEntity.authorName}" name="authorName"><br>
+  Author ID: <input type="text" value="${authorEntity!=null?authorEntity.uuid:0}" name="authorId"><br>
+  Author Name: <input type="text" value="${authorEntity!=null?authorEntity.authorName:"Input Name"}" name="authorName"><br>
 
   Articles: <br>
   <div id="articles">
     <div>
-      Article ID: <input type="text" name="articleIds"><br>
-      Article Text: <input type="text" name="articleTexts"><br>
+      Article ID: <input type="text" value="${article!=null?authorEntity.uuid:0}" name="articleIds"><br>
+      Article Text: <input type="text" value="${article!=null?article.text:"Input text"}" name="articleTexts"><br>
     </div>
   </div>
 

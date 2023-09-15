@@ -7,8 +7,11 @@
     <title>Authors and Articles</title>
 </head>
 <body>
-
 <h1>Authors and Articles</h1>
+<br>
+<h3><a href="index.jsp">Home</a></h3>
+<br>
+<p><a href="AuthorArticlesForm.jsp"> Add new author and servlet page</a> </p>
 
 <table border="1">
     <tr>
@@ -51,15 +54,13 @@
             <tr>
                 <td>${article.uuid}</td>
                 <td>${article.text}</td>
+                <td><a href="/AuthorServlet?action=addArticle&authorId=${author.uuid}">Add</a></td>
                 <td><a href="/AuthorServlet?action=updateArticle&articleId=${article.uuid}&authorId=${author.uuid}">Update</a></td>
                 <td><a href="/AuthorServlet?action=deleteArticle&articleId=${article.uuid}&authorId=${author.uuid}">Delete</a></td>
             </tr>
         </c:forEach>
     </table>
 </c:forEach>
-
-<p><a href="AuthorArticlesForm.jsp"> Author and Servlet Page</a> </p>
-
 </body>
 </html>
 

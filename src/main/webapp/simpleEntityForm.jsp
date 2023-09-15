@@ -4,8 +4,13 @@
     <title>SimpleEntity Form</title>
 </head>
 <body>
+
+<h1>Simple Entitys</h1>
+<br>
+<h3><a href="index.jsp">Home</a></h3>
+<br>
+
 <section>
-    <h3><a href="index.jsp">Home</a></h3>
     <br>
     <h2>${action == 'create' ? 'Create SimpleEntity' : 'Update SimpleEntity'}</h2>
     <form method="post" action="${pageContext.request.contextPath}/simple?action=${action}">
