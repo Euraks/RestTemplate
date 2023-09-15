@@ -32,7 +32,7 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
                 authorEntity.setAuthorName(resultSet.getString("authorName"));
 
                 List<Article> articles = findArticlesByAuthorId(id, connection);
-                authorEntity.setInnerEntityList(articles);
+                authorEntity.setArticleList(articles);
 
                 return authorEntity;
             }
@@ -107,10 +107,10 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
 
                     AuthorEntity author = authorsMap.get(authorId);
                     if (author != null) {
-                        if (author.getInnerEntityList() == null) {
-                            author.setInnerEntityList(new ArrayList<>());
+                        if (author.getArticleList() == null) {
+                            author.setArticleList(new ArrayList<>());
                         }
-                        author.getInnerEntityList().add(article);
+                        author.getArticleList().add(article);
                     }
                 }
             }
@@ -136,7 +136,7 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
             String sqlArticle = "INSERT INTO Article (id, author_id, text) VALUES (?, ?, ?)";
             try (PreparedStatement psArticle = connection.prepareStatement( sqlArticle )){
 
-                for (Article article : authorEntity.getInnerEntityList()) {
+                for (Article article : authorEntity.getArticleList()) {
                     psArticle.setObject( 1, article.getUuid() );
                     psArticle.setObject( 2, authorEntity.getUuid() );
                     psArticle.setString( 3, article.getText() );
@@ -170,7 +170,7 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
             String updateArticleSQL = "UPDATE Article SET text = ? WHERE id = ? AND author_id = ?";
             try (PreparedStatement updateArticleStmt = connection.prepareStatement(updateArticleSQL)) {
 
-                for (Article article : authorEntity.getInnerEntityList()) {
+                for (Article article : authorEntity.getArticleList()) {
                     updateArticleStmt.setString(1, article.getText());
                     updateArticleStmt.setObject(2, article.getUuid());
                     updateArticleStmt.setObject(3, authorEntity.getUuid());

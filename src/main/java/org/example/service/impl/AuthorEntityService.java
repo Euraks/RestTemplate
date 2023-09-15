@@ -39,18 +39,4 @@ public class AuthorEntityService implements Service<AuthorEntity, UUID> {
     public void update(AuthorEntity authorEntity) {
         repository.update( authorEntity );
     }
-
-    public static void main(String[] args) {
-        AuthorEntity authorEntity = new AuthorEntity();
-        authorEntity.setUuid( UUID.randomUUID() );
-        authorEntity.setAuthorName( "Author 1" );
-        List<Article> articleList = Arrays.asList( new Article(UUID.randomUUID(), "Article 1" ),
-                new Article( UUID.randomUUID(),"Article 2" ),
-                new Article( UUID.randomUUID(),"Article 3" ),
-                new Article( UUID.randomUUID(),"Article 4" ) );
-        authorEntity.setInnerEntityList( articleList );
-
-        AuthorEntityService service = new AuthorEntityService();
-        service.save( authorEntity );
-    }
 }
