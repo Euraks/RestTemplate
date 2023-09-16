@@ -26,12 +26,12 @@ public class AuthorServlet extends HttpServlet {
         if ("update".equals( action )) {
             UUID authorId = UUID.fromString( req.getParameter( "authorId" ) );
             AuthorEntity authorEntity = service.findById( authorId );
-            req.setAttribute( "authorEntity", authorEntity );
+            req.setAttribute( "author", authorEntity );
             req.getRequestDispatcher( "AuthorForm.jsp" ).forward( req, resp ); // addArticle
         } else if ("updateArticle".equals( action )) {
             UUID authorId = UUID.fromString( req.getParameter( "authorId" ) );
             AuthorEntity authorEntity = service.findById( authorId );
-            req.setAttribute( "authorEntity", authorEntity );
+            req.setAttribute( "author", authorEntity );
             UUID articleId = UUID.fromString( req.getParameter( "articleId" ) );
             Article article = service.findArticleById( articleId );
             req.setAttribute( "article", article );
@@ -39,8 +39,8 @@ public class AuthorServlet extends HttpServlet {
         } else if ("addArticle".equals( action )) {
             UUID authorId = UUID.fromString( req.getParameter( "authorId" ) );
             AuthorEntity authorEntity = service.findById( authorId );
-            req.setAttribute( "authorEntity", authorEntity );
-            req.setAttribute( "action","addArticle" );
+            req.setAttribute( "author", authorEntity );
+            req.setAttribute( "action", "addArticle" );
             UUID articleId = UUID.randomUUID();
             Article article = new Article();
             article.setUuid( articleId );
@@ -76,17 +76,22 @@ public class AuthorServlet extends HttpServlet {
             service.save( authorEntity );
 
             resp.sendRedirect( "/AuthorServlet" );
-        } else {
-            if ("addArticle".equals( action )){
-                UUID authorId = UUID.fromString( req.getParameter( "authorId" ) );
-                AuthorEntity authorEntity = service.findById( authorId );
-                String articleTexts = req.getParameter( "articleTexts" );
-                List<Article> articles = authorEntity.getArticleList();
-                articles.add( new Article( UUID.randomUUID(), articleTexts ) );
-                authorEntity.setArticleList( articles );
-                service.save( authorEntity );
-                resp.sendRedirect( "/AuthorServlet" );
-            }
+        } else if ("addArticle".equals( action )) {
+            UUID authorId = UUID.fromString( req.getParameter( "authorId" ) );
+            AuthorEntity authorEntity = service.findById( authorId );
+            String articleTexts = req.getParameter( "articleTexts" );
+            List<Article> articles = authorEntity.getArticleList();
+            articles.add( new Article( UUID.randomUUID(), articleTexts ) );
+            authorEntity.setArticleList( articles );
+            service.save( authorEntity );
+            resp.sendRedirect( "/AuthorServlet" );
+        } else if ("updateAuthor".equals( action )) {
+            UUID authorId = UUID.fromString( req.getParameter( "authorId" ) );
+            AuthorEntity authorEntity = service.findById( authorId );
+            String authorName = req.getParameter( "authorName" );
+            authorEntity.setAuthorName( authorName );
+            service.save( authorEntity );
+            resp.sendRedirect( "/AuthorServlet" );
         }
     }
 }

@@ -17,10 +17,11 @@
 <h3><a href="index.jsp">Home</a></h3>
 <br>
 
-<form action="${pageContext.request.contextPath}/AuthorServlet?action=createAuthor" method="post">
+<form action="${pageContext.request.contextPath}/AuthorServlet?action=updateAuthor&authorId=${author.uuid}" method="post">
     <input type="hidden" name="action" value="create">
-    Author ID: <input type="text" value="${authorEntity.uuid}" name="authorId"><br>
-    Author Name: <input type="text" value="${authorEntity.authorName}" name="authorName"><br>
+    Author ID: <input type="text" value="${author.uuid}" name="authorId"><br>
+    Author Name: <input type="text" value="${author.authorName}" name="authorName"><br>
+    <input type="submit" value="Create">
 </form>
 
 </body>

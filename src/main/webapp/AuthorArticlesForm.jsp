@@ -14,13 +14,13 @@
 
 <p>New Author and article</p>
 <form action="${pageContext.request.contextPath}/AuthorServlet?action=${action}" method="post">
-  Author ID: <input type="text" value="${authorEntity!=null?authorEntity.uuid:0}" name="authorId"><br>
-  Author Name: <input type="text" value="${authorEntity!=null?authorEntity.authorName:"Input Name"}" name="authorName"><br>
+  Author ID: <input type="text" value="${author!=null?author.uuid:0}" name="authorId"><br>
+  Author Name: <input type="text" value="${author!=null?author.authorName:"Input Name"}" name="authorName"><br>
 
   Articles: <br>
   <div id="articles">
     <div>
-      Article ID: <input type="text" value="${article!=null?authorEntity.uuid:0}" name="articleIds"><br>
+      Article ID: <input type="text" value="${author!=null?author.uuid:0}" name="articleIds"><br>
       Article Text: <input type="text" value="${article!=null?article.text:"Input text"}" name="articleTexts"><br>
     </div>
   </div>

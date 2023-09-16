@@ -11,7 +11,7 @@
 <br>
 <h3><a href="index.jsp">Home</a></h3>
 <br>
-<p><a href="AuthorArticlesForm.jsp"> Add new author and servlet page</a> </p>
+<p><a href="AuthorArticlesForm.jsp?action=update"> Add new author and servlet page</a> </p>
 
 <table border="1">
     <tr>
