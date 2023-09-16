@@ -212,4 +212,21 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
         return authorEntity;
     }
 
+    @Override
+    public boolean deleteArticleById(UUID articleId) {
+
+        String sql = "DELETE FROM article WHERE id = ?";
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement( sql )){
+
+            preparedStatement.setObject( 1, articleId );
+
+            int rowsAffected = preparedStatement.executeUpdate();
+
+            return rowsAffected > 0;
+        } catch(SQLException e){
+            throw new RuntimeException( e );
+        }
+    }
+
 }

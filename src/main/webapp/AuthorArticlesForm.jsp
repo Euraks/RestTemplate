@@ -20,7 +20,7 @@
   Articles: <br>
   <div id="articles">
     <div>
-      Article ID: <input type="text" value="${author!=null?author.uuid:0}" name="articleIds"><br>
+      Article ID: <input type="text" value="${article!=null?article.uuid:0}" name="articleIds"><br>
       Article Text: <input type="text" value="${article!=null?article.text:"Input text"}" name="articleTexts"><br>
     </div>
   </div>

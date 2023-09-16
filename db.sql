@@ -17,3 +17,4 @@ CREATE TABLE IF NOT EXISTS Article
     text      TEXT NOT NULL,
     CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES AuthorEntity (id) ON DELETE CASCADE
 );
+
