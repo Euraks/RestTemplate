@@ -11,6 +11,4 @@ public interface SimpleEntityService<T,K> {
     List<T> findAll();
 
     void delete(K k);
-
-    void update(T t);
 }

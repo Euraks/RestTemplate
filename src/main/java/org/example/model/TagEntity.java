@@ -1,10 +1,12 @@
 package org.example.model;
 
+import java.util.List;
 import java.util.UUID;
 
 public class TagEntity {
     private UUID uuid;
     private String tagName;
+    private List<BookEntity> bookEntities;
 
     public TagEntity() {
         this.uuid = UUID.randomUUID();
@@ -24,5 +26,13 @@ public class TagEntity {
 
     public void setTagName(String tagName) {
         this.tagName = tagName;
+    }
+
+    public List<BookEntity> getBookEntities() {
+        return bookEntities;
+    }
+
+    public void setBookEntities(List<BookEntity> bookEntities) {
+        this.bookEntities = bookEntities;
     }
 }

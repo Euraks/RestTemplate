@@ -4,14 +4,14 @@ import org.example.model.SimpleEntity;
 
 import java.util.List;
 
-public interface SimpleRepository<T, K> {
-    T findById(K id);
+public interface Repository<T,K> {
+    T findById(K k);
 
-    boolean deleteById(K id);
+    boolean deleteById(K k);
 
     List<T> findAll();
 
     T save(T t);
 
-    T update(SimpleEntity simpleEntity);
+    T update(T t);
 }

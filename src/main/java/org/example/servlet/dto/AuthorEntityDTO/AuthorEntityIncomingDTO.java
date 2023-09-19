@@ -3,7 +3,6 @@ package org.example.servlet.dto.AuthorEntityDTO;
 import org.example.model.Article;
 
 import java.util.List;
-import java.util.UUID;
 
 public class AuthorEntityIncomingDTO {
 

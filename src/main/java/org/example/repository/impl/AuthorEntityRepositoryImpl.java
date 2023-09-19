@@ -3,6 +3,7 @@ package org.example.repository.impl;
 import org.example.db.HikariCPDataSource;
 import org.example.model.Article;
 import org.example.model.AuthorEntity;
+import org.example.model.SimpleEntity;
 import org.example.repository.AuthorEntityRepository;
 
 import java.sql.Connection;
@@ -42,7 +43,7 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
     }
 
     public Article findArticleById(UUID id) {
-        String sql = "SELECT id, text FROM article WHERE id = ?";
+        String sql = "SELECT id, author_id, text FROM article WHERE id = ?";
         try (Connection connection = connectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement( sql )){
             preparedStatement.setObject( 1, id );
@@ -50,6 +51,7 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
             if (resultSet.next()) {
                 Article article = new Article();
                 article.setUuid( (UUID) resultSet.getObject( "id" ) );
+                article.setAuthor_uuid( (UUID) resultSet.getObject( "author_id" ) );
                 article.setText( resultSet.getString( "text" ) );
 
                 return article;
@@ -60,21 +62,17 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
         return null;
     }
 
-    @Override
-    public Article getNewArticle() {
-        return null;
-    }
-
 
     private List<Article> findArticlesByAuthorId(UUID authorId, Connection connection) throws SQLException {
         List<Article> articles = new ArrayList<>();
-        String sql = "SELECT id, text FROM Article WHERE author_id = ?";
+        String sql = "SELECT id ,author_id , text FROM Article WHERE author_id = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement( sql )){
             preparedStatement.setObject( 1, authorId );
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 Article article = new Article();
                 article.setUuid( (UUID) resultSet.getObject( "id" ) );
+                article.setAuthor_uuid( (UUID) resultSet.getObject( "author_id" ) );
                 article.setText( resultSet.getString( "text" ) );
                 articles.add( article );
             }
@@ -105,7 +103,7 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
         String articlesSql = "SELECT * FROM Article";
 
         try (Connection connection = connectionManager.getConnection()){
-            // Запрос для авторов
+
             try (PreparedStatement preparedStatement = connection.prepareStatement( authorsSql );
                  ResultSet resultSet = preparedStatement.executeQuery()){
                 while (resultSet.next()) {
@@ -127,6 +125,7 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
 
                     Article article = new Article();
                     article.setUuid( uuid );
+                    article.setAuthor_uuid( authorId );
                     article.setText( text );
 
                     AuthorEntity author = authorsMap.get( authorId );
@@ -147,7 +146,7 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
 
     @Override
     public AuthorEntity save(AuthorEntity authorEntity) {
-        String sqlAuthor = "INSERT INTO AuthorEntity (id, authorName) " +
+        String sqlAuthor = "INSERT INTO AuthorEntity (id,  authorName) " +
                 "VALUES (?, ?) ON CONFLICT (id) DO UPDATE\n" +
                 "SET authorName = EXCLUDED.authorName;";
         try (Connection connection = connectionManager.getConnection();

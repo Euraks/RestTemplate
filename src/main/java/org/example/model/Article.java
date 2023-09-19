@@ -4,6 +4,7 @@ import java.util.UUID;
 
 public class Article {
     private UUID uuid;
+    private UUID author_uuid;
     private String text;
 
     public Article() {
@@ -12,6 +13,14 @@ public class Article {
     public Article(UUID uuid, String text) {
         this.uuid = uuid;
         this.text = text;
+    }
+
+    public UUID getAuthor_uuid() {
+        return author_uuid;
+    }
+
+    public void setAuthor_uuid(UUID author_uuid) {
+        this.author_uuid = author_uuid;
     }
 
     public UUID getUuid() {

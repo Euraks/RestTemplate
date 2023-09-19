@@ -1,6 +1,7 @@
 package org.example.servlet.dto.AuthorEntityDTO.mapper;
 
 
+import org.example.model.Article;
 import org.example.model.AuthorEntity;
 import org.example.servlet.dto.AuthorEntityDTO.AuthorEntityAllOutGoingDTO;
 import org.example.servlet.dto.AuthorEntityDTO.AuthorEntityIncomingDTO;
@@ -9,7 +10,9 @@ import org.example.servlet.dto.AuthorEntityDTO.AuthorEntityUpdateDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Mapper
 public interface AuthorEntityMapper {
@@ -26,10 +29,18 @@ public interface AuthorEntityMapper {
         return authorEntityAllOutGoingDTO;
     }
 
-    default AuthorEntity map(AuthorEntityIncomingDTO authorEntityIncomingDTO){
+    default AuthorEntity map(AuthorEntityIncomingDTO authorEntityIncomingDTO) {
         AuthorEntity authorEntity = new AuthorEntity();
         authorEntity.setAuthorName( authorEntityIncomingDTO.getAuthorName() );
-        authorEntity.setArticleList( authorEntityIncomingDTO.getArticleList() );
+        List<Article> articles = new ArrayList<>();
+        for (Article article : authorEntityIncomingDTO.getArticleList()) {
+            if (article.getUuid()==null){
+                article.setUuid( UUID.randomUUID() );
+            }
+            article.setAuthor_uuid( authorEntity.getUuid() );
+            articles.add( article );
+        }
+        authorEntity.setArticleList( articles );
         return authorEntity;
     }
 

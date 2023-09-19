@@ -2,7 +2,7 @@ package org.example.repository.impl;
 
 import org.example.db.HikariCPDataSource;
 import org.example.model.SimpleEntity;
-import org.example.repository.SimpleEntityRepository;
+import org.example.repository.Repository;
 import org.example.repository.mapper.SimpleResultSetMapper;
 
 import java.sql.Connection;
@@ -14,13 +14,13 @@ import java.util.List;
 import java.util.UUID;
 
 
-public class SimpleEntityRepositoryImpl implements SimpleEntityRepository {
+public class SimpleEntityRepositoryImpl implements Repository<SimpleEntity, UUID> {
 
     private final HikariCPDataSource connectionManager = new HikariCPDataSource();
 
     @Override
     public SimpleEntity findById(UUID uuid) {
-        String sql = "SELECT uuid,description FROM simpleentity WHERE uuid='"+uuid.toString()+"'";
+        String sql = "SELECT uuid,description FROM simpleentity WHERE uuid='" + uuid.toString() + "'";
         try (Connection connection = connectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement( sql )){
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -70,7 +70,7 @@ public class SimpleEntityRepositoryImpl implements SimpleEntityRepository {
 
     @Override
     public SimpleEntity save(SimpleEntity simpleEntity) {
-        String sql = "INSERT INTO simpleentity (uuid, description) Values (?, ?) ON CONFLICT (uuid) \n" +
+        String sql = "INSERT INTO simpleentity (uuid, description) VALUES (?, ?) ON CONFLICT (uuid) \n" +
                 "DO UPDATE SET description = EXCLUDED.description;";
         try (Connection connection = connectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement( sql )){
@@ -87,8 +87,8 @@ public class SimpleEntityRepositoryImpl implements SimpleEntityRepository {
     @Override
     public SimpleEntity update(SimpleEntity simpleEntity) {
         String sql = "UPDATE simpleentity " +
-                "SET description='"+simpleEntity.getDescription()+"' " +
-                "WHERE uuid='"+simpleEntity.getUuid()+"';";
+                "SET description='" + simpleEntity.getDescription() + "' " +
+                "WHERE uuid='" + simpleEntity.getUuid() + "';";
         try (Connection connection = connectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement( sql )){
             preparedStatement.executeUpdate();

@@ -6,15 +6,13 @@ import org.example.repository.AuthorEntityRepository;
 import org.example.repository.impl.AuthorEntityRepositoryImpl;
 import org.example.service.AuthorEntityService;
 
-
 import java.util.List;
 import java.util.UUID;
 
 
-
 public class AuthorEntityServiceImpl implements AuthorEntityService<AuthorEntity, UUID> {
 
-    private AuthorEntityRepository<AuthorEntity,UUID> repository = new AuthorEntityRepositoryImpl();
+    private AuthorEntityRepository<AuthorEntity, UUID> repository = new AuthorEntityRepositoryImpl();
 
     @Override
     public AuthorEntity save(AuthorEntity authorEntity) {
@@ -57,6 +55,6 @@ public class AuthorEntityServiceImpl implements AuthorEntityService<AuthorEntity
 
     @Override
     public void deleteArticleById(UUID articleId) {
-        repository.deleteArticleById(articleId);
+        repository.deleteArticleById( articleId );
     }
 }

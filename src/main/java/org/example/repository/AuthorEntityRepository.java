@@ -1,25 +1,14 @@
 package org.example.repository;
 
 import org.example.model.Article;
+import org.example.model.AuthorEntity;
 
-import java.util.List;
 import java.util.UUID;
 
-public interface AuthorEntityRepository<T,K> {
-    T findById(K id);
+public interface AuthorEntityRepository<T, K> extends Repository<AuthorEntity, UUID> {
 
-    boolean deleteById(K id);
+    boolean deleteArticleById(K k);
 
-    List<T> findAll();
+    Article findArticleById(K k);
 
-    T save(T t);
-
-    T update(T t);
-
-    boolean deleteArticleById(UUID articleId);
-
-    Article findArticleById(UUID uuid);
-
-
-    Article getNewArticle();
 }

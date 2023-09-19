@@ -52,14 +52,14 @@ public class AuthorsId extends HttpServlet {
             String[] pathParts = pathInfo.split( "/" );
             if (pathParts.length > 1) {
                 StringBuilder sb = getStringFromRequest( request );
-
+                UUID authorId = UUID.fromString( pathParts[1]);
                 String json = sb.toString();
 
                 ObjectMapper objectMapper = new ObjectMapper();
                 AuthorEntityUpdateDTO authorEntityUpdateDTO = objectMapper.readValue( json, AuthorEntityUpdateDTO.class );
 
                 AuthorEntity updateAuthorEntity = AuthorEntityMapper.INSTANCE.map( authorEntityUpdateDTO );
-                AuthorEntity newAuthorEntity = service.findById( updateAuthorEntity.getUuid() );
+                AuthorEntity newAuthorEntity = service.findById( authorId );
                 newAuthorEntity.setAuthorName( updateAuthorEntity.getAuthorName() );
                 newAuthorEntity.setArticleList( updateAuthorEntity.getArticleList() );
                 service.save( newAuthorEntity);

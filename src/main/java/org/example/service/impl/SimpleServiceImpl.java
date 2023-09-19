@@ -1,16 +1,17 @@
 package org.example.service.impl;
 
 import org.example.model.SimpleEntity;
-import org.example.repository.SimpleEntityRepository;
+import org.example.repository.Repository;
 import org.example.repository.impl.SimpleEntityRepositoryImpl;
 import org.example.service.SimpleEntityService;
-
 
 import java.util.List;
 import java.util.UUID;
 
-public class SimpleServiceImpl implements SimpleEntityService<SimpleEntity,UUID> {
-    private final SimpleEntityRepository repository = new SimpleEntityRepositoryImpl();;
+public class SimpleServiceImpl implements SimpleEntityService<SimpleEntity, UUID> {
+    private final Repository<SimpleEntity, UUID> repository = new SimpleEntityRepositoryImpl();
+    ;
+
     @Override
     public SimpleEntity save(SimpleEntity simpleEntity) {
         repository.save( simpleEntity );
@@ -30,10 +31,5 @@ public class SimpleServiceImpl implements SimpleEntityService<SimpleEntity,UUID>
     @Override
     public void delete(UUID uuid) {
         repository.deleteById( uuid );
-    }
-
-    @Override
-    public void update(SimpleEntity simpleEntity) {
-        repository.update(simpleEntity);
     }
 }
