@@ -7,6 +7,7 @@ public class TagEntity {
     private String tagName;
 
     public TagEntity() {
+        this.uuid = UUID.randomUUID();
     }
 
     public UUID getUuid() {

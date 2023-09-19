@@ -4,6 +4,8 @@ package org.example.servlet.dto.AuthorEntityDTO.mapper;
 import org.example.model.AuthorEntity;
 import org.example.servlet.dto.AuthorEntityDTO.AuthorEntityAllOutGoingDTO;
 import org.example.servlet.dto.AuthorEntityDTO.AuthorEntityIncomingDTO;
+import org.example.servlet.dto.AuthorEntityDTO.AuthorEntityOutGoingDTO;
+import org.example.servlet.dto.AuthorEntityDTO.AuthorEntityUpdateDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -14,7 +16,9 @@ public interface AuthorEntityMapper {
 
     AuthorEntityMapper INSTANCE = Mappers.getMapper( AuthorEntityMapper.class );
 
+    AuthorEntityOutGoingDTO map(AuthorEntity authorEntity);
 
+    AuthorEntity map(AuthorEntityUpdateDTO authorEntityUpdateDTO);
 
     default AuthorEntityAllOutGoingDTO mapListToDto(List<AuthorEntity> simpleEntityList) {
         AuthorEntityAllOutGoingDTO authorEntityAllOutGoingDTO = new AuthorEntityAllOutGoingDTO();

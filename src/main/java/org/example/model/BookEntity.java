@@ -7,6 +7,7 @@ public class BookEntity {
     private String bookText;
 
     public BookEntity() {
+        this.uuid = UUID.randomUUID();
     }
 
     public UUID getUuid() {

@@ -1,13 +1,16 @@
-package org.example.servlet.simpleEntityServlets;
+package org.example.servlet.AuthorServlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
+import jakarta.servlet.annotation.*;
+import org.example.model.AuthorEntity;
 import org.example.model.SimpleEntity;
-import org.example.service.impl.SimpleServiceImpl;
+import org.example.service.AuthorEntityService;
+import org.example.service.impl.AuthorEntityServiceImpl;
+import org.example.servlet.dto.AuthorEntityDTO.AuthorEntityOutGoingDTO;
+import org.example.servlet.dto.AuthorEntityDTO.AuthorEntityUpdateDTO;
+import org.example.servlet.dto.AuthorEntityDTO.mapper.AuthorEntityMapper;
 import org.example.servlet.dto.SimpleEntityDTO.SimpleEntityOutGoingDTO;
 import org.example.servlet.dto.SimpleEntityDTO.SimpleEntityUpdateDTO;
 import org.example.servlet.dto.SimpleEntityDTO.mapper.SimpleDtoMapper;
@@ -16,21 +19,24 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.UUID;
 
-@WebServlet(name = "SimplesId", value = "/simples/*")
-public class SimplesId extends HttpServlet {
+@WebServlet(name = "AuthorsId", value = "/authors/*")
+public class AuthorsId extends HttpServlet {
+
     ObjectMapper mapper = new ObjectMapper();
-    private final SimpleServiceImpl service = new SimpleServiceImpl();
+    private final AuthorEntityService<AuthorEntity, UUID> service = new AuthorEntityServiceImpl();
+
+
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String pathInfo = request.getPathInfo();
         if (pathInfo != null && !pathInfo.isEmpty()) {
             String[] pathParts = pathInfo.split( "/" );
             if (pathParts.length > 1) {
                 String id = pathParts[1];
-                SimpleEntity simpleEntity = service.findById( UUID.fromString( id ) );
-                SimpleEntityOutGoingDTO simpleEntityOutGoingDTO = SimpleDtoMapper.INSTANCE.map( simpleEntity );
-                String jsonString = mapper.writeValueAsString( simpleEntityOutGoingDTO );
+                AuthorEntity authorEntity = service.findById( UUID.fromString( id ) );
+                 AuthorEntityOutGoingDTO authorEntityOutGoingDTO = AuthorEntityMapper.INSTANCE.map( authorEntity);
+                String jsonString = mapper.writeValueAsString( authorEntityOutGoingDTO );
                 response.setContentType( "application/json" );
                 response.setCharacterEncoding( "UTF-8" );
                 response.getWriter().write("Get SimpleEntity UUID:"+ jsonString );
@@ -50,12 +56,13 @@ public class SimplesId extends HttpServlet {
                 String json = sb.toString();
 
                 ObjectMapper objectMapper = new ObjectMapper();
-                SimpleEntityUpdateDTO simpleEntityUpdateDTO = objectMapper.readValue( json, SimpleEntityUpdateDTO.class );
+                AuthorEntityUpdateDTO authorEntityUpdateDTO = objectMapper.readValue( json, AuthorEntityUpdateDTO.class );
 
-                SimpleEntity updateSimpleEntity = SimpleDtoMapper.INSTANCE.map( simpleEntityUpdateDTO );
-                SimpleEntity newSimpleEntity = service.findById( updateSimpleEntity.getUuid() );
-                newSimpleEntity.setDescription( updateSimpleEntity.getDescription() );
-                service.save( newSimpleEntity );
+                AuthorEntity updateAuthorEntity = AuthorEntityMapper.INSTANCE.map( authorEntityUpdateDTO );
+                AuthorEntity newAuthorEntity = service.findById( updateAuthorEntity.getUuid() );
+                newAuthorEntity.setAuthorName( updateAuthorEntity.getAuthorName() );
+                newAuthorEntity.setArticleList( updateAuthorEntity.getArticleList() );
+                service.save( newAuthorEntity);
                 response.setContentType( "application/json" );
                 response.setCharacterEncoding( "UTF-8" );
                 response.getWriter().write("Updated SimpleEntity UUID:"+ json );
@@ -74,7 +81,7 @@ public class SimplesId extends HttpServlet {
                 service.delete( UUID.fromString( id ) );
                 response.setContentType( "application/json" );
                 response.setCharacterEncoding( "UTF-8" );
-                response.getWriter().write( "Deleted SimpleEntity UUID:" + id );
+                response.getWriter().write("Delete SimpleEntity UUID:"+ id );
                 return;
             }
         }
