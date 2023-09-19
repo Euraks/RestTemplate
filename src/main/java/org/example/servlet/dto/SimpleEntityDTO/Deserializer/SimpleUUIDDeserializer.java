@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import java.io.IOException;
 import java.util.UUID;
 
-public class CustomUUIDDeserializer extends JsonDeserializer<UUID> {
+public class SimpleUUIDDeserializer extends JsonDeserializer<UUID> {
     @Override
     public UUID deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         String value = jsonParser.getValueAsString();

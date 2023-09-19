@@ -1,25 +1,14 @@
-package org.example.model;
+package org.example.servlet.dto.AuthorEntityDTO;
+
+import org.example.model.Article;
 
 import java.util.List;
 import java.util.UUID;
 
+public class AuthorEntityIncomingDTO {
 
-public class AuthorEntity {
-    private UUID uuid;
     private String authorName;
     private List<Article> articleList;
-
-    public AuthorEntity() {
-        this.uuid = UUID.randomUUID();
-    }
-
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
-    }
 
     public String getAuthorName() {
         return authorName;
@@ -37,4 +26,3 @@ public class AuthorEntity {
         this.articleList = articleList;
     }
 }
-

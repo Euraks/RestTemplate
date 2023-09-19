@@ -7,18 +7,22 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.model.AuthorEntity;
-import org.example.service.impl.AuthorEntityService;
+import org.example.service.AuthorEntityService;
+import org.example.service.impl.AuthorEntityServiceImpl;
 import org.example.servlet.dto.AuthorEntityDTO.AuthorEntityAllOutGoingDTO;
+import org.example.servlet.dto.AuthorEntityDTO.AuthorEntityIncomingDTO;
 import org.example.servlet.dto.AuthorEntityDTO.mapper.AuthorEntityMapper;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @WebServlet(name = "Authors", value = "/authors")
 public class Authors extends HttpServlet {
 
     ObjectMapper mapper = new ObjectMapper();
-    private final AuthorEntityService service = new AuthorEntityService();
+    private final AuthorEntityService<AuthorEntity, UUID> service = new AuthorEntityServiceImpl();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -32,6 +36,28 @@ public class Authors extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        StringBuilder sb = getStringFromRequest( request );
 
+        String json = sb.toString();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        AuthorEntityIncomingDTO authorEntityIncomingDTO = objectMapper.readValue( json, AuthorEntityIncomingDTO.class );
+
+        AuthorEntity authorEntity = AuthorEntityMapper.INSTANCE.map( authorEntityIncomingDTO );
+        service.save( authorEntity );
+        response.getWriter().write( "Added SimpleEntity UUID:" + authorEntity.getUuid() );
+        response.setContentType( "text/plain" );
+        response.setCharacterEncoding( "UTF-8" );
+    }
+
+    private StringBuilder getStringFromRequest(HttpServletRequest request) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        String line;
+        try (BufferedReader reader = request.getReader()){
+            while ((line = reader.readLine()) != null) {
+                sb.append( line );
+            }
+        }
+        return sb;
     }
 }

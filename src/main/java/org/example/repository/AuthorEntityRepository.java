@@ -1,5 +1,7 @@
 package org.example.repository;
 
+import org.example.model.Article;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -15,4 +17,9 @@ public interface AuthorEntityRepository<T,K> {
     T update(T t);
 
     boolean deleteArticleById(UUID articleId);
+
+    Article findArticleById(UUID uuid);
+
+
+    Article getNewArticle();
 }

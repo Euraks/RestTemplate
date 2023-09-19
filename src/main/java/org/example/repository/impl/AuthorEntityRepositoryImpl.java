@@ -60,6 +60,11 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
         return null;
     }
 
+    @Override
+    public Article getNewArticle() {
+        return null;
+    }
+
 
     private List<Article> findArticlesByAuthorId(UUID authorId, Connection connection) throws SQLException {
         List<Article> articles = new ArrayList<>();

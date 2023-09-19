@@ -2,17 +2,19 @@ package org.example.service.impl;
 
 import org.example.model.Article;
 import org.example.model.AuthorEntity;
+import org.example.repository.AuthorEntityRepository;
 import org.example.repository.impl.AuthorEntityRepositoryImpl;
-import org.example.service.Service;
+import org.example.service.AuthorEntityService;
+
 
 import java.util.List;
 import java.util.UUID;
 
 
 
-public class AuthorEntityService implements Service<AuthorEntity, UUID> {
+public class AuthorEntityServiceImpl implements AuthorEntityService<AuthorEntity, UUID> {
 
-    private AuthorEntityRepositoryImpl repository = new AuthorEntityRepositoryImpl();
+    private AuthorEntityRepository<AuthorEntity,UUID> repository = new AuthorEntityRepositoryImpl();
 
     @Override
     public AuthorEntity save(AuthorEntity authorEntity) {
@@ -25,6 +27,7 @@ public class AuthorEntityService implements Service<AuthorEntity, UUID> {
     }
 
 
+    @Override
     public Article findArticleById(UUID uuid) {
         return repository.findArticleById( uuid );
     }
@@ -44,6 +47,7 @@ public class AuthorEntityService implements Service<AuthorEntity, UUID> {
         repository.update( authorEntity );
     }
 
+    @Override
     public Article getNewArticle() {
         UUID articleId = UUID.randomUUID();
         Article article = new Article();
@@ -51,6 +55,7 @@ public class AuthorEntityService implements Service<AuthorEntity, UUID> {
         return article;
     }
 
+    @Override
     public void deleteArticleById(UUID articleId) {
         repository.deleteArticleById(articleId);
     }

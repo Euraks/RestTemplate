@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.model.SimpleEntity;
+import org.example.service.SimpleEntityService;
 import org.example.service.impl.SimpleServiceImpl;
 import org.example.servlet.dto.SimpleEntityDTO.SimpleEntityAllOutGoingDTO;
 import org.example.servlet.dto.SimpleEntityDTO.SimpleEntityIncomingDTO;
@@ -15,11 +16,12 @@ import org.example.servlet.dto.SimpleEntityDTO.mapper.SimpleDtoMapper;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @WebServlet(name = "Simples", value = "/simples")
 public class Simples extends HttpServlet {
     ObjectMapper mapper = new ObjectMapper();
-    private final SimpleServiceImpl service = new SimpleServiceImpl();
+    private final SimpleEntityService<SimpleEntity, UUID> service = new SimpleServiceImpl();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -42,7 +44,7 @@ public class Simples extends HttpServlet {
 
         SimpleEntity simpleEntity = SimpleDtoMapper.INSTANCE.map( simpleEntityIncomingDTO );
         service.save( simpleEntity );
-        response.getWriter().write( "Added SimpleEntity UUID:"+ simpleEntity.getUuid() );
+        response.getWriter().write( "Added SimpleEntity UUID:" + simpleEntity.getUuid() );
         response.setContentType( "text/plain" );
         response.setCharacterEncoding( "UTF-8" );
 
