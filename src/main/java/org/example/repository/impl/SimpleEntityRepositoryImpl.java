@@ -70,7 +70,8 @@ public class SimpleEntityRepositoryImpl implements SimpleEntityRepository {
 
     @Override
     public SimpleEntity save(SimpleEntity simpleEntity) {
-        String sql = "INSERT INTO simpleentity (uuid, description) Values (?, ?)";
+        String sql = "INSERT INTO simpleentity (uuid, description) Values (?, ?) ON CONFLICT (uuid) \n" +
+                "DO UPDATE SET description = EXCLUDED.description;";
         try (Connection connection = connectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement( sql )){
             preparedStatement.setObject( 1, simpleEntity.getUuid() );

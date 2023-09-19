@@ -1,32 +1,35 @@
 package org.example.servlet;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.example.model.SimpleEntity;
 import org.example.service.impl.SimpleServiceImpl;
 import org.example.servlet.dto.IncomingSimplyDto;
 import org.example.servlet.dto.OutGoingSimplyDto;
 import org.example.servlet.mapper.SimpleDtoMapper;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
 
-@WebServlet(urlPatterns = "/simple")
+@WebServlet(name = "SimpleServlet", value = "/simple")
 public class SimpleServlet extends HttpServlet {
 
+    ObjectMapper mapper = new ObjectMapper();
     private final SimpleServiceImpl service = new SimpleServiceImpl();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String action = req.getParameter("action");
+        String pathInfo = req.getPathInfo();
 
-        switch (action == null ? "all" : action) {
+        switch (pathInfo == null ? "/simples" : pathInfo) {
             case "delete":
                 UUID uuid = getUuid( req );
                 service.delete(uuid);
@@ -35,24 +38,26 @@ public class SimpleServlet extends HttpServlet {
             case "create":
                 SimpleEntity newEntity = new SimpleEntity();
                 OutGoingSimplyDto outGoingSimplyDto = SimpleDtoMapper.INSTANCE.map( newEntity );
-                req.setAttribute( "action",action );
+                req.setAttribute( "action",pathInfo );
                 req.setAttribute("simpleEntity", outGoingSimplyDto );
                 req.getRequestDispatcher("simpleEntityForm.jsp").forward(req, resp);
                 break;
             case "update":
                 SimpleEntity simpleEntity = service.findById(getUuid( req )  );
                 OutGoingSimplyDto updateOutGoingSimplyDto = SimpleDtoMapper.INSTANCE.map( simpleEntity );
-                req.setAttribute( "action",action );
+                req.setAttribute( "action",pathInfo );
                 req.setAttribute("simpleEntity", updateOutGoingSimplyDto );
                 req.getRequestDispatcher("simpleEntityForm.jsp").forward(req, resp);
                 break;
-            case "all":
+            case "/simples":
             default:
-                List<SimpleEntity> simpleEntityList = service.findAll();
-                OutGoingSimplyDto simpleEntityDTO = SimpleDtoMapper.INSTANCE.mapListToDto( simpleEntityList );
-                req.setAttribute( "simpleEntityes",simpleEntityDTO );
-                req.getRequestDispatcher( "simpleEntityes.jsp" ).forward( req,resp );
-                break;
+//                List<SimpleEntity> simpleEntityList = service.findAll();
+//                OutGoingSimplyDto simpleEntityDTO = SimpleDtoMapper.INSTANCE.mapListToDto( simpleEntityList );
+//                String jsonString = mapper.writeValueAsString(simpleEntityDTO);
+//                resp.setContentType( "application/json" );
+//                resp.setCharacterEncoding("UTF-8");
+//                resp.getWriter().write(jsonString);
+//                break;
         }
     }
 
