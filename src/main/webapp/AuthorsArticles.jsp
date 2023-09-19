@@ -21,7 +21,7 @@
 <table border="1">
     <thead>
     <tr>
-        <th>Author UUID</th>
+<%--        <th>Author UUID</th>--%>
         <th>Author Name</th>
         <th>Articles</th>
         <th>Actions</th>
@@ -30,13 +30,13 @@
     <tbody>
     <c:forEach var="author" items="${authors}">
         <tr>
-            <td>${author.uuid}</td>
+<%--            <td>${author.uuid}</td>--%>
             <td>${author.authorName}</td>
             <td>
                 <table border="1">
                     <thead>
                     <tr>
-                        <th>Article UUID</th>
+<%--                        <th>Article UUID</th>--%>
                         <th>Article Text</th>
                         <th>Actions</th>
                     </tr>
@@ -44,7 +44,7 @@
                     <tbody>
                     <c:forEach var="article" items="${author.articleList}">
                         <tr>
-                            <td>${article.uuid}</td>
+<%--                            <td>${article.uuid}</td>--%>
                             <td>${article.text}</td>
                             <td>
                                 <a href="/AuthorServlet?action=addArticle&authorId=${author.uuid}">Add</a>
