@@ -10,7 +10,7 @@ import org.example.model.SimpleEntity;
 import org.example.service.impl.SimpleServiceImpl;
 import org.example.servlet.dto.SimpleEntityDTO.SimpleEntityAllOutGoingDTO;
 import org.example.servlet.dto.SimpleEntityDTO.SimpleEntityIncomingDTO;
-import org.example.servlet.mapper.SimpleDtoMapper;
+import org.example.servlet.dto.SimpleEntityDTO.mapper.SimpleDtoMapper;
 
 import java.io.BufferedReader;
 import java.io.IOException;

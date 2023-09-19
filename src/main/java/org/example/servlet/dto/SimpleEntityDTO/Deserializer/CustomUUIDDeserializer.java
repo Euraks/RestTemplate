@@ -1,4 +1,4 @@
-package org.example.servlet.simpleEntityServlets.Deserializer;
+package org.example.servlet.dto.SimpleEntityDTO.Deserializer;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;

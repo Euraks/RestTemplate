@@ -1,4 +1,4 @@
-package org.example.servlet.mapper;
+package org.example.servlet.dto.SimpleEntityDTO.mapper;
 
 import org.example.model.SimpleEntity;
 
