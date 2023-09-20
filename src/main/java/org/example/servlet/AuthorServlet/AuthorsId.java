@@ -17,13 +17,14 @@ import org.example.servlet.dto.SimpleEntityDTO.mapper.SimpleDtoMapper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.UUID;
 
 @WebServlet(name = "AuthorsId", value = "/authors/*")
 public class AuthorsId extends HttpServlet {
 
     ObjectMapper mapper = new ObjectMapper();
-    private final AuthorEntityService<AuthorEntity, UUID> service = new AuthorEntityServiceImpl();
+    private final AuthorEntityService service = new AuthorEntityServiceImpl();
 
 
 
@@ -62,7 +63,11 @@ public class AuthorsId extends HttpServlet {
                 AuthorEntity newAuthorEntity = service.findById( authorId );
                 newAuthorEntity.setAuthorName( updateAuthorEntity.getAuthorName() );
                 newAuthorEntity.setArticleList( updateAuthorEntity.getArticleList() );
-                service.save( newAuthorEntity);
+                try{
+                    service.save( newAuthorEntity);
+                } catch(SQLException e){
+                    e.printStackTrace();
+                }
                 response.setContentType( "application/json" );
                 response.setCharacterEncoding( "UTF-8" );
                 response.getWriter().write("Updated SimpleEntity UUID:"+ json );

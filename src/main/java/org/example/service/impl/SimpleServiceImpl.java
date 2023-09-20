@@ -3,17 +3,18 @@ package org.example.service.impl;
 import org.example.model.SimpleEntity;
 import org.example.repository.Repository;
 import org.example.repository.impl.SimpleEntityRepositoryImpl;
-import org.example.service.SimpleEntityService;
+import org.example.service.Service;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-public class SimpleServiceImpl implements SimpleEntityService<SimpleEntity, UUID> {
+public class SimpleServiceImpl implements Service<SimpleEntity, UUID> {
     private final Repository<SimpleEntity, UUID> repository = new SimpleEntityRepositoryImpl();
-    ;
+
 
     @Override
-    public SimpleEntity save(SimpleEntity simpleEntity) {
+    public SimpleEntity save(SimpleEntity simpleEntity) throws SQLException {
         repository.save( simpleEntity );
         return simpleEntity;
     }

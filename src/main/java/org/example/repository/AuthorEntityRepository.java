@@ -9,9 +9,5 @@ import java.util.UUID;
 
 public interface AuthorEntityRepository<T, K> extends Repository<AuthorEntity, UUID> {
 
-    boolean deleteArticleById(K k);
-
-    Article findArticleById(K k);
-
     List<Article> findArticlesAll();
 }

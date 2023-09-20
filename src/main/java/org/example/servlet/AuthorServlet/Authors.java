@@ -15,6 +15,7 @@ import org.example.servlet.dto.AuthorEntityDTO.mapper.AuthorEntityMapper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,7 +23,7 @@ import java.util.UUID;
 public class Authors extends HttpServlet {
 
     ObjectMapper mapper = new ObjectMapper();
-    private final AuthorEntityService<AuthorEntity, UUID> service = new AuthorEntityServiceImpl();
+    private final AuthorEntityService service = new AuthorEntityServiceImpl();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -44,7 +45,11 @@ public class Authors extends HttpServlet {
         AuthorEntityIncomingDTO authorEntityIncomingDTO = objectMapper.readValue( json, AuthorEntityIncomingDTO.class );
 
         AuthorEntity authorEntity = AuthorEntityMapper.INSTANCE.map( authorEntityIncomingDTO );
-        service.save( authorEntity );
+        try{
+            service.save( authorEntity );
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
         response.getWriter().write( "Added SimpleEntity UUID:" + authorEntity.getUuid() );
         response.setContentType( "text/plain" );
         response.setCharacterEncoding( "UTF-8" );

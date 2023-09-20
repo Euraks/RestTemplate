@@ -2,6 +2,7 @@ package org.example.repository;
 
 import org.example.model.SimpleEntity;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public interface Repository<T,K> {
@@ -11,7 +12,5 @@ public interface Repository<T,K> {
 
     List<T> findAll();
 
-    T save(T t);
-
-    T update(T t);
+    T save(T t) throws SQLException;
 }

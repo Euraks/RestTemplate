@@ -21,7 +21,7 @@ import java.util.UUID;
 public class Articles extends HttpServlet {
 
     ObjectMapper mapper = new ObjectMapper();
-    private final AuthorEntityService<AuthorEntity, UUID> service = new AuthorEntityServiceImpl();
+    private final AuthorEntityService service = new AuthorEntityServiceImpl();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

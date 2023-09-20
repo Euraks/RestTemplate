@@ -14,6 +14,7 @@ import org.example.servlet.dto.SimpleEntityDTO.mapper.SimpleDtoMapper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.UUID;
 
 @WebServlet(name = "SimplesId", value = "/simples/*")
@@ -45,6 +46,7 @@ public class SimplesId extends HttpServlet {
         if (pathInfo != null && !pathInfo.isEmpty()) {
             String[] pathParts = pathInfo.split( "/" );
             if (pathParts.length > 1) {
+                String id = pathParts[1];
                 StringBuilder sb = getStringFromRequest( request );
 
                 String json = sb.toString();
@@ -53,9 +55,13 @@ public class SimplesId extends HttpServlet {
                 SimpleEntityUpdateDTO simpleEntityUpdateDTO = objectMapper.readValue( json, SimpleEntityUpdateDTO.class );
 
                 SimpleEntity updateSimpleEntity = SimpleDtoMapper.INSTANCE.map( simpleEntityUpdateDTO );
-                SimpleEntity newSimpleEntity = service.findById( updateSimpleEntity.getUuid() );
+                SimpleEntity newSimpleEntity = service.findById( UUID.fromString( id ) );
                 newSimpleEntity.setDescription( updateSimpleEntity.getDescription() );
-                service.save( newSimpleEntity );
+                try{
+                    service.save( newSimpleEntity );
+                } catch(SQLException e){
+                    e.printStackTrace();
+                }
                 response.setContentType( "application/json" );
                 response.setCharacterEncoding( "UTF-8" );
                 response.getWriter().write("Updated SimpleEntity UUID:"+ json );

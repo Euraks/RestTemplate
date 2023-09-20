@@ -7,16 +7,17 @@ import org.example.repository.impl.AuthorEntityRepositoryImpl;
 import org.example.service.AuthorEntityService;
 import org.example.servlet.AuthorServlet.Articles;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
 
-public class AuthorEntityServiceImpl implements AuthorEntityService<AuthorEntity, UUID> {
+public class AuthorEntityServiceImpl implements AuthorEntityService {
 
     private AuthorEntityRepository<AuthorEntity, UUID> repository = new AuthorEntityRepositoryImpl();
 
     @Override
-    public AuthorEntity save(AuthorEntity authorEntity) {
+    public AuthorEntity save(AuthorEntity authorEntity) throws SQLException {
         return repository.save( authorEntity );
     }
 
@@ -25,11 +26,6 @@ public class AuthorEntityServiceImpl implements AuthorEntityService<AuthorEntity
         return repository.findById( uuid );
     }
 
-
-    @Override
-    public Article findArticleById(UUID uuid) {
-        return repository.findArticleById( uuid );
-    }
 
     @Override
     public List<AuthorEntity> findAll() {
@@ -42,25 +38,7 @@ public class AuthorEntityServiceImpl implements AuthorEntityService<AuthorEntity
     }
 
     @Override
-    public void update(AuthorEntity authorEntity) {
-        repository.update( authorEntity );
-    }
-
-    @Override
-    public Article getNewArticle() {
-        UUID articleId = UUID.randomUUID();
-        Article article = new Article();
-        article.setUuid( articleId );
-        return article;
-    }
-
-    @Override
     public List<Article> findArticlesAll() {
         return repository.findArticlesAll();
-    }
-
-    @Override
-    public void deleteArticleById(UUID articleId) {
-        repository.deleteArticleById( articleId );
     }
 }
