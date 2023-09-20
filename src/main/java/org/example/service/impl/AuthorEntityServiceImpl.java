@@ -5,6 +5,7 @@ import org.example.model.AuthorEntity;
 import org.example.repository.AuthorEntityRepository;
 import org.example.repository.impl.AuthorEntityRepositoryImpl;
 import org.example.service.AuthorEntityService;
+import org.example.servlet.AuthorServlet.Articles;
 
 import java.util.List;
 import java.util.UUID;
@@ -51,6 +52,11 @@ public class AuthorEntityServiceImpl implements AuthorEntityService<AuthorEntity
         Article article = new Article();
         article.setUuid( articleId );
         return article;
+    }
+
+    @Override
+    public List<Article> findArticlesAll() {
+        return repository.findArticlesAll();
     }
 
     @Override

@@ -3,8 +3,8 @@ package org.example.repository.impl;
 import org.example.db.HikariCPDataSource;
 import org.example.model.Article;
 import org.example.model.AuthorEntity;
-import org.example.model.SimpleEntity;
 import org.example.repository.AuthorEntityRepository;
+import org.example.servlet.AuthorServlet.Articles;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -60,6 +60,31 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
             throw new RuntimeException( e );
         }
         return null;
+    }
+
+    @Override
+    public List<Article> findArticlesAll() {
+        String articlesSql = "SELECT * FROM Article";
+        List<Article> articles = new ArrayList<>();
+
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement( articlesSql );
+             ResultSet resultSet = preparedStatement.executeQuery()){
+            while (resultSet.next()) {
+                UUID uuid = UUID.fromString( resultSet.getString( "id" ) );
+                UUID authorId = UUID.fromString( resultSet.getString( "author_id" ) );
+                String text = resultSet.getString( "text" );
+
+                Article article = new Article();
+                article.setUuid( uuid );
+                article.setAuthor_uuid( authorId );
+                article.setText( text );
+                articles.add( article );
+            }
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+        return articles;
     }
 
 
