@@ -5,6 +5,7 @@ import org.example.model.TagEntity;
 import org.example.servlet.dto.BookTagDTO.BookAllOutGoingDTO;
 import org.example.servlet.dto.BookTagDTO.BookIncomingDTO;
 import org.example.servlet.dto.BookTagDTO.BookOutGoingDTO;
+import org.example.servlet.dto.BookTagDTO.BookUpdateDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -18,6 +19,8 @@ public interface BookMapper {
     BookMapper INSTANCE = Mappers.getMapper( BookMapper.class );
 
     BookOutGoingDTO map(BookEntity bookEntity);
+
+    BookEntity map(BookUpdateDTO bookUpdateDTO);
 
     default BookAllOutGoingDTO mapListToDto(List<BookEntity> bookEntities) {
         BookAllOutGoingDTO bookAllOutGoingDTO = new BookAllOutGoingDTO();

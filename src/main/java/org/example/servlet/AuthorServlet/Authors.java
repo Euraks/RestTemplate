@@ -26,7 +26,12 @@ public class Authors extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        List<AuthorEntity> authorEntityList = service.findAll();
+        List<AuthorEntity> authorEntityList = null;
+        try{
+            authorEntityList = service.findAll();
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
         AuthorEntityAllOutGoingDTO authorEntityAllOutGoingDTO = AuthorEntityMapper.INSTANCE.mapListToDto( authorEntityList );
         String jsonString = mapper.writeValueAsString( authorEntityAllOutGoingDTO );
         response.setContentType( "application/json" );

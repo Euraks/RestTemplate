@@ -10,7 +10,7 @@ public interface Repository<T,K> {
 
     boolean deleteById(K k);
 
-    List<T> findAll();
+    List<T> findAll() throws SQLException;
 
     T save(T t) throws SQLException;
 }

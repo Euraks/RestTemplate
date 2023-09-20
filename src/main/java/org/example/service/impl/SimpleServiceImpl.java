@@ -25,7 +25,7 @@ public class SimpleServiceImpl implements Service<SimpleEntity, UUID> {
     }
 
     @Override
-    public List<SimpleEntity> findAll() {
+    public List<SimpleEntity> findAll() throws SQLException {
         return repository.findAll();
     }
 

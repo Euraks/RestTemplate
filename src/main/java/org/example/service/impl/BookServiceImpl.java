@@ -24,7 +24,7 @@ public class BookServiceImpl implements Service<BookEntity, UUID> {
     }
 
     @Override
-    public List<BookEntity> findAll() {
+    public List<BookEntity> findAll() throws SQLException {
         return repository.findAll();
     }
 

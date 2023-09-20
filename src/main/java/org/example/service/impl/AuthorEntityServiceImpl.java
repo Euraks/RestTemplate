@@ -28,7 +28,7 @@ public class AuthorEntityServiceImpl implements AuthorEntityService {
 
 
     @Override
-    public List<AuthorEntity> findAll() {
+    public List<AuthorEntity> findAll() throws SQLException {
         return repository.findAll();
     }
 

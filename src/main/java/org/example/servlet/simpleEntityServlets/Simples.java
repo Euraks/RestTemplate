@@ -26,7 +26,12 @@ public class Simples extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<SimpleEntity> simpleEntityList = service.findAll();
+        List<SimpleEntity> simpleEntityList = null;
+        try{
+            simpleEntityList = service.findAll();
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
         SimpleEntityAllOutGoingDTO simpleEntityAllOutGoingDTO = SimpleDtoMapper.INSTANCE.mapListToDto( simpleEntityList );
         String jsonString = mapper.writeValueAsString( simpleEntityAllOutGoingDTO );
         response.setContentType( "application/json" );

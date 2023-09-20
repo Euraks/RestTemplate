@@ -6,16 +6,12 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.model.AuthorEntity;
-import org.example.model.BookEntity;
+import org.example.model.TagEntity;
 import org.example.service.Service;
-import org.example.service.impl.BookServiceImpl;
-import org.example.servlet.dto.AuthorEntityDTO.AuthorEntityAllOutGoingDTO;
-import org.example.servlet.dto.AuthorEntityDTO.AuthorEntityIncomingDTO;
-import org.example.servlet.dto.AuthorEntityDTO.mapper.AuthorEntityMapper;
-import org.example.servlet.dto.BookTagDTO.BookAllOutGoingDTO;
-import org.example.servlet.dto.BookTagDTO.BookIncomingDTO;
-import org.example.servlet.dto.BookTagDTO.mapper.BookMapper;
+import org.example.service.impl.TagServiceImpl;
+import org.example.servlet.dto.BookTagDTO.TagAllOutGoingDTO;
+import org.example.servlet.dto.BookTagDTO.TagIncomingDTO;
+import org.example.servlet.dto.BookTagDTO.mapper.TagMapper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,25 +19,25 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-@WebServlet(name = "Books", value = "/books")
-public class Books extends HttpServlet {
+@WebServlet(name = "Tags", value = "/tags")
+public class Tags extends HttpServlet {
 
     ObjectMapper mapper = new ObjectMapper();
-    private final Service<BookEntity, UUID> service = new BookServiceImpl();
+    private final Service<TagEntity, UUID> service = new TagServiceImpl();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<BookEntity> bookEntities = null;
+        List<TagEntity> tagEntities = null;
         try{
-            bookEntities = service.findAll();
+            tagEntities = service.findAll();
         } catch(SQLException e){
             e.printStackTrace();
         }
-        BookAllOutGoingDTO bookAllIncomingDTO = BookMapper.INSTANCE.mapListToDto( bookEntities );
-        String jsonString = mapper.writeValueAsString( bookAllIncomingDTO );
+        TagAllOutGoingDTO tagAllIncomingDTO = TagMapper.INSTANCE.mapListToDto( tagEntities );
+        String jsonString = mapper.writeValueAsString( tagAllIncomingDTO );
         response.setContentType( "application/json" );
         response.setCharacterEncoding( "UTF-8" );
-        response.getWriter().write( "GetAll BookEntity UUID:" + jsonString );
+        response.getWriter().write( "GetAll TagEntity UUID:" + jsonString );
     }
 
     @Override
@@ -51,15 +47,15 @@ public class Books extends HttpServlet {
         String json = sb.toString();
 
         ObjectMapper objectMapper = new ObjectMapper();
-        BookIncomingDTO bookIncomingDTO = objectMapper.readValue( json, BookIncomingDTO.class );
+        TagIncomingDTO tagIncomingDTO = objectMapper.readValue( json, TagIncomingDTO.class );
 
-        BookEntity bookEntity = BookMapper.INSTANCE.map( bookIncomingDTO );
+        TagEntity tagEntity = TagMapper.INSTANCE.map( tagIncomingDTO );
         try{
-            service.save( bookEntity );
+            service.save( tagEntity );
         } catch(SQLException e){
             e.printStackTrace();
         }
-        response.getWriter().write( "Added BookEntity UUID:" + bookEntity.getUuid() );
+        response.getWriter().write( "Added BookEntity UUID:" + tagEntity.getUuid() );
         response.setContentType( "text/plain" );
         response.setCharacterEncoding( "UTF-8" );
     }

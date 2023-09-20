@@ -9,7 +9,7 @@ public interface Service<T,K> {
 
     T findById(K k);
 
-    List<T> findAll();
+    List<T> findAll() throws SQLException;
 
     void delete(K k);
 }
