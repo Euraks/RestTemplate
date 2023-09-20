@@ -31,7 +31,8 @@ public class TagServiceImpl implements Service<TagEntity, UUID> {
     }
 
     @Override
-    public void delete(UUID uuid) {
+    public boolean delete(UUID uuid) {
         repository.deleteById( uuid );
+        return false;
     }
 }

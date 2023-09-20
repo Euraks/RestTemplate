@@ -17,9 +17,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @WebServlet(name = "TagsId", value = "/tags/*")
 public class TagsId extends HttpServlet {
+
+    private static final Logger LOGGER = Logger.getLogger(TagsId.class.getName());
 
     ObjectMapper mapper = new ObjectMapper();
     private final Service<TagEntity, UUID> service = new TagServiceImpl();
@@ -111,23 +115,36 @@ public class TagsId extends HttpServlet {
     }
 
     @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pathInfo = request.getPathInfo();
+
+        setResponseDefaults(response);
+
         if (pathInfo != null && !pathInfo.isEmpty()) {
             String[] pathParts = pathInfo.split("/");
             if (pathParts.length > 1) {
                 String id = pathParts[1];
-                service.delete(UUID.fromString(id));
-                response.setContentType("application/json");
-                response.setCharacterEncoding("UTF-8");
-                response.getWriter().write("Delete TagEntity UUID:" + id);
+                if (service.delete(UUID.fromString(id))) {
+                    response.getWriter().write("Delete TagEntity UUID:" + id);
+                    LOGGER.log( Level.INFO, "Successfully deleted TagEntity with UUID: {0}", id);
+                } else {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    response.getWriter().write("TagEntity with UUID:" + id + " not found");
+                    LOGGER.log(Level.WARNING, "TagEntity with UUID: {0} not found", id);
+                }
                 return;
             }
         }
+
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         response.getWriter().write("ID is required for deletion");
+        LOGGER.log(Level.WARNING, "ID is required for deletion");
     }
 
-
-
+    private void setResponseDefaults(HttpServletResponse response) {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+    }
 }
+
+

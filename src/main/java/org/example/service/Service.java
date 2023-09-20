@@ -11,5 +11,5 @@ public interface Service<T,K> {
 
     List<T> findAll() throws SQLException;
 
-    void delete(K k);
+    boolean delete(K k);
 }

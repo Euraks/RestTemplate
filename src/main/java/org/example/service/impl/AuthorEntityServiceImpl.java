@@ -5,7 +5,6 @@ import org.example.model.AuthorEntity;
 import org.example.repository.AuthorEntityRepository;
 import org.example.repository.impl.AuthorEntityRepositoryImpl;
 import org.example.service.AuthorEntityService;
-import org.example.servlet.AuthorServlet.Articles;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -33,8 +32,9 @@ public class AuthorEntityServiceImpl implements AuthorEntityService {
     }
 
     @Override
-    public void delete(UUID uuid) {
+    public boolean delete(UUID uuid) {
         repository.deleteById( uuid );
+        return false;
     }
 
     @Override

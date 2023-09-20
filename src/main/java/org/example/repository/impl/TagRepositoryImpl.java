@@ -1,5 +1,6 @@
 package org.example.repository.impl;
 
+import org.example.Main;
 import org.example.db.HikariCPDataSource;
 import org.example.model.BookEntity;
 import org.example.model.TagEntity;
@@ -13,8 +14,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TagRepositoryImpl implements Repository<TagEntity, UUID> {
+
+    private static final Logger LOGGER = Logger.getLogger( Main.class.getName() );
 
 
     private final HikariCPDataSource connectionManager = new HikariCPDataSource();
@@ -67,13 +72,11 @@ public class TagRepositoryImpl implements Repository<TagEntity, UUID> {
             connection = connectionManager.getConnection();
             connection.setAutoCommit(false);
 
-
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     "DELETE FROM Book_Tag WHERE tag_uuid = ?")) {
                 preparedStatement.setObject(1, uuid);
                 preparedStatement.executeUpdate();
             }
-
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     "DELETE FROM tagentity WHERE uuid = ?")) {
@@ -81,6 +84,7 @@ public class TagRepositoryImpl implements Repository<TagEntity, UUID> {
                 int affectedRows = preparedStatement.executeUpdate();
 
                 if (affectedRows == 0) {
+                    connection.rollback();
                     return false;
                 }
             }
@@ -93,21 +97,23 @@ public class TagRepositoryImpl implements Repository<TagEntity, UUID> {
                 try {
                     connection.rollback();
                 } catch (SQLException rollbackException) {
-
+                    LOGGER.log( Level.SEVERE, "Failed to rollback transaction", rollbackException);
                 }
             }
-
+            LOGGER.log(Level.SEVERE, "SQLException encountered while deleting", e);
             return false;
+
         } finally {
             if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException closeException) {
-
+                    LOGGER.log(Level.WARNING, "Failed to close the connection", closeException);
                 }
             }
         }
     }
+
 
 
     @Override
