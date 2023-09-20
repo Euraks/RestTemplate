@@ -85,7 +85,7 @@ public class AuthorsId extends HttpServlet {
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pathInfo = request.getPathInfo();
 
-        setResponseDefaults(response); // Устанавливаем значения по умолчанию для ответа
+        setResponseDefaults(response);
 
         if (pathInfo != null && !pathInfo.isEmpty()) {
             String[] pathParts = pathInfo.split("/");
@@ -101,7 +101,7 @@ public class AuthorsId extends HttpServlet {
                         LOGGER.log(Level.WARNING, "SimpleEntity with UUID: {0} not found", id);
                     }
                     return;
-                } catch (Exception e) {  // Замените Exception на конкретный тип исключения, который может выбросить ваш метод
+                } catch (Exception e) {  
                     e.printStackTrace();
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     response.getWriter().write("Failed to delete SimpleEntity UUID:" + id);
