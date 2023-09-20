@@ -1,25 +1,12 @@
-package org.example.model;
+package org.example.servlet.dto.BookTagDTO;
+
+import org.example.model.TagEntity;
 
 import java.util.List;
-import java.util.UUID;
 
-public class BookEntity {
-    private UUID uuid;
+public class BookIncomingDTO {
     private String bookText;
     private List<TagEntity> tagEntities;
-
-
-    public BookEntity() {
-        this.uuid = UUID.randomUUID();
-    }
-
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
-    }
 
     public String getBookText() {
         return bookText;

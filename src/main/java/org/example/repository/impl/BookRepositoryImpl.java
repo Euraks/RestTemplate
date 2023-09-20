@@ -161,7 +161,7 @@ public class BookRepositoryImpl implements Repository<BookEntity, UUID> {
             connection = connectionManager.getConnection();
             connection.setAutoCommit(false);
 
-            // Сохранить BookEntity
+
             String bookInsertQuery = "INSERT INTO BookEntity (uuid, bookText) VALUES (?, ?) ON CONFLICT (uuid) DO UPDATE SET bookText=EXCLUDED.bookText;;";
             try (PreparedStatement ps = connection.prepareStatement(bookInsertQuery)) {
                 ps.setObject(1, bookEntity.getUuid());

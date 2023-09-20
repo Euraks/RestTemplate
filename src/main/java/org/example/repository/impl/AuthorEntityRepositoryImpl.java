@@ -190,7 +190,8 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
 
                 for (Article article : authorEntity.getArticleList()) {
                     psArticle.setObject( 1, article.getUuid() );
-                    psArticle.setObject( 2, authorEntity.getUuid() );
+                    UUID newUUID = article.getUuid().equals( authorEntity.getUuid() )?authorEntity.getUuid():article.getAuthor_uuid();
+                    psArticle.setObject( 2, newUUID );
                     psArticle.setString( 3, article.getText() );
                     psArticle.executeUpdate();
                 }

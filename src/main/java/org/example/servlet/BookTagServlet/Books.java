@@ -1,4 +1,4 @@
-package org.example.servlet.AuthorServlet;
+package org.example.servlet.BookTagServlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
@@ -7,31 +7,36 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.model.AuthorEntity;
-import org.example.service.AuthorEntityService;
-import org.example.service.impl.AuthorEntityServiceImpl;
+import org.example.model.BookEntity;
+import org.example.service.Service;
+import org.example.service.impl.BookServiceImpl;
 import org.example.servlet.dto.AuthorEntityDTO.AuthorEntityAllOutGoingDTO;
 import org.example.servlet.dto.AuthorEntityDTO.AuthorEntityIncomingDTO;
 import org.example.servlet.dto.AuthorEntityDTO.mapper.AuthorEntityMapper;
+import org.example.servlet.dto.BookTagDTO.BookAllOutGoingDTO;
+import org.example.servlet.dto.BookTagDTO.BookIncomingDTO;
+import org.example.servlet.dto.BookTagDTO.mapper.BookMapper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
-@WebServlet(name = "Authors", value = "/authors")
-public class Authors extends HttpServlet {
+@WebServlet(name = "Books", value = "/books")
+public class Books extends HttpServlet {
 
     ObjectMapper mapper = new ObjectMapper();
-    private final AuthorEntityService service = new AuthorEntityServiceImpl();
+    private final Service<BookEntity, UUID> service = new BookServiceImpl();
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        List<AuthorEntity> authorEntityList = service.findAll();
-        AuthorEntityAllOutGoingDTO authorEntityAllOutGoingDTO = AuthorEntityMapper.INSTANCE.mapListToDto( authorEntityList );
-        String jsonString = mapper.writeValueAsString( authorEntityAllOutGoingDTO );
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        List<BookEntity> bookEntities = service.findAll();
+        BookAllOutGoingDTO bookAllIncomingDTO = BookMapper.INSTANCE.mapListToDto( bookEntities );
+        String jsonString = mapper.writeValueAsString( bookAllIncomingDTO );
         response.setContentType( "application/json" );
         response.setCharacterEncoding( "UTF-8" );
-        response.getWriter().write( "GetAll AuthorEntity UUID:" + jsonString );
+        response.getWriter().write( "GetAll BookEntity UUID:" + jsonString );
     }
 
     @Override
@@ -41,15 +46,15 @@ public class Authors extends HttpServlet {
         String json = sb.toString();
 
         ObjectMapper objectMapper = new ObjectMapper();
-        AuthorEntityIncomingDTO authorEntityIncomingDTO = objectMapper.readValue( json, AuthorEntityIncomingDTO.class );
+        BookIncomingDTO bookIncomingDTO = objectMapper.readValue( json, BookIncomingDTO.class );
 
-        AuthorEntity authorEntity = AuthorEntityMapper.INSTANCE.map( authorEntityIncomingDTO );
+        BookEntity bookEntity = BookMapper.INSTANCE.map( bookIncomingDTO );
         try{
-            service.save( authorEntity );
+            service.save( bookEntity );
         } catch(SQLException e){
             e.printStackTrace();
         }
-        response.getWriter().write( "Added SimpleEntity UUID:" + authorEntity.getUuid() );
+        response.getWriter().write( "Added BookEntity UUID:" + bookEntity.getUuid() );
         response.setContentType( "text/plain" );
         response.setCharacterEncoding( "UTF-8" );
     }
