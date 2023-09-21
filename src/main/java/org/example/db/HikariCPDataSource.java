@@ -13,7 +13,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class HikariCPDataSource implements ConnectionManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger(  HikariCPDataSource.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( HikariCPDataSource.class );
 
 
     private static HikariConfig config;
@@ -28,7 +28,7 @@ public class HikariCPDataSource implements ConnectionManager {
             properties.load( input );
             config = new HikariConfig( properties );
         } catch(IOException e){
-            LOGGER.info( "Message  {}",11 );
+            LOGGER.info( "Message  {}", 11 );
         }
         ds = new HikariDataSource( config );
     }

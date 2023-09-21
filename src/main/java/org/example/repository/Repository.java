@@ -1,11 +1,9 @@
 package org.example.repository;
 
-import org.example.model.SimpleEntity;
-
 import java.sql.SQLException;
 import java.util.List;
 
-public interface Repository<T,K> {
+public interface Repository<T, K> {
     T findById(K k);
 
     boolean deleteById(K k);
