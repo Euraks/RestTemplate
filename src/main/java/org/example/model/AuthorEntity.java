@@ -1,6 +1,7 @@
 package org.example.model;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 
@@ -35,6 +36,28 @@ public class AuthorEntity {
 
     public void setArticleList(List<Article> articleList) {
         this.articleList = articleList;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AuthorEntity)) return false;
+        AuthorEntity that = (AuthorEntity) o;
+        return Objects.equals( getAuthorName(), that.getAuthorName() ) && Objects.equals( getArticleList(), that.getArticleList() );
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash( getAuthorName(), getArticleList() );
+    }
+
+    @Override
+    public String toString() {
+        return "AuthorEntity{" +
+                "uuid=" + uuid +
+                ", authorName='" + authorName + '\'' +
+                ", articleList=" + articleList +
+                '}';
     }
 }
 

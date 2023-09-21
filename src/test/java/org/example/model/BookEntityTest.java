@@ -1,47 +1,65 @@
 package org.example.model;
-
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import java.util.Arrays;
-import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
 class BookEntityTest {
 
-    private BookEntity bookEntity;
-
-    @BeforeEach
-    public void setUp() {
-        bookEntity = new BookEntity();
+    @Test
+    void testConstructor() {
+        BookEntity book = new BookEntity();
+        assertNotNull(book.getUuid());
     }
 
     @Test
-    void testInitialization() {
-        assertNotNull( bookEntity.getUuid(), "UUID should not be null after initialization" );
+    void testGettersAndSetters() {
+        BookEntity book = new BookEntity();
+        UUID uuid = UUID.randomUUID();
+        book.setUuid(uuid);
+        book.setBookText("Test book");
+        book.setTagEntities(Arrays.asList(new TagEntity()));
+
+        assertEquals(uuid, book.getUuid());
+        assertEquals("Test book", book.getBookText());
+        assertEquals(1, book.getTagEntities().size());
     }
 
     @Test
-    void testSetAndGetBookText() {
-        String bookText = "This is a test book text";
-        bookEntity.setBookText( bookText );
-        assertEquals( bookText, bookEntity.getBookText(), "Set and retrieved book text should be the same" );
+    void testEquals() {
+        BookEntity book1 = new BookEntity();
+        book1.setBookText("Test book");
+        book1.setTagEntities(Arrays.asList(new TagEntity()));
+
+        BookEntity book2 = new BookEntity();
+        book2.setBookText("Test book");
+        book2.setTagEntities(Arrays.asList(new TagEntity()));
+
+        assertEquals(book1, book1);
+        assertEquals(book1, book2);
+
+        book2.setBookText("Different text");
+        assertNotEquals(book1, book2);
     }
 
     @Test
-    void testSetAndGetTagEntities() {
-        TagEntity tag1 = new TagEntity();
-        TagEntity tag2 = new TagEntity();
-        List<TagEntity> tags = Arrays.asList( tag1, tag2 );
+    void testHashCode() {
+        BookEntity book1 = new BookEntity();
+        book1.setBookText("Test book");
+        book1.setTagEntities(Arrays.asList(new TagEntity()));
 
-        bookEntity.setTagEntities( tags );
+        BookEntity book2 = new BookEntity();
+        book2.setBookText("Test book");
+        book2.setTagEntities(Arrays.asList(new TagEntity()));
 
-        List<TagEntity> retrievedTags = bookEntity.getTagEntities();
+        assertEquals(book1.hashCode(), book2.hashCode());
+    }
 
-        assertNotNull( retrievedTags, "Tag entities list should not be null" );
-        assertEquals( 2, retrievedTags.size(), "Tag entities list size should be 2" );
-        assertTrue( retrievedTags.contains( tag1 ) && retrievedTags.contains( tag2 ), "Retrieved tags should match the set tags" );
+    @Test
+    void testToString() {
+        BookEntity book = new BookEntity();
+        String expectedString = "BookEntity{uuid=" + book.getUuid() + ", bookText='null', tagEntities=null}";
+        assertEquals(expectedString, book.toString());
     }
 }

@@ -35,14 +35,6 @@ public class SimpleEntity {
     }
 
     @Override
-    public String toString() {
-        return "SimpleEntity{" +
-                "id=" + uuid +
-                ", description='" + description + '\'' +
-                '}';
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof SimpleEntity)) return false;
@@ -54,4 +46,13 @@ public class SimpleEntity {
     public int hashCode() {
         return Objects.hash( getDescription() );
     }
+
+    @Override
+    public String toString() {
+        return "SimpleEntity{" +
+                "id=" + uuid +
+                ", description='" + description + '\'' +
+                '}';
+    }
+
 }

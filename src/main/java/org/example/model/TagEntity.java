@@ -1,6 +1,7 @@
 package org.example.model;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class TagEntity {
@@ -34,5 +35,27 @@ public class TagEntity {
 
     public void setBookEntities(List<BookEntity> bookEntities) {
         this.bookEntities = bookEntities;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TagEntity)) return false;
+        TagEntity tagEntity = (TagEntity) o;
+        return Objects.equals( getTagName(), tagEntity.getTagName() );
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash( getTagName() );
+    }
+
+    @Override
+    public String toString() {
+        return "TagEntity{" +
+                "uuid=" + uuid +
+                ", tagName='" + tagName + '\'' +
+                ", bookEntities=" + bookEntities +
+                '}';
     }
 }

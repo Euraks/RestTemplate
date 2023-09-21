@@ -1,53 +1,44 @@
 package org.example.model;
-
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class AuthorEntityTest {
 
-    private AuthorEntity authorEntity;
-
-    @BeforeEach
-    public void setUp() {
-        authorEntity = new AuthorEntity();
+    @Test
+    void testConstructorInitializesUuid() {
+        AuthorEntity author = new AuthorEntity();
+        assertNotNull(author.getUuid());
     }
 
     @Test
-    void testInitialization() {
-        assertNotNull(authorEntity.getUuid(), "UUID should not be null after initialization");
+    void testEqualsAndHashCode() {
+        AuthorEntity author1 = new AuthorEntity();
+        AuthorEntity author2 = new AuthorEntity();
+
+        author1.setAuthorName("Author Name");
+        author1.setArticleList(Arrays.asList(new Article()));
+
+        author2.setAuthorName("Author Name");
+        author2.setArticleList(Arrays.asList(new Article()));
+
+        assertTrue(author1.equals(author2) && author2.equals(author1));
+        assertEquals(author1.hashCode(), author2.hashCode());
     }
 
     @Test
-    void testSetAndGetUuid() {
-        UUID newUuid = UUID.randomUUID();
-        authorEntity.setUuid(newUuid);
+    void testGettersAndSetters() {
+        AuthorEntity author = new AuthorEntity();
+        UUID uuid = UUID.randomUUID();
+        author.setUuid(uuid);
+        author.setAuthorName("Test Author");
+        author.setArticleList(Arrays.asList(new Article()));
 
-        assertEquals(newUuid, authorEntity.getUuid(), "UUID should match the set value");
-    }
-
-    @Test
-    void testSetAndGetAuthorName() {
-        String name = "Steve Wozniak";
-        authorEntity.setAuthorName(name);
-
-        assertEquals(name, authorEntity.getAuthorName(), "Author name should match the set value");
-    }
-
-    @Test
-    void testSetAndGetArticleList() {
-        Article article1 = new Article(); // предположим, у вас есть конструктор по умолчанию
-        Article article2 = new Article();
-
-        List<Article> articles = Arrays.asList(article1, article2);
-        authorEntity.setArticleList(articles);
-
-        assertEquals(2, authorEntity.getArticleList().size(), "Article list should contain 2 articles");
-        assertTrue(authorEntity.getArticleList().containsAll(articles), "Article list should match the set value");
+        assertEquals(uuid, author.getUuid());
+        assertEquals("Test Author", author.getAuthorName());
+        assertEquals(1, author.getArticleList().size());
     }
 }
