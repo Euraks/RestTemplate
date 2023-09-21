@@ -18,56 +18,63 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @WebServlet(name = "Tags", value = "/tags")
 public class Tags extends HttpServlet {
 
-    ObjectMapper mapper = new ObjectMapper();
+    private static final Logger LOGGER = Logger.getLogger(Tags.class.getName());
+
+    private final ObjectMapper mapper = new ObjectMapper();
     private final Service<TagEntity, UUID> service = new TagServiceImpl();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<TagEntity> tagEntities = null;
-        try{
+        List<TagEntity> tagEntities;
+        try {
             tagEntities = service.findAll();
-        } catch(SQLException e){
-            e.printStackTrace();
+            TagAllOutGoingDTO tagAllIncomingDTO = TagMapper.INSTANCE.mapListToDto(tagEntities);
+            String jsonString = mapper.writeValueAsString(tagAllIncomingDTO);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("GetAll TagEntity UUID:" + jsonString);
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error retrieving all TagEntities", e);
+            throw new ServletException(e);
         }
-        TagAllOutGoingDTO tagAllIncomingDTO = TagMapper.INSTANCE.mapListToDto( tagEntities );
-        String jsonString = mapper.writeValueAsString( tagAllIncomingDTO );
-        response.setContentType( "application/json" );
-        response.setCharacterEncoding( "UTF-8" );
-        response.getWriter().write( "GetAll TagEntity UUID:" + jsonString );
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        StringBuilder sb = getStringFromRequest( request );
-
+        StringBuilder sb = getStringFromRequest(request);
         String json = sb.toString();
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        TagIncomingDTO tagIncomingDTO = objectMapper.readValue( json, TagIncomingDTO.class );
-
-        TagEntity tagEntity = TagMapper.INSTANCE.map( tagIncomingDTO );
-        try{
-            service.save( tagEntity );
-        } catch(SQLException e){
-            e.printStackTrace();
+        try {
+            TagIncomingDTO tagIncomingDTO = mapper.readValue(json, TagIncomingDTO.class);
+            TagEntity tagEntity = TagMapper.INSTANCE.map(tagIncomingDTO);
+            service.save(tagEntity);
+            response.getWriter().write("Added BookEntity UUID:" + tagEntity.getUuid());
+            setResponseDefaults(response, "text/plain");
+        } catch (SQLException e) {
+            LOGGER.log( Level.SEVERE, "Error saving TagEntity", e);
+            throw new ServletException(e);
         }
-        response.getWriter().write( "Added BookEntity UUID:" + tagEntity.getUuid() );
-        response.setContentType( "text/plain" );
-        response.setCharacterEncoding( "UTF-8" );
     }
 
     private StringBuilder getStringFromRequest(HttpServletRequest request) throws IOException {
         StringBuilder sb = new StringBuilder();
         String line;
-        try (BufferedReader reader = request.getReader()){
+        try (BufferedReader reader = request.getReader()) {
             while ((line = reader.readLine()) != null) {
-                sb.append( line );
+                sb.append(line);
             }
         }
         return sb;
+    }
+
+    private void setResponseDefaults(HttpServletResponse response, String contentType) {
+        response.setContentType(contentType);
+        response.setCharacterEncoding("UTF-8");
     }
 }
