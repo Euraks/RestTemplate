@@ -10,7 +10,14 @@ import java.util.List;
 import java.util.UUID;
 
 public class SimpleServiceImpl implements Service<SimpleEntity, UUID> {
-    private final Repository<SimpleEntity, UUID> repository = new SimpleEntityRepositoryImpl();
+    private Repository<SimpleEntity, UUID> repository = new SimpleEntityRepositoryImpl();
+
+    public SimpleServiceImpl() {
+    }
+
+    public SimpleServiceImpl(Repository<SimpleEntity, UUID> mockRepository) {
+        this.repository = mockRepository;
+    }
 
 
     @Override
@@ -31,7 +38,6 @@ public class SimpleServiceImpl implements Service<SimpleEntity, UUID> {
 
     @Override
     public boolean delete(UUID uuid) {
-        repository.deleteById( uuid );
-        return false;
+        return repository.deleteById( uuid );
     }
 }

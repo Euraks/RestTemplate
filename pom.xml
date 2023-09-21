@@ -13,10 +13,11 @@
         <log4j.version>2.20.0</log4j.version>
         <jakarta.version>6.0.0</jakarta.version>
         <jackson.version>2.15.2</jackson.version>
+        <mockito.version>3.12.4</mockito.version>
         <HikariCP.version>5.0.1</HikariCP.version>
-        <testcontainers.version>1.17.6</testcontainers.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+        <testcontainers.version>1.17.6</testcontainers.version>
         <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
         <junit-jupiter-api.version>5.9.3</junit-jupiter-api.version>
         <postgresql.driver.version>42.6.0</postgresql.driver.version>
@@ -66,7 +67,14 @@
             <version>${junit-jupiter-api.version}</version>
             <scope>test</scope>
         </dependency>
-        <!-- Testcontainers -->
+        <!-- Test -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>3.12.4</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
