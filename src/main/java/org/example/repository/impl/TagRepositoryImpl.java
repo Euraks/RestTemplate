@@ -5,6 +5,7 @@ import org.example.db.HikariCPDataSource;
 import org.example.model.BookEntity;
 import org.example.model.TagEntity;
 import org.example.repository.Repository;
+import org.example.repository.mapper.TagResultSetMapper;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -36,9 +37,7 @@ public class TagRepositoryImpl implements Repository<TagEntity, UUID> {
                 bookStatement.setObject(1, uuid);
                 try (ResultSet rs = bookStatement.executeQuery()) {
                     if (rs.next()) {
-                        tagEntity = new TagEntity();
-                        tagEntity.setUuid((UUID) rs.getObject("uuid"));
-                        tagEntity.setTagName(rs.getString("tagName"));
+                        tagEntity = TagResultSetMapper.INSTANCE.map(rs);
                     }
                 }
             }

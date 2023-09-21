@@ -5,6 +5,7 @@ import org.example.db.HikariCPDataSource;
 import org.example.model.BookEntity;
 import org.example.model.TagEntity;
 import org.example.repository.Repository;
+import org.example.repository.mapper.BookResultSetMapper;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -32,9 +33,7 @@ public class BookRepositoryImpl implements Repository<BookEntity, UUID> {
                 bookStatement.setObject( 1, uuid );
                 try (ResultSet rs = bookStatement.executeQuery()){
                     if (rs.next()) {
-                        bookEntity = new BookEntity();
-                        bookEntity.setUuid( (UUID) rs.getObject( "uuid" ) );
-                        bookEntity.setBookText( rs.getString( "bookText" ) );
+                       bookEntity = BookResultSetMapper.INSTANCE.map(rs);
                     }
                 }
             }
