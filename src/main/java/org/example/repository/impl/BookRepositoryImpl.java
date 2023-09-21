@@ -1,5 +1,6 @@
 package org.example.repository.impl;
 
+import org.example.db.ConnectionManager;
 import org.example.db.HikariCPDataSource;
 import org.example.model.BookEntity;
 import org.example.model.TagEntity;
@@ -16,7 +17,7 @@ import java.util.UUID;
 
 public class BookRepositoryImpl implements Repository<BookEntity, UUID> {
 
-    private final HikariCPDataSource connectionManager = new HikariCPDataSource();
+    private final ConnectionManager connectionManager = new HikariCPDataSource();
 
     @Override
     public BookEntity findById(UUID uuid) {
@@ -26,33 +27,33 @@ public class BookRepositoryImpl implements Repository<BookEntity, UUID> {
         String bookQuery = "SELECT * FROM BookEntity WHERE uuid = ?";
         String tagQuery = "SELECT t.* FROM TagEntity t INNER JOIN Book_Tag bt ON t.uuid = bt.tag_uuid WHERE bt.book_uuid = ?";
 
-        try (Connection connection = connectionManager.getConnection()) {
-            try (PreparedStatement bookStatement = connection.prepareStatement(bookQuery)) {
-                bookStatement.setObject(1, uuid);
-                try (ResultSet rs = bookStatement.executeQuery()) {
+        try (Connection connection = connectionManager.getConnection()){
+            try (PreparedStatement bookStatement = connection.prepareStatement( bookQuery )){
+                bookStatement.setObject( 1, uuid );
+                try (ResultSet rs = bookStatement.executeQuery()){
                     if (rs.next()) {
                         bookEntity = new BookEntity();
-                        bookEntity.setUuid((UUID) rs.getObject("uuid"));
-                        bookEntity.setBookText(rs.getString("bookText"));
+                        bookEntity.setUuid( (UUID) rs.getObject( "uuid" ) );
+                        bookEntity.setBookText( rs.getString( "bookText" ) );
                     }
                 }
             }
 
             if (bookEntity != null) {
-                try (PreparedStatement tagStatement = connection.prepareStatement(tagQuery)) {
-                    tagStatement.setObject(1, uuid);
-                    try (ResultSet rs = tagStatement.executeQuery()) {
+                try (PreparedStatement tagStatement = connection.prepareStatement( tagQuery )){
+                    tagStatement.setObject( 1, uuid );
+                    try (ResultSet rs = tagStatement.executeQuery()){
                         while (rs.next()) {
                             TagEntity tagEntity = new TagEntity();
-                            tagEntity.setUuid((UUID) rs.getObject("uuid"));
-                            tagEntity.setTagName(rs.getString("tagName"));
-                            tagEntities.add(tagEntity);
+                            tagEntity.setUuid( (UUID) rs.getObject( "uuid" ) );
+                            tagEntity.setTagName( rs.getString( "tagName" ) );
+                            tagEntities.add( tagEntity );
                         }
                     }
                 }
-                bookEntity.setTagEntities(tagEntities);
+                bookEntity.setTagEntities( tagEntities );
             }
-        } catch (Exception e) {
+        } catch(Exception e){
             e.printStackTrace();
             // Handle exception
         }
@@ -63,21 +64,21 @@ public class BookRepositoryImpl implements Repository<BookEntity, UUID> {
 
     public boolean deleteById(UUID uuid) {
         Connection connection = null;
-        try {
+        try{
             connection = connectionManager.getConnection();
-            connection.setAutoCommit(false);
+            connection.setAutoCommit( false );
 
             // Удаление связанных записей в таблице Book_Tag
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    "DELETE FROM Book_Tag WHERE book_uuid = ?")) {
-                preparedStatement.setObject(1, uuid);
+                    "DELETE FROM Book_Tag WHERE book_uuid = ?" )){
+                preparedStatement.setObject( 1, uuid );
                 preparedStatement.executeUpdate();
             }
 
             // Удаление записи в таблице BookEntity
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    "DELETE FROM BookEntity WHERE uuid = ?")) {
-                preparedStatement.setObject(1, uuid);
+                    "DELETE FROM BookEntity WHERE uuid = ?" )){
+                preparedStatement.setObject( 1, uuid );
                 int affectedRows = preparedStatement.executeUpdate();
 
                 if (affectedRows == 0) {
@@ -88,21 +89,21 @@ public class BookRepositoryImpl implements Repository<BookEntity, UUID> {
             connection.commit();
             return true;
 
-        } catch (SQLException e) {
+        } catch(SQLException e){
             if (connection != null) {
-                try {
+                try{
                     connection.rollback();
-                } catch (SQLException rollbackException) {
+                } catch(SQLException rollbackException){
                     // обработка исключения
                 }
             }
             // обработка исключения
             return false;
-        } finally {
+        } finally{
             if (connection != null) {
-                try {
+                try{
                     connection.close();
-                } catch (SQLException closeException) {
+                } catch(SQLException closeException){
                     // обработка исключения
                 }
             }
@@ -121,32 +122,32 @@ public class BookRepositoryImpl implements Repository<BookEntity, UUID> {
                 "ORDER BY b.uuid";
 
         try (Connection connection = connectionManager.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
+             PreparedStatement ps = connection.prepareStatement( sql )){
 
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                UUID bookUuid = UUID.fromString(rs.getString("book_uuid"));
-                BookEntity bookEntity = map.getOrDefault(bookUuid, new BookEntity());
-                bookEntity.setUuid(bookUuid);
-                bookEntity.setBookText(rs.getString("bookText"));
+                UUID bookUuid = UUID.fromString( rs.getString( "book_uuid" ) );
+                BookEntity bookEntity = map.getOrDefault( bookUuid, new BookEntity() );
+                bookEntity.setUuid( bookUuid );
+                bookEntity.setBookText( rs.getString( "bookText" ) );
 
-                if (rs.getString("tag_uuid") != null) {
+                if (rs.getString( "tag_uuid" ) != null) {
                     TagEntity tagEntity = new TagEntity();
-                    tagEntity.setUuid(UUID.fromString(rs.getString("tag_uuid")));
-                    tagEntity.setTagName(rs.getString("tagName"));
+                    tagEntity.setUuid( UUID.fromString( rs.getString( "tag_uuid" ) ) );
+                    tagEntity.setTagName( rs.getString( "tagName" ) );
                     if (bookEntity.getTagEntities() == null) {
-                        bookEntity.setTagEntities(new ArrayList<>());
+                        bookEntity.setTagEntities( new ArrayList<>() );
                     }
-                    bookEntity.getTagEntities().add(tagEntity);
+                    bookEntity.getTagEntities().add( tagEntity );
                 }
 
-                map.put(bookUuid, bookEntity);
+                map.put( bookUuid, bookEntity );
             }
 
-            bookEntities = new ArrayList<>(map.values());
+            bookEntities = new ArrayList<>( map.values() );
 
-        } catch (Exception e) {
+        } catch(Exception e){
             e.printStackTrace();
         }
 
@@ -157,15 +158,15 @@ public class BookRepositoryImpl implements Repository<BookEntity, UUID> {
     public BookEntity save(BookEntity bookEntity) throws SQLException {
         Connection connection = null;
 
-        try {
+        try{
             connection = connectionManager.getConnection();
-            connection.setAutoCommit(false);
+            connection.setAutoCommit( false );
 
 
             String bookInsertQuery = "INSERT INTO BookEntity (uuid, bookText) VALUES (?, ?) ON CONFLICT (uuid) DO UPDATE SET bookText=EXCLUDED.bookText;;";
-            try (PreparedStatement ps = connection.prepareStatement(bookInsertQuery)) {
-                ps.setObject(1, bookEntity.getUuid());
-                ps.setString(2, bookEntity.getBookText());
+            try (PreparedStatement ps = connection.prepareStatement( bookInsertQuery )){
+                ps.setObject( 1, bookEntity.getUuid() );
+                ps.setString( 2, bookEntity.getBookText() );
                 ps.executeUpdate();
             }
 
@@ -174,16 +175,16 @@ public class BookRepositoryImpl implements Repository<BookEntity, UUID> {
             if (tagEntities != null) {
                 for (TagEntity tag : tagEntities) {
                     String tagInsertQuery = "INSERT INTO TagEntity (uuid, tagName) VALUES (?, ?) ON CONFLICT (uuid) DO UPDATE SET tagName=EXCLUDED.tagName;";
-                    try (PreparedStatement ps = connection.prepareStatement(tagInsertQuery)) {
-                        ps.setObject(1, tag.getUuid());
-                        ps.setString(2, tag.getTagName());
+                    try (PreparedStatement ps = connection.prepareStatement( tagInsertQuery )){
+                        ps.setObject( 1, tag.getUuid() );
+                        ps.setString( 2, tag.getTagName() );
                         ps.executeUpdate();
                     }
 
                     String bookTagInsertQuery = "INSERT INTO Book_Tag (book_uuid, tag_uuid) VALUES (?, ?) ON CONFLICT (book_uuid, tag_uuid) DO NOTHING;";
-                    try (PreparedStatement ps = connection.prepareStatement(bookTagInsertQuery)) {
-                        ps.setObject(1, bookEntity.getUuid());
-                        ps.setObject(2, tag.getUuid());
+                    try (PreparedStatement ps = connection.prepareStatement( bookTagInsertQuery )){
+                        ps.setObject( 1, bookEntity.getUuid() );
+                        ps.setObject( 2, tag.getUuid() );
                         ps.executeUpdate();
                     }
                 }
@@ -192,15 +193,15 @@ public class BookRepositoryImpl implements Repository<BookEntity, UUID> {
             connection.commit();
             return bookEntity;
 
-        } catch (SQLException ex) {
+        } catch(SQLException ex){
             if (connection != null) {
                 connection.rollback();
             }
             throw ex;
 
-        } finally {
+        } finally{
             if (connection != null) {
-                connection.setAutoCommit(true);
+                connection.setAutoCommit( true );
                 connection.close();
             }
         }

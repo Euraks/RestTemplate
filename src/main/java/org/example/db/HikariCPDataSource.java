@@ -12,7 +12,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class HikariCPDataSource {
+public class HikariCPDataSource implements ConnectionManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(  HikariCPDataSource.class );
 
 
@@ -33,6 +33,7 @@ public class HikariCPDataSource {
         ds = new HikariDataSource( config );
     }
 
+    @Override
     public Connection getConnection() {
         try{
             return ds.getConnection();

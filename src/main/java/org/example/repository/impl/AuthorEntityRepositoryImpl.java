@@ -1,10 +1,10 @@
 package org.example.repository.impl;
 
+import org.example.db.ConnectionManager;
 import org.example.db.HikariCPDataSource;
 import org.example.model.Article;
 import org.example.model.AuthorEntity;
 import org.example.repository.AuthorEntityRepository;
-import org.example.servlet.AuthorServlet.Articles;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,7 +18,7 @@ import java.util.UUID;
 
 public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<AuthorEntity, UUID> {
 
-    private final HikariCPDataSource connectionManager = new HikariCPDataSource();
+    private final ConnectionManager connectionManager = new HikariCPDataSource();
 
     public AuthorEntity findById(UUID id) {
         String sql = "SELECT id, authorName FROM AuthorEntity WHERE id = ?";
@@ -190,7 +190,7 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
 
                 for (Article article : authorEntity.getArticleList()) {
                     psArticle.setObject( 1, article.getUuid() );
-                    UUID newUUID = article.getUuid().equals( authorEntity.getUuid() )?authorEntity.getUuid():article.getAuthor_uuid();
+                    UUID newUUID = article.getUuid().equals( authorEntity.getUuid() ) ? authorEntity.getUuid() : article.getAuthor_uuid();
                     psArticle.setObject( 2, newUUID );
                     psArticle.setString( 3, article.getText() );
                     psArticle.executeUpdate();

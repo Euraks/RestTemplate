@@ -1,6 +1,7 @@
 package org.example.repository.impl;
 
 import org.example.Main;
+import org.example.db.ConnectionManager;
 import org.example.db.HikariCPDataSource;
 import org.example.model.BookEntity;
 import org.example.model.TagEntity;
@@ -11,7 +12,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -22,7 +22,7 @@ public class TagRepositoryImpl implements Repository<TagEntity, UUID> {
     private static final Logger LOGGER = Logger.getLogger( Main.class.getName() );
 
 
-    private final HikariCPDataSource connectionManager = new HikariCPDataSource();
+    private final ConnectionManager connectionManager = new HikariCPDataSource();
 
     @Override
     public TagEntity findById(UUID uuid) {

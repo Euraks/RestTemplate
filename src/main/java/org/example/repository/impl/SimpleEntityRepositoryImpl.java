@@ -1,5 +1,6 @@
 package org.example.repository.impl;
 
+import org.example.db.ConnectionManager;
 import org.example.db.HikariCPDataSource;
 import org.example.model.SimpleEntity;
 import org.example.repository.Repository;
@@ -16,7 +17,7 @@ import java.util.UUID;
 
 public class SimpleEntityRepositoryImpl implements Repository<SimpleEntity, UUID> {
 
-    private final HikariCPDataSource connectionManager = new HikariCPDataSource();
+    private final ConnectionManager connectionManager = new HikariCPDataSource();
 
     @Override
     public SimpleEntity findById(UUID uuid) {

@@ -101,7 +101,7 @@ public class AuthorsId extends HttpServlet {
                         LOGGER.log(Level.WARNING, "SimpleEntity with UUID: {0} not found", id);
                     }
                     return;
-                } catch (Exception e) {  
+                } catch (Exception e) {
                     e.printStackTrace();
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     response.getWriter().write("Failed to delete SimpleEntity UUID:" + id);
