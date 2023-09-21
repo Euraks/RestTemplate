@@ -17,7 +17,14 @@ import java.util.UUID;
 
 public class SimpleEntityRepositoryImpl implements Repository<SimpleEntity, UUID> {
 
-    private final ConnectionManager connectionManager = new HikariCPDataSource();
+    private ConnectionManager connectionManager = new HikariCPDataSource();
+
+    public SimpleEntityRepositoryImpl() {
+    }
+
+    public SimpleEntityRepositoryImpl(ConnectionManager testConnectionManager) {
+        connectionManager = testConnectionManager;
+    }
 
     @Override
     public SimpleEntity findById(UUID uuid) {
@@ -27,7 +34,7 @@ public class SimpleEntityRepositoryImpl implements Repository<SimpleEntity, UUID
             ResultSet resultSet = preparedStatement.executeQuery();
             List<SimpleEntity> simpleEntityList = getSimpleEntiysList( resultSet );
 
-            return simpleEntityList.get( 0 );
+            return simpleEntityList.isEmpty()?null:simpleEntityList.get( 0 );
 
         } catch(SQLException e){
             throw new RuntimeException( e );

@@ -7,10 +7,13 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.model.SimpleEntity;
+import org.example.service.Service;
 import org.example.service.impl.SimpleServiceImpl;
 import org.example.servlet.dto.SimpleEntityDTO.SimpleEntityOutGoingDTO;
 import org.example.servlet.dto.SimpleEntityDTO.SimpleEntityUpdateDTO;
 import org.example.servlet.dto.SimpleEntityDTO.mapper.SimpleDtoMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,70 +22,80 @@ import java.util.UUID;
 
 @WebServlet(name = "SimplesId", value = "/simples/*")
 public class SimplesId extends HttpServlet {
-    ObjectMapper mapper = new ObjectMapper();
-    private final SimpleServiceImpl service = new SimpleServiceImpl();
+
+    private static final Logger LOGGER = LoggerFactory.getLogger( SimplesId.class );
+    private final ObjectMapper mapper = new ObjectMapper();
+    private final Service<SimpleEntity, UUID> service = new SimpleServiceImpl();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String pathInfo = request.getPathInfo();
-        if (pathInfo != null && !pathInfo.isEmpty()) {
-            String[] pathParts = pathInfo.split( "/" );
-            if (pathParts.length > 1) {
-                String id = pathParts[1];
-                SimpleEntity simpleEntity = service.findById( UUID.fromString( id ) );
-                SimpleEntityOutGoingDTO simpleEntityOutGoingDTO = SimpleDtoMapper.INSTANCE.map( simpleEntity );
-                String jsonString = mapper.writeValueAsString( simpleEntityOutGoingDTO );
-                response.setContentType( "application/json" );
-                response.setCharacterEncoding( "UTF-8" );
-                response.getWriter().write("Get SimpleEntity UUID:"+ jsonString );
-                return;
+        try{
+            String pathInfo = request.getPathInfo();
+            if (pathInfo != null && !pathInfo.isEmpty()) {
+                String[] pathParts = pathInfo.split( "/" );
+                if (pathParts.length > 1) {
+                    String id = pathParts[1];
+                    SimpleEntity simpleEntity = service.findById( UUID.fromString( id ) );
+                    SimpleEntityOutGoingDTO simpleEntityOutGoingDTO = SimpleDtoMapper.INSTANCE.map( simpleEntity );
+                    String jsonString = mapper.writeValueAsString( simpleEntityOutGoingDTO );
+
+                    response.setContentType( "application/json" );
+                    response.setCharacterEncoding( "UTF-8" );
+                    response.getWriter().write( "Get SimpleEntity UUID:" + jsonString );
+                }
             }
+        } catch(Exception e){
+            handleException( response, e, "Failed to process GET request" );
         }
     }
 
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String pathInfo = request.getPathInfo();
-        if (pathInfo != null && !pathInfo.isEmpty()) {
-            String[] pathParts = pathInfo.split( "/" );
-            if (pathParts.length > 1) {
-                String id = pathParts[1];
-                StringBuilder sb = getStringFromRequest( request );
+        try{
+            String pathInfo = request.getPathInfo();
+            if (pathInfo != null && !pathInfo.isEmpty()) {
+                String[] pathParts = pathInfo.split( "/" );
+                if (pathParts.length > 1) {
+                    String id = pathParts[1];
+                    StringBuilder sb = getStringFromRequest( request );
 
-                String json = sb.toString();
+                    String json = sb.toString();
 
-                ObjectMapper objectMapper = new ObjectMapper();
-                SimpleEntityUpdateDTO simpleEntityUpdateDTO = objectMapper.readValue( json, SimpleEntityUpdateDTO.class );
+                    SimpleEntityUpdateDTO simpleEntityUpdateDTO = mapper.readValue( json, SimpleEntityUpdateDTO.class );
 
-                SimpleEntity updateSimpleEntity = SimpleDtoMapper.INSTANCE.map( simpleEntityUpdateDTO );
-                SimpleEntity newSimpleEntity = service.findById( UUID.fromString( id ) );
-                newSimpleEntity.setDescription( updateSimpleEntity.getDescription() );
-                try{
+                    SimpleEntity updateSimpleEntity = SimpleDtoMapper.INSTANCE.map( simpleEntityUpdateDTO );
+                    SimpleEntity newSimpleEntity = service.findById( UUID.fromString( id ) );
+                    newSimpleEntity.setDescription( updateSimpleEntity.getDescription() );
                     service.save( newSimpleEntity );
-                } catch(SQLException e){
-                    e.printStackTrace();
+
+                    response.setContentType( "application/json" );
+                    response.setCharacterEncoding( "UTF-8" );
+                    response.getWriter().write( "Updated SimpleEntity UUID:" + json );
                 }
-                response.setContentType( "application/json" );
-                response.setCharacterEncoding( "UTF-8" );
-                response.getWriter().write("Updated SimpleEntity UUID:"+ json );
-                return;
             }
+        } catch(SQLException e){
+            handleException( response, e, "Failed to save the updated entity" );
+        } catch(Exception e){
+            handleException( response, e, "Failed to process PUT request" );
         }
     }
 
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String pathInfo = request.getPathInfo();
-        if (pathInfo != null && !pathInfo.isEmpty()) {
-            String[] pathParts = pathInfo.split( "/" );
-            if (pathParts.length > 1) {
-                String id = pathParts[1];
-                service.delete( UUID.fromString( id ) );
-                response.setContentType( "application/json" );
-                response.setCharacterEncoding( "UTF-8" );
-                response.getWriter().write( "Deleted SimpleEntity UUID:" + id );
-                return;
+        try{
+            String pathInfo = request.getPathInfo();
+            if (pathInfo != null && !pathInfo.isEmpty()) {
+                String[] pathParts = pathInfo.split( "/" );
+                if (pathParts.length > 1) {
+                    String id = pathParts[1];
+                    service.delete( UUID.fromString( id ) );
+                    response.setContentType( "application/json" );
+                    response.setCharacterEncoding( "UTF-8" );
+                    response.getWriter().write( "Deleted SimpleEntity UUID:" + id );
+                }
             }
+        } catch(Exception e){
+            handleException( response, e, "Failed to process DELETE request" );
         }
     }
 
@@ -95,5 +108,15 @@ public class SimplesId extends HttpServlet {
             }
         }
         return sb;
+    }
+
+    private void handleException(HttpServletResponse response, Exception e, String logMessage) {
+        LOGGER.error( logMessage, e );
+        response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+        try{
+            response.getWriter().write( "An internal server error occurred." );
+        } catch(IOException ioException){
+            LOGGER.error( "Failed to send error response.", ioException );
+        }
     }
 }

@@ -1,6 +1,5 @@
 package org.example.repository.impl;
 
-import org.example.Main;
 import org.example.db.ConnectionManager;
 import org.example.db.HikariCPDataSource;
 import org.example.model.BookEntity;
@@ -19,7 +18,7 @@ import java.util.logging.Logger;
 
 public class TagRepositoryImpl implements Repository<TagEntity, UUID> {
 
-    private static final Logger LOGGER = Logger.getLogger( Main.class.getName() );
+    private static final Logger LOGGER = Logger.getLogger( TagRepositoryImpl.class.getName() );
 
 
     private final ConnectionManager connectionManager = new HikariCPDataSource();

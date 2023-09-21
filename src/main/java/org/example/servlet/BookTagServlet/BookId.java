@@ -12,18 +12,20 @@ import org.example.service.impl.BookServiceImpl;
 import org.example.servlet.dto.BookTagDTO.BookOutGoingDTO;
 import org.example.servlet.dto.BookTagDTO.BookUpdateDTO;
 import org.example.servlet.dto.BookTagDTO.mapper.BookMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 @WebServlet(name = "BookId", value = "/books/*")
 public class BookId extends HttpServlet {
 
-    private static final Logger LOGGER = Logger.getLogger(TagsId.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger( BookId.class );
 
     ObjectMapper mapper = new ObjectMapper();
     private final Service<BookEntity, UUID> service = new BookServiceImpl();
@@ -100,11 +102,11 @@ public class BookId extends HttpServlet {
                 String id = pathParts[1];
                 if (service.delete(UUID.fromString(id))) {
                     response.getWriter().write("Delete BookEntity UUID:" + id);
-                    LOGGER.log( Level.INFO, "Successfully deleted BookEntity with UUID: {0}", id);
+
                 } else {
                     response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                     response.getWriter().write("BookEntity with UUID:" + id + " not found");
-                    LOGGER.log(Level.WARNING, "BookEntity with UUID: {0} not found", id);
+
                 }
                 return;
             }
@@ -112,7 +114,7 @@ public class BookId extends HttpServlet {
 
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         response.getWriter().write("ID is required for deletion");
-        LOGGER.log(Level.WARNING, "ID is required for deletion");
+
     }
 
     private void setResponseDefaults(HttpServletResponse response) {

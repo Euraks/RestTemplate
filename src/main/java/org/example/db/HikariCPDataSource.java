@@ -41,8 +41,4 @@ public class HikariCPDataSource implements ConnectionManager {
         }
         return null;
     }
-
-    public static void main(String[] args) {
-        System.out.println( new HikariCPDataSource().getConnection() );
-    }
 }
