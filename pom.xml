@@ -103,8 +103,6 @@
                             <version>${org.mapstruct.version}</version>
                         </path>
                     </annotationProcessorPaths>
-                    <!-- due to problem in maven-compiler-plugin, for verbose mode add
-                  showWarnings -->
                     <showWarnings>true</showWarnings>
                     <compilerArgs>
                         <arg>

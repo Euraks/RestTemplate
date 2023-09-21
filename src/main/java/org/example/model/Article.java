@@ -1,5 +1,6 @@
 package org.example.model;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class Article {
@@ -41,5 +42,27 @@ public class Article {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Article)) return false;
+        Article article = (Article) o;
+        return Objects.equals( getText(), article.getText() );
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash( getText() );
+    }
+
+    @Override
+    public String toString() {
+        return "Article{" +
+                "uuid=" + uuid +
+                ", author_uuid=" + author_uuid +
+                ", text='" + text + '\'' +
+                '}';
     }
 }
