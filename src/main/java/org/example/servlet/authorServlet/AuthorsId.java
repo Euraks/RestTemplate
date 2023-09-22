@@ -5,6 +5,8 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import org.example.model.AuthorEntity;
+import org.example.repository.AuthorEntityRepository;
+import org.example.repository.impl.AuthorEntityRepositoryImpl;
 import org.example.service.AuthorEntityService;
 import org.example.service.impl.AuthorEntityServiceImpl;
 import org.example.servlet.bookTagServlet.TagsId;
@@ -22,10 +24,11 @@ import java.util.logging.Logger;
 @WebServlet(name = "AuthorsId", value = "/authors/*")
 public class AuthorsId extends HttpServlet {
 
-    private static final Logger LOGGER = Logger.getLogger( TagsId.class.getName());
+    private static final Logger LOGGER = Logger.getLogger( AuthorsId.class.getName());
 
     ObjectMapper mapper = new ObjectMapper();
-    private final AuthorEntityService service = new AuthorEntityServiceImpl();
+    private final AuthorEntityRepository<AuthorEntity, UUID> repository = new AuthorEntityRepositoryImpl();
+    private final AuthorEntityService service = new AuthorEntityServiceImpl( repository );
 
 
 

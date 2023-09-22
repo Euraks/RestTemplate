@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.model.BookEntity;
+import org.example.repository.Repository;
+import org.example.repository.impl.BookRepositoryImpl;
 import org.example.service.Service;
 import org.example.service.impl.BookServiceImpl;
 import org.example.servlet.dto.BookTagDTO.BookAllOutGoingDTO;
@@ -23,7 +25,8 @@ import java.util.UUID;
 public class Books extends HttpServlet {
 
     ObjectMapper mapper = new ObjectMapper();
-    private final Service<BookEntity, UUID> service = new BookServiceImpl();
+    private final Repository<BookEntity,UUID> repository = new BookRepositoryImpl();
+    private final Service<BookEntity, UUID> service = new BookServiceImpl( repository );
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

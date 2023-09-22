@@ -3,7 +3,7 @@ package org.example.service.impl;
 import org.example.model.Article;
 import org.example.model.AuthorEntity;
 import org.example.repository.AuthorEntityRepository;
-import org.example.repository.impl.AuthorEntityRepositoryImpl;
+import org.example.repository.Repository;
 import org.example.service.AuthorEntityService;
 
 import java.sql.SQLException;
@@ -13,7 +13,11 @@ import java.util.UUID;
 
 public class AuthorEntityServiceImpl implements AuthorEntityService {
 
-    private AuthorEntityRepository<AuthorEntity, UUID> repository = new AuthorEntityRepositoryImpl();
+    private final AuthorEntityRepository<AuthorEntity, UUID> repository;
+
+    public AuthorEntityServiceImpl(AuthorEntityRepository<AuthorEntity, UUID> repository) {
+        this.repository = repository;
+    }
 
     @Override
     public AuthorEntity save(AuthorEntity authorEntity) throws SQLException {
@@ -35,6 +39,11 @@ public class AuthorEntityServiceImpl implements AuthorEntityService {
     public boolean delete(UUID uuid) {
         repository.deleteById( uuid );
         return false;
+    }
+
+    @Override
+    public Repository<AuthorEntity,UUID> getRepository() {
+        return this.repository;
     }
 
     @Override

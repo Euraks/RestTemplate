@@ -1,5 +1,7 @@
 package org.example.repository;
 
+import org.example.model.Article;
+
 import java.sql.SQLException;
 import java.util.List;
 
@@ -11,4 +13,5 @@ public interface Repository<T, K> {
     List<T> findAll() throws SQLException;
 
     T save(T t) throws SQLException;
+
 }

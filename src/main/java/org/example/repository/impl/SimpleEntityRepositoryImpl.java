@@ -17,10 +17,7 @@ import java.util.UUID;
 
 public class SimpleEntityRepositoryImpl implements Repository<SimpleEntity, UUID> {
 
-    private ConnectionManager connectionManager = new HikariCPDataSource();
-
-    public SimpleEntityRepositoryImpl() {
-    }
+    private final ConnectionManager connectionManager ;
 
     public SimpleEntityRepositoryImpl(ConnectionManager testConnectionManager) {
         connectionManager = testConnectionManager;

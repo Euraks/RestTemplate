@@ -2,7 +2,6 @@ package org.example.service.impl;
 
 import org.example.model.SimpleEntity;
 import org.example.repository.Repository;
-import org.example.repository.impl.SimpleEntityRepositoryImpl;
 import org.example.service.Service;
 
 import java.sql.SQLException;
@@ -10,13 +9,12 @@ import java.util.List;
 import java.util.UUID;
 
 public class SimpleServiceImpl implements Service<SimpleEntity, UUID> {
-    private Repository<SimpleEntity, UUID> repository = new SimpleEntityRepositoryImpl();
 
-    public SimpleServiceImpl() {
-    }
+    private final Repository<SimpleEntity, UUID> repository;
 
-    public SimpleServiceImpl(Repository<SimpleEntity, UUID> mockRepository) {
-        this.repository = mockRepository;
+
+    public SimpleServiceImpl(Repository<SimpleEntity, UUID> repository) {
+        this.repository = repository;
     }
 
 
@@ -39,5 +37,10 @@ public class SimpleServiceImpl implements Service<SimpleEntity, UUID> {
     @Override
     public boolean delete(UUID uuid) {
         return repository.deleteById( uuid );
+    }
+
+    @Override
+    public Repository<SimpleEntity, UUID> getRepository() {
+        return this.repository;
     }
 }

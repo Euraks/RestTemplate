@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.model.AuthorEntity;
+import org.example.repository.AuthorEntityRepository;
+import org.example.repository.impl.AuthorEntityRepositoryImpl;
 import org.example.service.AuthorEntityService;
 import org.example.service.impl.AuthorEntityServiceImpl;
 import org.example.servlet.dto.AuthorEntityDTO.AuthorEntityAllOutGoingDTO;
@@ -17,12 +19,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 @WebServlet(name = "Authors", value = "/authors")
 public class Authors extends HttpServlet {
 
     ObjectMapper mapper = new ObjectMapper();
-    private final AuthorEntityService service = new AuthorEntityServiceImpl();
+    private final AuthorEntityRepository<AuthorEntity, UUID> repository = new AuthorEntityRepositoryImpl();
+    private final AuthorEntityService service = new AuthorEntityServiceImpl( repository );
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {

@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.model.TagEntity;
+import org.example.repository.Repository;
+import org.example.repository.impl.TagRepositoryImpl;
 import org.example.service.Service;
 import org.example.service.impl.TagServiceImpl;
 import org.example.servlet.dto.BookTagDTO.TagAllOutGoingDTO;
@@ -26,8 +28,9 @@ public class Tags extends HttpServlet {
 
     private static final Logger LOGGER = Logger.getLogger(Tags.class.getName());
 
+    private final Repository<TagEntity,UUID> tagRepository = new TagRepositoryImpl();
     private final ObjectMapper mapper = new ObjectMapper();
-    private final Service<TagEntity, UUID> service = new TagServiceImpl();
+    private final Service<TagEntity, UUID> service = new TagServiceImpl( tagRepository );
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

@@ -12,4 +12,6 @@ public interface Service<T,K> {
     List<T> findAll() throws SQLException;
 
     boolean delete(K k);
+
+    Object getRepository();
 }

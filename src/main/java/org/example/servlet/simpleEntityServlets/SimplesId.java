@@ -6,7 +6,11 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.example.db.ConnectionManager;
+import org.example.db.HikariCPDataSource;
 import org.example.model.SimpleEntity;
+import org.example.repository.Repository;
+import org.example.repository.impl.SimpleEntityRepositoryImpl;
 import org.example.service.Service;
 import org.example.service.impl.SimpleServiceImpl;
 import org.example.servlet.dto.SimpleEntityDTO.SimpleEntityOutGoingDTO;
@@ -20,12 +24,21 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
 
-@WebServlet(name = "SimplesId", value = "/simples/*")
+@WebServlet(name = "Simples", value = "/simples")
 public class SimplesId extends HttpServlet {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger( SimplesId.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimplesId.class);
     private final ObjectMapper mapper = new ObjectMapper();
-    private final Service<SimpleEntity, UUID> service = new SimpleServiceImpl();
+
+    private final ConnectionManager connectionManager;
+    private final Repository<SimpleEntity, UUID> repository;
+    private final Service<SimpleEntity, UUID> service;
+
+    public SimplesId(ConnectionManager connectionManager) {
+        this.connectionManager = connectionManager;
+        this.repository = new SimpleEntityRepositoryImpl(this.connectionManager);
+        this.service = new SimpleServiceImpl(repository);
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
