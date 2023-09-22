@@ -13,5 +13,4 @@ public interface Repository<T, K> {
     List<T> findAll() throws SQLException;
 
     T save(T t) throws SQLException;
-
 }
