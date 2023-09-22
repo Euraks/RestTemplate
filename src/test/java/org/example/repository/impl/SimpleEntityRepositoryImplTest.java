@@ -12,6 +12,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -46,10 +47,30 @@ public class SimpleEntityRepositoryImplTest {
         SimpleEntity savedEntity = repository.save( entity );
         assertNotNull( savedEntity );
         assertEquals( entity.getDescription(), savedEntity.getDescription() );
-        entity.setDescription( "Update description" );
-        savedEntity = repository.save( entity );
+
+        UUID uuidSavedEntity = entity.getUuid();
+        savedEntity = repository.findById( uuidSavedEntity );
+        assertEquals( entity.getDescription(), savedEntity.getDescription() );
+        assertEquals( entity.getUuid(), savedEntity.getUuid() );
+    }
+
+    @Test
+    void testSaveUpdate() {
+        SimpleEntity entity = new SimpleEntity( "Test description" );
+        UUID uuidSavedEntity = entity.getUuid();
+
+        SimpleEntity savedEntity = repository.save( entity );
         assertNotNull( savedEntity );
         assertEquals( entity.getDescription(), savedEntity.getDescription() );
+
+        entity = repository.findById( uuidSavedEntity );
+        assertNotNull( entity );
+        entity.setDescription( "Updated description" );
+        repository.save( entity );
+
+        savedEntity = repository.findById( uuidSavedEntity );
+        assertEquals( entity.getDescription(), savedEntity.getDescription() );
+        assertEquals( entity.getUuid(), savedEntity.getUuid() );
     }
 
     @Test
@@ -60,6 +81,7 @@ public class SimpleEntityRepositoryImplTest {
         SimpleEntity foundEntity = repository.findById( entity.getUuid() );
         assertNotNull( foundEntity );
         assertEquals( entity.getUuid(), foundEntity.getUuid() );
+        assertEquals( entity.getDescription(), foundEntity.getDescription() );
     }
 
     @Test
