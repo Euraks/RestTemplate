@@ -41,6 +41,9 @@ class BookEntityTest {
 
         book2.setBookText("Different text");
         assertNotEquals(book1, book2);
+
+        TagEntity tagEntity = new TagEntity();
+        assertNotEquals( book1, tagEntity);
     }
 
     @Test

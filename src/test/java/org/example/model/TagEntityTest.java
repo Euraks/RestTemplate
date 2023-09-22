@@ -58,6 +58,11 @@ class TagEntityTest {
 
         assertEquals(tag1, tag2);
         assertNotEquals(tag1, tag3);
+
+        assertEquals(tag1, tag1);
+
+        BookEntity book = new BookEntity();
+        assertNotEquals(tag1, book);
     }
 
     @Test

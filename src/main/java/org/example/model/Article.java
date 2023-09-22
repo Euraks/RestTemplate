@@ -11,6 +11,10 @@ public class Article {
     public Article() {
     }
 
+    public Article(String text) {
+        this.text = text;
+    }
+
     public Article(UUID uuid, String text) {
         this.uuid = uuid;
         this.text = text;
@@ -30,10 +34,6 @@ public class Article {
 
     public void setUuid(UUID uuid) {
         this.uuid = uuid;
-    }
-
-    public Article(String text) {
-        this.text = text;
     }
 
     public String getText() {

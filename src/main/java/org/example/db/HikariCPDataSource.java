@@ -13,32 +13,41 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class HikariCPDataSource implements ConnectionManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger( HikariCPDataSource.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger(HikariCPDataSource.class);
 
+    private final HikariDataSource ds;
 
-    private static HikariConfig config;
-    private static final HikariDataSource ds;
+    public HikariCPDataSource() {
+        HikariConfig config = initializeConfig();
+        this.ds = new HikariDataSource(config);
+    }
 
-    static {
+    protected HikariCPDataSource(HikariDataSource ds) {
+        this.ds = ds;
+    }
+
+    private HikariConfig initializeConfig() {
         Properties properties = new Properties();
-        try (InputStream input = HikariCPDataSource.class.getClassLoader().getResourceAsStream( "db.properties" )){
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("db.properties")) {
             if (input == null) {
-                throw new FileNotFoundException( "db.properties not found" );
+                throw new FileNotFoundException("db.properties not found");
             }
-            properties.load( input );
-            config = new HikariConfig( properties );
-        } catch(IOException e){
-            LOGGER.info( "Message  {}", 11 );
+            properties.load(input);
+            return new HikariConfig(properties);
+        } catch (IOException e) {
+            LOGGER.error("Failed to initialize HikariConfig", e);
+            return null;
         }
-        ds = new HikariDataSource( config );
     }
 
     @Override
     public Connection getConnection() {
-        try{
+        try {
             return ds.getConnection();
-        } catch(SQLException e){
+        } catch (SQLException e) {
+            LOGGER.error("Failed to get connection", e);
+            return null;
         }
-        return null;
     }
 }
+

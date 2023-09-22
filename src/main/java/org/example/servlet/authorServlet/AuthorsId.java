@@ -1,20 +1,16 @@
-package org.example.servlet.AuthorServlet;
+package org.example.servlet.authorServlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import org.example.model.AuthorEntity;
-import org.example.model.SimpleEntity;
 import org.example.service.AuthorEntityService;
 import org.example.service.impl.AuthorEntityServiceImpl;
-import org.example.servlet.BookTagServlet.TagsId;
+import org.example.servlet.bookTagServlet.TagsId;
 import org.example.servlet.dto.AuthorEntityDTO.AuthorEntityOutGoingDTO;
 import org.example.servlet.dto.AuthorEntityDTO.AuthorEntityUpdateDTO;
 import org.example.servlet.dto.AuthorEntityDTO.mapper.AuthorEntityMapper;
-import org.example.servlet.dto.SimpleEntityDTO.SimpleEntityOutGoingDTO;
-import org.example.servlet.dto.SimpleEntityDTO.SimpleEntityUpdateDTO;
-import org.example.servlet.dto.SimpleEntityDTO.mapper.SimpleDtoMapper;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -1,46 +1,38 @@
 package org.example.db;
+import com.zaxxer.hikari.HikariDataSource;
+import org.junit.jupiter.api.*;
+import org.mockito.Mockito;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-
+import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.*;
 
-@Testcontainers
-public class HikariCPDataSourceTest {
+class HikariCPDataSourceTest {
 
-    @Container
-    public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:13.1")
-            .withDatabaseName("test")
-            .withUsername("user")
-            .withPassword("password");
+    @Test
+    void testGetConnection() throws SQLException {
+        HikariDataSource mockDataSource = mock(HikariDataSource.class);
+        Connection mockConnection = mock(Connection.class);
+        when(mockDataSource.getConnection()).thenReturn(mockConnection);
 
-    @BeforeAll
-    public static void setUp() {
-        System.setProperty("dataSourceClassName", "org.postgresql.ds.PGSimpleDataSource");
-        System.setProperty("dataSource.user", "user");
-        System.setProperty("dataSource.password", "password");
-        System.setProperty("dataSource.databaseName", "test");
-        System.setProperty("dataSource.portNumber", postgreSQLContainer.getMappedPort(5432).toString());
-        System.setProperty("dataSource.serverName", postgreSQLContainer.getContainerIpAddress());
-    }
+        HikariCPDataSource dataSource = new HikariCPDataSource(mockDataSource);
+        Connection connection = dataSource.getConnection();
 
-    @AfterAll
-    public static void tearDown() {
-        postgreSQLContainer.stop();
+        Assertions.assertNotNull(connection);
+        Mockito.verify(mockDataSource).getConnection();
     }
 
     @Test
-    public void testConnection() throws SQLException {
-        HikariCPDataSource hikariCPDataSource = new HikariCPDataSource();
-        try (Connection connection = hikariCPDataSource.getConnection()) {
-            assertNotNull(connection);
-        }
+    void testGetConnectionException() throws SQLException {
+        HikariDataSource mockDataSource = mock(HikariDataSource.class);
+        when(mockDataSource.getConnection()).thenThrow(new SQLException("Test exception"));
+
+        HikariCPDataSource dataSource = new HikariCPDataSource(mockDataSource);
+        Connection connection = dataSource.getConnection();
+
+        Assertions.assertNull(connection);
+        Mockito.verify(mockDataSource).getConnection();
     }
 }

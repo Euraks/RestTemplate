@@ -1,4 +1,4 @@
-package org.example.servlet.BookTagServlet;
+package org.example.servlet.bookTagServlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
@@ -19,7 +19,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
-import java.util.logging.Level;
 
 
 @WebServlet(name = "BookId", value = "/books/*")

@@ -1,4 +1,4 @@
-package org.example.servlet.AuthorServlet;
+package org.example.servlet.authorServlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;

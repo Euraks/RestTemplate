@@ -19,6 +19,14 @@ class ArticleTest {
         article = new Article( uuid, text );
         assertEquals( uuid, article.getUuid() );
         assertEquals( text, article.getText() );
+
+        article = new Article( text );
+        assertNull( article.getUuid() );
+        assertEquals( text, article.getText() );
+
+        article = new Article( uuid, text );
+        assertEquals( uuid, article.getUuid() );
+        assertEquals( text, article.getText() );
     }
 
     @Test
@@ -44,9 +52,14 @@ class ArticleTest {
         Article article2 = new Article( text );
         Article article3 = new Article( "Different text" );
 
+        assertEquals( article1, article1 );
+
         assertEquals( article1, article2 );
         assertNotEquals( article1, article3 );
         assertNotEquals( article2, article3 );
+
+        AuthorEntity author = new AuthorEntity();
+        assertNotEquals( article2, author );
 
         assertEquals( article1.hashCode(), article2.hashCode() );
         assertNotEquals( article1.hashCode(), article3.hashCode() );

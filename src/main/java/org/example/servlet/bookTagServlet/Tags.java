@@ -1,4 +1,4 @@
-package org.example.servlet.BookTagServlet;
+package org.example.servlet.bookTagServlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;

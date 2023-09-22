@@ -1,4 +1,4 @@
-package org.example.servlet.BookTagServlet;
+package org.example.servlet.bookTagServlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
@@ -6,13 +6,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.model.AuthorEntity;
 import org.example.model.BookEntity;
 import org.example.service.Service;
 import org.example.service.impl.BookServiceImpl;
-import org.example.servlet.dto.AuthorEntityDTO.AuthorEntityAllOutGoingDTO;
-import org.example.servlet.dto.AuthorEntityDTO.AuthorEntityIncomingDTO;
-import org.example.servlet.dto.AuthorEntityDTO.mapper.AuthorEntityMapper;
 import org.example.servlet.dto.BookTagDTO.BookAllOutGoingDTO;
 import org.example.servlet.dto.BookTagDTO.BookIncomingDTO;
 import org.example.servlet.dto.BookTagDTO.mapper.BookMapper;

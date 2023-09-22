@@ -53,19 +53,17 @@ class SimpleEntityTest {
         SimpleEntity entity1 = new SimpleEntity( description1 );
         SimpleEntity entity2 = new SimpleEntity( description1 );
         SimpleEntity entity3 = new SimpleEntity( description2 );
-
+        TagEntity tagEntity = new TagEntity();
 
         assertEquals( entity1, entity1, "Entity should be equal to itself" );
 
-
         assertTrue( entity1.equals( entity2 ) && entity2.equals( entity1 ), "Entities with the same description should be equal" );
-
 
         assertNotEquals( entity1, entity3, "Entities with different descriptions should not be equal" );
 
+        assertNotEquals( entity1, tagEntity, "Entities with class  should not be equal" );
 
         assertNotEquals( null, entity1, "Entity should not be equal to null" );
-
 
         assertEquals( entity1.hashCode(), entity2.hashCode(), "Entities with the same description should have the same hashcode" );
         assertNotEquals( entity1.hashCode(), entity3.hashCode(), "Entities with different descriptions should have different hashcodes" );
