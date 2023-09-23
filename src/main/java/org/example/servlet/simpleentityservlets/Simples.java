@@ -1,4 +1,4 @@
-package org.example.servlet.simpleEntityServlets;
+package org.example.servlet.simpleentityservlets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.annotation.WebServlet;
@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.db.ConnectionManager;
+import org.example.db.HikariCPDataSource;
 import org.example.model.SimpleEntity;
 import org.example.repository.Repository;
 import org.example.repository.impl.SimpleEntityRepositoryImpl;
@@ -29,6 +30,13 @@ public class Simples extends HttpServlet {
     private final ConnectionManager connectionManager;
     private final Repository<SimpleEntity, UUID> repository;
     private Service<SimpleEntity, UUID> service;
+
+    public Simples() {
+        this.connectionManager = new HikariCPDataSource();
+        this.repository = new SimpleEntityRepositoryImpl(this.connectionManager);
+        this.service = new SimpleServiceImpl(repository);
+    }
+
 
     public Simples(ConnectionManager connectionManager) {
         this.connectionManager = connectionManager;

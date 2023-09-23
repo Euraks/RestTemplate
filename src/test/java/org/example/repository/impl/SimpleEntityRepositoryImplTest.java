@@ -2,6 +2,7 @@ package org.example.repository.impl;
 
 import org.example.db.ConnectionManager;
 import org.example.model.SimpleEntity;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,9 +15,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 @Testcontainers
 public class SimpleEntityRepositoryImplTest {
 
@@ -25,33 +23,38 @@ public class SimpleEntityRepositoryImplTest {
             .withDatabaseName( "test-db" )
             .withUsername( "test" )
             .withPassword( "test" )
-            .withInitScript("db.sql");
+            .withInitScript( "db.sql" );
 
     private SimpleEntityRepositoryImpl repository;
 
     @BeforeEach
     void setUp() {
-
         ConnectionManager testConnectionManager = new ConnectionManager() {
             @Override
             public Connection getConnection() throws SQLException {
-                return postgreSQLContainer.createConnection("");
+                return postgreSQLContainer.createConnection( "" );
             }
         };
-        repository = new SimpleEntityRepositoryImpl(testConnectionManager);
+        repository = new SimpleEntityRepositoryImpl( testConnectionManager );
+    }
+
+    @AfterEach
+    void tearDown() {
+        repository.clearAll();
     }
 
     @Test
     void testSave() {
         SimpleEntity entity = new SimpleEntity( "Test description" );
-        SimpleEntity savedEntity = repository.save( entity );
-        assertNotNull( savedEntity );
-        assertEquals( entity.getDescription(), savedEntity.getDescription() );
+        SimpleEntity savedEntity = repository.save( entity ).orElse( null );
+        Assertions.assertNotNull( savedEntity );
+        Assertions.assertEquals( entity.getDescription(), savedEntity.getDescription() );
 
         UUID uuidSavedEntity = entity.getUuid();
-        savedEntity = repository.findById( uuidSavedEntity );
-        assertEquals( entity.getDescription(), savedEntity.getDescription() );
-        assertEquals( entity.getUuid(), savedEntity.getUuid() );
+        savedEntity = repository.findById( uuidSavedEntity ).orElse( null );
+        assert savedEntity != null;
+        Assertions.assertEquals( entity.getDescription(), savedEntity.getDescription() );
+        Assertions.assertEquals( entity.getUuid(), savedEntity.getUuid() );
     }
 
     @Test
@@ -59,18 +62,19 @@ public class SimpleEntityRepositoryImplTest {
         SimpleEntity entity = new SimpleEntity( "Test description" );
         UUID uuidSavedEntity = entity.getUuid();
 
-        SimpleEntity savedEntity = repository.save( entity );
-        assertNotNull( savedEntity );
-        assertEquals( entity.getDescription(), savedEntity.getDescription() );
+        SimpleEntity savedEntity = repository.save( entity ).orElse( null );
+        Assertions.assertNotNull( savedEntity );
+        Assertions.assertEquals( entity.getDescription(), savedEntity.getDescription() );
 
-        entity = repository.findById( uuidSavedEntity );
-        assertNotNull( entity );
+        entity = repository.findById( uuidSavedEntity ).orElse( null );
+        Assertions.assertNotNull( entity );
         entity.setDescription( "Updated description" );
         repository.save( entity );
 
-        savedEntity = repository.findById( uuidSavedEntity );
-        assertEquals( entity.getDescription(), savedEntity.getDescription() );
-        assertEquals( entity.getUuid(), savedEntity.getUuid() );
+        savedEntity = repository.findById( uuidSavedEntity ).orElse( null );
+        assert savedEntity != null;
+        Assertions.assertEquals( entity.getDescription(), savedEntity.getDescription() );
+        Assertions.assertEquals( entity.getUuid(), savedEntity.getUuid() );
     }
 
     @Test
@@ -78,10 +82,10 @@ public class SimpleEntityRepositoryImplTest {
         SimpleEntity entity = new SimpleEntity( "Test description" );
         repository.save( entity );
 
-        SimpleEntity foundEntity = repository.findById( entity.getUuid() );
-        assertNotNull( foundEntity );
-        assertEquals( entity.getUuid(), foundEntity.getUuid() );
-        assertEquals( entity.getDescription(), foundEntity.getDescription() );
+        SimpleEntity foundEntity = repository.findById( entity.getUuid() ).orElse( null );
+        Assertions.assertNotNull( foundEntity );
+        Assertions.assertEquals( entity.getUuid(), foundEntity.getUuid() );
+        Assertions.assertEquals( entity.getDescription(), foundEntity.getDescription() );
     }
 
     @Test
@@ -92,7 +96,7 @@ public class SimpleEntityRepositoryImplTest {
         boolean isDeleted = repository.deleteById( entity.getUuid() );
         Assertions.assertTrue( isDeleted );
 
-        SimpleEntity deletedEntity = repository.findById( entity.getUuid() );
+        SimpleEntity deletedEntity = repository.findById( entity.getUuid() ).orElse( null );
         Assertions.assertNull( deletedEntity );
     }
 
@@ -102,7 +106,6 @@ public class SimpleEntityRepositoryImplTest {
         repository.save( new SimpleEntity( "Test2" ) );
 
         List<SimpleEntity> entities = repository.findAll();
-        assertEquals( 2, entities.size() );
+        Assertions.assertEquals( 2, entities.size() );
     }
 }
-

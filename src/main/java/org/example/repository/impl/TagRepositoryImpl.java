@@ -1,208 +1,178 @@
 package org.example.repository.impl;
-
 import org.example.db.ConnectionManager;
-import org.example.db.HikariCPDataSource;
 import org.example.model.BookEntity;
 import org.example.model.TagEntity;
 import org.example.repository.Repository;
+import org.example.repository.mapper.BookResultSetMapper;
 import org.example.repository.mapper.TagResultSetMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-public class TagRepositoryImpl implements Repository<TagEntity, UUID> {
-
-    private static final Logger LOGGER = Logger.getLogger( TagRepositoryImpl.class.getName() );
-
-
-    private final ConnectionManager connectionManager = new HikariCPDataSource();
-
-    @Override
-    public TagEntity findById(UUID uuid) {
-        TagEntity tagEntity = null;
-        List<BookEntity> bookEntities = new ArrayList<>();
-
-        String bookQuery = "SELECT * FROM tagentity WHERE uuid = ?";
-        String tagQuery = "SELECT t.* FROM bookentity t INNER JOIN Book_Tag bt ON t.uuid = bt.tag_uuid WHERE bt.book_uuid = ?";
-
-        try (Connection connection = connectionManager.getConnection()) {
-            try (PreparedStatement bookStatement = connection.prepareStatement(bookQuery)) {
-                bookStatement.setObject(1, uuid);
-                try (ResultSet rs = bookStatement.executeQuery()) {
-                    if (rs.next()) {
-                        tagEntity = TagResultSetMapper.INSTANCE.map(rs);
-                    }
-                }
-            }
-
-            if (tagEntity != null) {
-                try (PreparedStatement tagStatement = connection.prepareStatement(tagQuery)) {
-                    tagStatement.setObject(1, uuid);
-                    try (ResultSet rs = tagStatement.executeQuery()) {
-                        while (rs.next()) {
-                            BookEntity bookEntity = new BookEntity();
-                            bookEntity.setUuid((UUID) rs.getObject("uuid"));
-                            bookEntity.setBookText(rs.getString("bookText"));
-                            bookEntities.add(bookEntity);
-                        }
-                    }
-                }
-                tagEntity.setBookEntities(bookEntities);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return tagEntity;
-    }
-
-
-    public boolean deleteById(UUID uuid) {
-        Connection connection = null;
-        try {
-            connection = connectionManager.getConnection();
-            connection.setAutoCommit(false);
-
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    "DELETE FROM Book_Tag WHERE tag_uuid = ?")) {
-                preparedStatement.setObject(1, uuid);
-                preparedStatement.executeUpdate();
-            }
-
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    "DELETE FROM tagentity WHERE uuid = ?")) {
-                preparedStatement.setObject(1, uuid);
-                int affectedRows = preparedStatement.executeUpdate();
-
-                if (affectedRows == 0) {
-                    connection.rollback();
-                    return false;
-                }
-            }
-
-            connection.commit();
-            return true;
-
-        } catch (SQLException e) {
-            if (connection != null) {
-                try {
-                    connection.rollback();
-                } catch (SQLException rollbackException) {
-                    LOGGER.log( Level.SEVERE, "Failed to rollback transaction", rollbackException);
-                }
-            }
-            LOGGER.log(Level.SEVERE, "SQLException encountered while deleting", e);
-            return false;
-
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException closeException) {
-                    LOGGER.log(Level.WARNING, "Failed to close the connection", closeException);
-                }
-            }
-        }
-    }
-
-
-
-    @Override
-    public List<TagEntity> findAll() throws SQLException {
-        String selectTagSql = "SELECT * FROM TagEntity";
-        String selectBookTagRelationSql = "SELECT * FROM Book_Tag WHERE tag_uuid = ?";
-        String selectBookSql = "SELECT * FROM BookEntity WHERE uuid = ?";
-
-        List<TagEntity> tagEntities = new ArrayList<>();
-
-        try (Connection connection = connectionManager.getConnection()) {
-            try (PreparedStatement tagStatement = connection.prepareStatement(selectTagSql)) {
-                ResultSet tagRs = tagStatement.executeQuery();
-                while (tagRs.next()) {
-                    TagEntity tagEntity = new TagEntity();
-                    tagEntity.setUuid((UUID) tagRs.getObject("uuid"));
-                    tagEntity.setTagName(tagRs.getString("tagName"));
-
-                    List<BookEntity> bookEntities = new ArrayList<>();
-                    try (PreparedStatement bookTagStatement = connection.prepareStatement(selectBookTagRelationSql)) {
-                        bookTagStatement.setObject(1, tagEntity.getUuid());
-                        ResultSet bookTagRs = bookTagStatement.executeQuery();
-                        while (bookTagRs.next()) {
-                            UUID bookUuid = (UUID) bookTagRs.getObject("book_uuid");
-
-                            try (PreparedStatement bookStatement = connection.prepareStatement(selectBookSql)) {
-                                bookStatement.setObject(1, bookUuid);
-                                ResultSet bookRs = bookStatement.executeQuery();
-                                if (bookRs.next()) {
-                                    BookEntity bookEntity = new BookEntity();
-                                    bookEntity.setUuid(bookUuid);
-                                    bookEntity.setBookText(bookRs.getString("bookText"));
-                                    bookEntities.add(bookEntity);
-                                }
-                            }
-                        }
-                    }
-
-                    tagEntity.setBookEntities(bookEntities);
-                    tagEntities.add(tagEntity);
-                }
-            }
-        }
-        return tagEntities;
-    }
-
-    public TagEntity save(TagEntity tagEntity) throws SQLException {
-        String insertTagSql = "INSERT INTO TagEntity (uuid, tagName) VALUES (?, ?) ON CONFLICT (uuid) DO UPDATE SET tagName = EXCLUDED.tagName";
-        String insertBookTagRelationSql = "INSERT INTO Book_Tag (book_uuid, tag_uuid) VALUES (?, ?) ON CONFLICT DO NOTHING";
-        String updateBookEntity = "INSERT INTO BookEntity (uuid, bookText) VALUES (?, ?) ON CONFLICT (uuid) DO UPDATE SET bookText = EXCLUDED.bookText";
-
-        try (Connection connection = connectionManager.getConnection()) {
-            connection.setAutoCommit(false);
-
-            if (tagEntity.getBookEntities() != null) {
-                try (PreparedStatement bookStatement = connection.prepareStatement(updateBookEntity)) {
-                    for (BookEntity bookEntity : tagEntity.getBookEntities()) {
-                        bookStatement.setObject(1, bookEntity.getUuid());
-                        bookStatement.setString(2, bookEntity.getBookText());
-                        bookStatement.addBatch();
-                    }
-                    bookStatement.executeBatch();
-                }
-            }
-
-            try (PreparedStatement tagStatement = connection.prepareStatement(insertTagSql)) {
-                tagStatement.setObject(1, tagEntity.getUuid());
-                tagStatement.setString(2, tagEntity.getTagName());
-                tagStatement.executeUpdate();
-            }
-
-            try (PreparedStatement bookTagStatement = connection.prepareStatement(insertBookTagRelationSql)) {
-                for (BookEntity bookEntity : tagEntity.getBookEntities()) {
-                    bookTagStatement.setObject(1, bookEntity.getUuid());
-                    bookTagStatement.setObject(2, tagEntity.getUuid());
-                    bookTagStatement.addBatch();
-                }
-                bookTagStatement.executeBatch();
-            }
-
-            // Commit the transaction
-            connection.commit();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            try (Connection connection = connectionManager.getConnection()) {
-                connection.rollback();
-            }
-            throw e;
-        }
-
-        return tagEntity;
-    }
-}
+import java.util.*;
+//
+//public class TagRepositoryImpl implements Repository<TagEntity, UUID> {
+//
+//    private static final Logger LOGGER = LoggerFactory.getLogger(TagRepositoryImpl.class);
+//
+//    private static final String FIND_BY_ID_SQL = "SELECT * FROM tagentity WHERE uuid = ?";
+//    private static final String DELETE_BY_ID_SQL = "DELETE FROM tagentity WHERE uuid = ?";
+//    private static final String FIND_ALL_SQL = "SELECT * FROM TagEntity";
+//    private static final String SAVE_TAG_SQL = "INSERT INTO TagEntity (uuid, tagName) VALUES (?, ?) ON CONFLICT (uuid) DO UPDATE SET tagName = EXCLUDED.tagName";
+//    private static final String DELETE_ALL_SQL = "DELETE FROM tagentity";
+//    private static final String DELETE_FROM_BOOK_TAG_SQL = "DELETE FROM Book_Tag WHERE tag_uuid = ?";
+//    private static final String SAVE_BOOK_SQL = "INSERT INTO BookEntity (uuid, bookText) VALUES (?, ?) ON CONFLICT (uuid) DO UPDATE SET bookText = EXCLUDED.bookText";
+//    private static final String INSERT_BOOK_TAG_SQL = "INSERT INTO Book_Tag (book_uuid, tag_uuid) VALUES (?, ?) ON CONFLICT DO NOTHING";
+//    private static final String FIND_BOOKS_BY_TAG_SQL = "SELECT b.* FROM BookEntity b JOIN Book_Tag bt ON b.uuid = bt.book_uuid WHERE bt.tag_uuid = ?";
+//    private static final String FIND_ALL_BOOKS_BY_TAGS_SQL = "SELECT b.*, bt.tag_uuid FROM BookEntity b JOIN Book_Tag bt ON b.uuid = bt.book_uuid";
+//
+//    private final ConnectionManager connectionManager;
+//
+//    public TagRepositoryImpl(ConnectionManager connectionManager) {
+//        this.connectionManager = connectionManager;
+//    }
+//
+//    @Override
+//    public Optional<TagEntity> findById(UUID uuid) {
+//        TagEntity tagEntity = null;
+//        try (Connection connection = connectionManager.getConnection();
+//             PreparedStatement tagStatement = connection.prepareStatement(FIND_BY_ID_SQL)) {
+//            tagStatement.setObject(1, uuid);
+//            try (ResultSet rs = tagStatement.executeQuery()) {
+//                if (rs.next()) {
+//                    tagEntity = TagResultSetMapper.INSTANCE.map(rs);
+//                }
+//            }
+//            if (tagEntity != null) {
+//                try (PreparedStatement bookStatement = connection.prepareStatement(FIND_BOOKS_BY_TAG_SQL)) {
+//                    bookStatement.setObject(1, uuid);
+//                    ResultSet bookResultSet = bookStatement.executeQuery();
+//                    List<BookEntity> bookEntities = new ArrayList<>();
+//                    while (bookResultSet.next()) {
+//                        BookEntity bookEntity = BookResultSetMapper.INSTANCE.map(bookResultSet);
+//                        bookEntities.add(bookEntity);
+//                    }
+//                    tagEntity.setBookEntities(bookEntities);
+//                }
+//            }
+//        } catch (SQLException e) {
+//            LOGGER.error("Error while finding tag by ID: {}", uuid, e);
+//        }
+//        return Optional.ofNullable(tagEntity);
+//    }
+//
+//
+//    @Override
+//    public boolean deleteById(UUID uuid) {
+//        try (Connection connection = connectionManager.getConnection()) {
+//            connection.setAutoCommit(false);
+//            try (PreparedStatement bookTagStatement = connection.prepareStatement(DELETE_FROM_BOOK_TAG_SQL);
+//                 PreparedStatement tagStatement = connection.prepareStatement(DELETE_BY_ID_SQL)) {
+//                bookTagStatement.setObject(1, uuid);
+//                bookTagStatement.executeUpdate();
+//
+//                tagStatement.setObject(1, uuid);
+//                int affectedRows = tagStatement.executeUpdate();
+//                if (affectedRows == 0) {
+//                    connection.rollback();
+//                    return false;
+//                }
+//                connection.commit();
+//            }
+//        } catch (SQLException e) {
+//            LOGGER.error("Error while deleting tag by ID: {}", uuid, e);
+//            return false;
+//        }
+//        return true;
+//    }
+//
+//    @Override
+//    public List<TagEntity> findAll() throws SQLException {
+//        List<TagEntity> tagEntities = new ArrayList<>();
+//        Map<UUID, TagEntity> tagMap = new HashMap<>();
+//        try (Connection connection = connectionManager.getConnection();
+//             PreparedStatement statement = connection.prepareStatement(FIND_ALL_SQL);
+//             ResultSet resultSet = statement.executeQuery()) {
+//            while (resultSet.next()) {
+//                TagEntity tagEntity = TagResultSetMapper.INSTANCE.map(resultSet);
+//                tagEntities.add(tagEntity);
+//                tagMap.put(tagEntity.getUuid(), tagEntity);
+//            }
+//            try (PreparedStatement bookStatement = connection.prepareStatement(FIND_ALL_BOOKS_BY_TAGS_SQL)) {
+//                ResultSet bookResultSet = bookStatement.executeQuery();
+//                while (bookResultSet.next()) {
+//                    UUID tagUuid = (UUID) bookResultSet.getObject("tag_uuid");
+//                    TagEntity relatedTag = tagMap.get(tagUuid);
+//                    if (relatedTag != null) {
+//                        BookEntity bookEntity = BookResultSetMapper.INSTANCE.map(bookResultSet);
+//                        if (relatedTag.getBookEntities() == null) {
+//                            relatedTag.setBookEntities(new ArrayList<>());
+//                        }
+//                        relatedTag.getBookEntities().add(bookEntity);
+//                    }
+//                }
+//            }
+//        } catch (SQLException e) {
+//            LOGGER.error("Error while finding all tags", e);
+//            throw e;
+//        }
+//        return tagEntities;
+//    }
+//
+//
+//    @Override
+//    public Optional<TagEntity> save(TagEntity tagEntity) throws SQLException {
+//        try (Connection connection = connectionManager.getConnection()) {
+//            connection.setAutoCommit(false);
+//
+//            try (PreparedStatement tagStatement = connection.prepareStatement(SAVE_TAG_SQL)) {
+//                tagStatement.setObject(1, tagEntity.getUuid());
+//                tagStatement.setString(2, tagEntity.getTagName());
+//                tagStatement.executeUpdate();
+//            }
+//
+//            if (tagEntity.getBookEntities() != null && !tagEntity.getBookEntities().isEmpty()) {
+//                try (PreparedStatement bookStatement = connection.prepareStatement(SAVE_BOOK_SQL);
+//                     PreparedStatement bookTagStatement = connection.prepareStatement(INSERT_BOOK_TAG_SQL)) {
+//                    for (BookEntity bookEntity : tagEntity.getBookEntities()) {
+//                        bookStatement.setObject(1, bookEntity.getUuid());
+//                        bookStatement.setString(2, bookEntity.getBookText());
+//                        bookStatement.addBatch();
+//
+//                        bookTagStatement.setObject(1, bookEntity.getUuid());
+//                        bookTagStatement.setObject(2, tagEntity.getUuid());
+//                        bookTagStatement.addBatch();
+//                    }
+//                    bookStatement.executeBatch();
+//                    bookTagStatement.executeBatch();
+//                }
+//            }
+//
+//            connection.commit();
+//            return Optional.of(tagEntity);
+//
+//        } catch (SQLException e) {
+//            LOGGER.error("Error while saving tag: {}", tagEntity, e);
+//            try {
+//                connectionManager.getConnection().rollback();
+//            } catch (SQLException rollbackException) {
+//                LOGGER.error("Failed to rollback transaction", rollbackException);
+//            }
+//            throw e;
+//        }
+//    }
+//
+//    @Override
+//    public void clearAll() {
+//        try (Connection connection = connectionManager.getConnection();
+//             PreparedStatement statement = connection.prepareStatement(DELETE_ALL_SQL)) {
+//            statement.executeUpdate();
+//        } catch (SQLException e) {
+//            LOGGER.error("Error while clearing all tags", e);
+//            throw new RuntimeException("Error while clearing all tags", e);
+//        }
+//    }
+//}

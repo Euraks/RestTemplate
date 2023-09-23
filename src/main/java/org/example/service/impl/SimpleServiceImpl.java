@@ -7,7 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class SimpleServiceImpl implements Service<SimpleEntity, UUID> {
@@ -21,34 +23,30 @@ public class SimpleServiceImpl implements Service<SimpleEntity, UUID> {
     }
 
     @Override
-    public SimpleEntity save(SimpleEntity simpleEntity) throws SQLException {
-        try {
-            repository.save(simpleEntity);
-            LOGGER.info("Saved SimpleEntity with UUID: {}", simpleEntity.getUuid());
-            return simpleEntity;
-        } catch (SQLException e) {
-            LOGGER.error("Failed to save SimpleEntity", e);
-            throw e;
+    public Optional<SimpleEntity> save(SimpleEntity simpleEntity) {
+        try{
+            repository.save( simpleEntity );
+            LOGGER.info( "Saved SimpleEntity with UUID: {}", simpleEntity.getUuid() );
+            return Optional.of( simpleEntity );
+        } catch(SQLException e){
+            LOGGER.error( "Failed to save SimpleEntity", e );
+            return Optional.empty();
         }
     }
 
     @Override
-    public SimpleEntity findById(UUID uuid) {
-        try {
-            return repository.findById(uuid);
-        } catch (Exception e) {
-            LOGGER.error("Failed to find SimpleEntity by UUID: {}", uuid, e);
-            throw e;
-        }
+    public Optional<SimpleEntity> findById(UUID uuid) {
+        return repository.findById( uuid );
     }
 
+
     @Override
-    public List<SimpleEntity> findAll() throws SQLException {
-        try {
+    public List<SimpleEntity> findAll() {
+        try{
             return repository.findAll();
-        } catch (SQLException e) {
-            LOGGER.error("Failed to find all SimpleEntities", e);
-            throw e;
+        } catch(SQLException e){
+            LOGGER.error( "Failed to find all SimpleEntities", e );
+            return Collections.emptyList();
         }
     }
 
@@ -64,7 +62,7 @@ public class SimpleServiceImpl implements Service<SimpleEntity, UUID> {
             return result;
         } catch (Exception e) {
             LOGGER.error("Failed to delete SimpleEntity by UUID: {}", uuid, e);
-            throw e;
+            return false;
         }
     }
 

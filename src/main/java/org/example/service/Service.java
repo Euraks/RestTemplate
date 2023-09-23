@@ -2,12 +2,13 @@ package org.example.service;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 public interface Service<T,K> {
 
-    T save(T t) throws SQLException;
+    Optional<T> save(T t) throws SQLException;
 
-    T findById(K k);
+    Optional<T> findById(K k);
 
     List<T> findAll() throws SQLException;
 

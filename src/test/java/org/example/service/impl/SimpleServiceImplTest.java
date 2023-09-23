@@ -8,11 +8,14 @@ import org.junit.jupiter.api.Test;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
+
 
 class SimpleServiceImplTest {
 
@@ -21,67 +24,79 @@ class SimpleServiceImplTest {
 
     @BeforeEach
     public void setUp() {
-        mockRepository = mock( Repository.class );
-        service = new SimpleServiceImpl( mockRepository );
+        mockRepository = mock(Repository.class);
+        service = new SimpleServiceImpl(mockRepository);
     }
 
     @Test
     void testSaveEntity() throws SQLException {
         SimpleEntity entity = new SimpleEntity();
-        entity.setUuid( UUID.randomUUID() );
-        entity.setDescription( "Test" );
+        entity.setUuid(UUID.randomUUID());
+        entity.setDescription("Test");
 
-        when( mockRepository.save( entity ) ).thenReturn( entity );
+        when(mockRepository.save(entity)).thenReturn(Optional.of(entity));
 
-        SimpleEntity savedEntity = service.save( entity );
+        Optional<SimpleEntity> savedEntityOpt = service.save(entity);
 
-        assertEquals( entity, savedEntity );
-        verify( mockRepository, times( 1 ) ).save( entity );
+        assertTrue(savedEntityOpt.isPresent());
+        assertEquals(entity, savedEntityOpt.get());
+        verify(mockRepository, times(1)).save(entity);
     }
-
 
     @Test
     void testFindById() {
         UUID uuid = UUID.randomUUID();
         SimpleEntity entity = new SimpleEntity();
-        entity.setUuid( uuid );
-        entity.setDescription( "Test" );
+        entity.setUuid(uuid);
+        entity.setDescription("Test");
 
-        when( mockRepository.findById( uuid ) ).thenReturn( entity );
+        when(mockRepository.findById(uuid)).thenReturn(Optional.of(entity));
 
-        SimpleEntity foundEntity = service.findById( uuid );
+        Optional<SimpleEntity> foundEntityOpt = service.findById(uuid);
 
-        assertEquals( entity, foundEntity );
-        verify( mockRepository, times( 1 ) ).findById( uuid );
+        assertTrue(foundEntityOpt.isPresent());
+        assertEquals(entity, foundEntityOpt.get());
+        verify(mockRepository, times(1)).findById(uuid);
     }
 
     @Test
     void testFindAll() throws SQLException {
         SimpleEntity entity1 = new SimpleEntity();
-        entity1.setUuid( UUID.randomUUID() );
-        entity1.setDescription( "Test1" );
+        entity1.setUuid(UUID.randomUUID());
+        entity1.setDescription("Test1");
 
         SimpleEntity entity2 = new SimpleEntity();
-        entity2.setUuid( UUID.randomUUID() );
-        entity2.setDescription( "Test2" );
+        entity2.setUuid(UUID.randomUUID());
+        entity2.setDescription("Test2");
 
-        when( mockRepository.findAll() ).thenReturn( Arrays.asList( entity1, entity2 ) );
+        when(mockRepository.findAll()).thenReturn(Arrays.asList(entity1, entity2));
 
         List<SimpleEntity> entities = service.findAll();
 
-        assertEquals( 2, entities.size() );
-        verify( mockRepository, times( 1 ) ).findAll();
+        assertEquals(2, entities.size());
+        verify(mockRepository, times(1)).findAll();
     }
 
     @Test
     void testDelete() {
         UUID uuid = UUID.randomUUID();
-        when( mockRepository.deleteById( uuid ) ).thenReturn( true );
+        when(mockRepository.deleteById(uuid)).thenReturn(true);
 
-        boolean result = service.delete( uuid );
+        boolean result = service.delete(uuid);
 
-        assertTrue( result );
-        verify( mockRepository, times( 1 ) ).deleteById( uuid );
+        assertTrue(result);
+        verify(mockRepository, times(1)).deleteById(uuid);
+    }
+
+    @Test
+    void testDeleteException() {
+        UUID uuid = UUID.randomUUID();
+        when(mockRepository.deleteById(uuid)).thenThrow(new RuntimeException("Delete error"));
+
+        boolean result = service.delete(uuid);
+
+        assertFalse(result);
+        verify(mockRepository, times(1)).deleteById(uuid);
     }
 
     @Test
@@ -89,5 +104,4 @@ class SimpleServiceImplTest {
         Repository<SimpleEntity, UUID> result = service.getRepository();
         assertEquals(mockRepository, result);
     }
-
 }
