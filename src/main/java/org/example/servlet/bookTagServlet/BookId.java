@@ -38,8 +38,8 @@ import java.util.UUID;
 //        if (pathInfo != null && !pathInfo.isEmpty()) {
 //            String[] pathParts = pathInfo.split( "/" );
 //            if (pathParts.length > 1) {
-//                String id = pathParts[1];
-//                BookEntity bookEntity = service.findById( UUID.fromString( id ) );
+//                UUID entityUUID = UUID.fromString(pathParts[pathParts.length - 1]);
+//                BookEntity bookEntity = service.findById( entityUUID );
 //                BookOutGoingDTO bookOutGoingDTO = BookMapper.INSTANCE.map( bookEntity );
 //                String jsonString = mapper.writeValueAsString( bookOutGoingDTO );
 //                response.setContentType( "application/json" );
@@ -57,14 +57,14 @@ import java.util.UUID;
 //            String[] pathParts = pathInfo.split( "/" );
 //            if (pathParts.length > 1) {
 //                StringBuilder sb = getStringFromRequest( request );
-//                UUID authorId = UUID.fromString( pathParts[1] );
+//                UUID authorUUID = UUID.fromString(pathParts[pathParts.length - 1]);
 //                String json = sb.toString();
 //
 //                ObjectMapper objectMapper = new ObjectMapper();
 //                BookUpdateDTO bookUpdateDTO = objectMapper.readValue( json, BookUpdateDTO.class );
 //
 //                BookEntity updateBookEntity = BookMapper.INSTANCE.map( bookUpdateDTO );
-//                BookEntity newBookEntity = service.findById( authorId );
+//                BookEntity newBookEntity = service.findById( authorUUID );
 //                newBookEntity.setBookText( updateBookEntity.getBookText() );
 //                newBookEntity.setTagEntities( updateBookEntity.getTagEntities() );
 //                try{
@@ -101,13 +101,13 @@ import java.util.UUID;
 //        if (pathInfo != null && !pathInfo.isEmpty()) {
 //            String[] pathParts = pathInfo.split("/");
 //            if (pathParts.length > 1) {
-//                String id = pathParts[1];
-//                if (service.delete(UUID.fromString(id))) {
-//                    response.getWriter().write("Delete BookEntity UUID:" + id);
+//                UUID bookUUID = UUID.fromString(pathParts[pathParts.length - 1]);
+//                if (service.delete(bookUUID)) {
+//                    response.getWriter().write("Delete BookEntity UUID:" + bookUUID);
 //
 //                } else {
 //                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-//                    response.getWriter().write("BookEntity with UUID:" + id + " not found");
+//                    response.getWriter().write("BookEntity with UUID:" + bookUUID + " not found");
 //
 //                }
 //                return;

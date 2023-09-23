@@ -4,6 +4,8 @@ import org.example.db.ConnectionManager;
 import org.example.model.Article;
 import org.example.model.AuthorEntity;
 import org.example.repository.AuthorEntityRepository;
+import org.example.repository.mapper.ArticleResultSetMapper;
+import org.example.repository.mapper.AuthorEntityResultSetMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,23 +13,22 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<AuthorEntity, UUID> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( AuthorEntityRepositoryImpl.class );
 
-    private static final String FIND_AUTHOR_BY_ID_SQL = "SELECT id, authorName FROM AuthorEntity WHERE id = ?";
-    private static final String DELETE_AUTHOR_BY_ID_SQL = "DELETE FROM AuthorEntity WHERE id = ?";
+    private static final String FIND_AUTHOR_BY_ID_SQL = "SELECT uuid, authorName FROM AuthorEntity WHERE uuid = ?";
+    private static final String DELETE_AUTHOR_BY_ID_SQL = "DELETE FROM AuthorEntity WHERE  uuid = ?";
     private static final String FIND_ALL_AUTHORS_SQL = "SELECT * FROM AuthorEntity";
-    private static final String SAVE_AUTHOR_SQL = "INSERT INTO AuthorEntity (id, authorName) VALUES (?, ?) " +
-            "ON CONFLICT (id) DO UPDATE SET authorName = EXCLUDED.authorName";
-    private static final String FIND_ARTICLES_BY_AUTHOR_ID_SQL = "SELECT id, author_id, text FROM Article WHERE author_id = ?";
-    private static final String SAVE_ARTICLE_SQL = "INSERT INTO Article (id, author_id, text) VALUES (?, ?, ?) " +
-            "ON CONFLICT (id) DO UPDATE SET author_id = EXCLUDED.author_id, text = EXCLUDED.text";
+    private static final String SAVE_AUTHOR_SQL = "INSERT INTO AuthorEntity (uuid, authorName) VALUES (?, ?) " +
+            "ON CONFLICT (uuid) DO UPDATE SET authorName = EXCLUDED.authorName";
+    private static final String FIND_ARTICLES_BY_AUTHOR_ID_SQL = "SELECT uuid, author_id, text FROM Article WHERE author_id = ?";
+    private static final String SAVE_ARTICLE_SQL = "INSERT INTO Article (uuid, author_id, text) VALUES (?, ?, ?) " +
+            "ON CONFLICT (uuid) DO UPDATE SET author_id = EXCLUDED.author_id, text = EXCLUDED.text";
+    private static final String DELETE_ARTICLE = "DELETE FROM Article";
+    private static final String DELETE_AUTHORS = "DELETE FROM AuthorEntity";
 
     private final ConnectionManager connectionManager;
 
@@ -37,21 +38,28 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
 
     @Override
     public Optional<AuthorEntity> findById(UUID uuid) {
-        return Optional.ofNullable( executeQuery( FIND_AUTHOR_BY_ID_SQL, statement -> {
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement( FIND_AUTHOR_BY_ID_SQL )){
+
             statement.setObject( 1, uuid );
             try (ResultSet resultSet = statement.executeQuery()){
                 if (resultSet.next()) {
-                    return createAuthorFromResultSet( resultSet );
+                    return Optional.of( createAuthorFromResultSet( resultSet ) );
                 }
-                return null;
+                return Optional.empty();
             }
-        } ) );
+        } catch(SQLException e){
+            LOGGER.error( "Error executing query: {}", FIND_AUTHOR_BY_ID_SQL, e );
+            return Optional.empty();
+        }
     }
 
 
     @Override
     public List<AuthorEntity> findAll() {
-        return executeQuery( FIND_ALL_AUTHORS_SQL, statement -> {
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement( FIND_ALL_AUTHORS_SQL )){
+
             try (ResultSet resultSet = statement.executeQuery()){
                 List<AuthorEntity> authors = new ArrayList<>();
                 while (resultSet.next()) {
@@ -59,16 +67,24 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
                 }
                 return authors;
             }
-        } );
+        } catch(SQLException e){
+            LOGGER.error( "Error executing query: {}", FIND_ALL_AUTHORS_SQL, e );
+            return Collections.emptyList();
+        }
     }
 
     @Override
     public boolean deleteById(UUID uuid) {
-        return executeUpdate( DELETE_AUTHOR_BY_ID_SQL, statement -> {
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement( DELETE_AUTHOR_BY_ID_SQL )){
             statement.setObject( 1, uuid );
             return statement.executeUpdate() > 0;
-        } );
+        } catch(SQLException e){
+            LOGGER.error( "Error executing update: {}", DELETE_AUTHOR_BY_ID_SQL, e );
+            return false;
+        }
     }
+
 
     @Override
     public Optional<AuthorEntity> save(AuthorEntity authorEntity) {
@@ -106,14 +122,7 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
              PreparedStatement preparedStatement = connection.prepareStatement( articlesSql );
              ResultSet resultSet = preparedStatement.executeQuery()){
             while (resultSet.next()) {
-                UUID uuid = UUID.fromString( resultSet.getString( "id" ) );
-                UUID authorId = UUID.fromString( resultSet.getString( "author_id" ) );
-                String text = resultSet.getString( "text" );
-
-                Article article = new Article();
-                article.setUuid( uuid );
-                article.setAuthor_uuid( authorId );
-                article.setText( text );
+                Article article = ArticleResultSetMapper.INSTANCE.map( resultSet );
                 articles.add( article );
             }
         } catch(SQLException e){
@@ -124,19 +133,34 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
 
     @Override
     public void clearAll() {
-        throw new UnsupportedOperationException( "Clear all operation not supported for authors" );
+        try (Connection connection = connectionManager.getConnection()){
+            connection.setAutoCommit( false );
+
+            try (PreparedStatement deleteArticles = connection.prepareStatement( DELETE_ARTICLE )){
+                deleteArticles.executeUpdate();
+            }
+
+            try (PreparedStatement deleteAuthors = connection.prepareStatement( DELETE_AUTHORS )){
+                deleteAuthors.executeUpdate();
+            }
+
+            connection.commit();
+        } catch(SQLException e){
+            LOGGER.error( "Error while clearing AuthorEntity and related entities", e );
+            throw new RuntimeException( e );
+        }
     }
 
     private AuthorEntity createAuthorFromResultSet(ResultSet resultSet) throws SQLException {
-        AuthorEntity authorEntity = new AuthorEntity();
-        authorEntity.setUuid( (UUID) resultSet.getObject( "id" ) );
-        authorEntity.setAuthorName( resultSet.getString( "authorName" ) );
+        AuthorEntity authorEntity = AuthorEntityResultSetMapper.INSTANCE.map( resultSet );
         authorEntity.setArticleList( findArticlesByAuthorId( authorEntity.getUuid() ) );
         return authorEntity;
     }
 
     private List<Article> findArticlesByAuthorId(UUID authorId) {
-        return executeQuery( FIND_ARTICLES_BY_AUTHOR_ID_SQL, statement -> {
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement( FIND_ARTICLES_BY_AUTHOR_ID_SQL )){
+
             statement.setObject( 1, authorId );
             try (ResultSet resultSet = statement.executeQuery()){
                 List<Article> articles = new ArrayList<>();
@@ -145,48 +169,14 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
                 }
                 return articles;
             }
-        } );
+        } catch(SQLException e){
+            LOGGER.error( "Error executing query: {}", FIND_ARTICLES_BY_AUTHOR_ID_SQL, e );
+            return Collections.emptyList();
+        }
     }
 
     private Article createArticleFromResultSet(ResultSet resultSet) throws SQLException {
-        Article article = new Article();
-        article.setUuid( (UUID) resultSet.getObject( "id" ) );
-        article.setAuthor_uuid( (UUID) resultSet.getObject( "author_id" ) );
-        article.setText( resultSet.getString( "text" ) );
-        return article;
+        return ArticleResultSetMapper.INSTANCE.map( resultSet );
     }
-
-    private <T> T executeQuery(String sql, PreparedStatementSetterAndMapper<T> setterAndMapper) {
-        try (Connection connection = connectionManager.getConnection();
-             PreparedStatement statement = connection.prepareStatement( sql )){
-
-            return setterAndMapper.apply( statement );
-        } catch(SQLException e){
-            LOGGER.error( "Error executing query: {}", sql, e );
-            throw new RuntimeException( e );
-        }
-    }
-
-    private boolean executeUpdate(String sql, PreparedStatementSetter setter) {
-        try (Connection connection = connectionManager.getConnection();
-             PreparedStatement statement = connection.prepareStatement( sql )){
-
-            return setter.apply( statement );
-        } catch(SQLException e){
-            LOGGER.error( "Error executing update: {}", sql, e );
-            throw new RuntimeException( e );
-        }
-    }
-
-    @FunctionalInterface
-    private interface PreparedStatementSetterAndMapper<T> {
-        T apply(PreparedStatement statement) throws SQLException;
-    }
-
-    @FunctionalInterface
-    public interface PreparedStatementSetter {
-        boolean apply(PreparedStatement statement) throws SQLException;
-    }
-
 }
 

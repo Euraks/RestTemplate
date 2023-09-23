@@ -6,16 +6,16 @@ CREATE TABLE IF NOT EXISTS SimpleEntity
 
 CREATE TABLE IF NOT EXISTS AuthorEntity
 (
-    id         uuid PRIMARY KEY,
+    uuid         uuid PRIMARY KEY,
     authorName TEXT
 );
 
 CREATE TABLE IF NOT EXISTS Article
 (
-    id        uuid PRIMARY KEY,
+    uuid        uuid PRIMARY KEY,
     author_id uuid NOT NULL,
     text      TEXT NOT NULL,
-    CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES AuthorEntity (id) ON DELETE CASCADE
+    CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES AuthorEntity (uuid) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS BookEntity

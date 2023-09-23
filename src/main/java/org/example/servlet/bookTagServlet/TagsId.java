@@ -24,9 +24,9 @@ package org.example.servlet.bookTagServlet;
 //        if (pathInfo != null && !pathInfo.isEmpty()) {
 //            String[] pathParts = pathInfo.split("/");
 //            if (pathParts.length > 1) {
-//                String id = pathParts[1];
+//                UUID tagUUID = UUID.fromString(pathParts[pathParts.length - 1]);
 //                try {
-//                    Optional<TagEntity> optionalTag = service.findById(UUID.fromString(id));
+//                    Optional<TagEntity> optionalTag = service.findById(tagUUID);
 //                    if (optionalTag.isPresent()) {
 //                        TagOutGoingDTO tagOutGoingDTO = TagMapper.INSTANCE.map(optionalTag.get());
 //                        String jsonString = mapper.writeValueAsString(tagOutGoingDTO);
@@ -120,14 +120,14 @@ package org.example.servlet.bookTagServlet;
 //        if (pathInfo != null && !pathInfo.isEmpty()) {
 //            String[] pathParts = pathInfo.split("/");
 //            if (pathParts.length > 1) {
-//                String id = pathParts[1];
-//                if (service.delete(UUID.fromString(id))) {
-//                    response.getWriter().write("Delete TagEntity UUID:" + id);
-//                    LOGGER.l( Level.INFO, "Successfully deleted TagEntity with UUID: {0}", id);
+//                UUID tagUUID = UUID.fromString(pathParts[pathParts.length - 1]);
+//                if (service.delete(tagUUID)) {
+//                    response.getWriter().write("Delete TagEntity UUID:" + tagUUID);
+//                    LOGGER.l( Level.INFO, "Successfully deleted TagEntity with UUID: {0}", tagUUID);
 //                } else {
 //                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-//                    response.getWriter().write("TagEntity with UUID:" + id + " not found");
-//                    LOGGER.log(Level.WARNING, "TagEntity with UUID: {0} not found", id);
+//                    response.getWriter().write("TagEntity with UUID:" + tagUUID + " not found");
+//                    LOGGER.log(Level.WARNING, "TagEntity with UUID: {0} not found", tagUUID);
 //                }
 //                return;
 //            }
