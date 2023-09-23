@@ -1,5 +1,6 @@
 package org.example.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -31,7 +32,10 @@ public class AuthorEntity {
     }
 
     public List<Article> getArticleList() {
-        return articleList;
+        if (this.articleList == null) {
+            this.articleList = new ArrayList<>();
+        }
+        return this.articleList;
     }
 
     public void setArticleList(List<Article> articleList) {

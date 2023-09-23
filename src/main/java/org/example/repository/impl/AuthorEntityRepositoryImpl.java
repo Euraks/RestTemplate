@@ -98,8 +98,8 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
             if (authorEntity.getArticleList() != null && !authorEntity.getArticleList().isEmpty()) {
                 try (PreparedStatement psArticle = connection.prepareStatement( SAVE_ARTICLE_SQL )){
                     for (Article article : authorEntity.getArticleList()) {
-                        psArticle.setObject( 1, article.getUuid() );
-                        psArticle.setObject( 2, article.getAuthor_uuid() );
+                        psArticle.setObject( 1, article.getUuid()==null?UUID.randomUUID():article.getUuid() );
+                        psArticle.setObject( 2, authorEntity.getUuid() );
                         psArticle.setString( 3, article.getText() );
                         psArticle.addBatch();
                     }

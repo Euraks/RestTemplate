@@ -2,6 +2,7 @@ package org.example.servlet.dto.AuthorEntityDTO;
 
 import org.example.model.Article;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AuthorEntityIncomingDTO {
@@ -18,7 +19,10 @@ public class AuthorEntityIncomingDTO {
     }
 
     public List<Article> getArticleList() {
-        return articleList;
+        if (this.articleList == null) {
+            this.articleList = new ArrayList<>();
+        }
+        return this.articleList;
     }
 
     public void setArticleList(List<Article> articleList) {

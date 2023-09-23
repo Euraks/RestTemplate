@@ -2,13 +2,17 @@ package org.example.servlet.dto.AuthorEntityDTO;
 
 import org.example.model.Article;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ArticleAllOutGoingDTO {
     List<Article> articles;
 
     public List<Article> getArticles() {
-        return articles;
+        if (this.articles == null) {
+            this.articles = new ArrayList<>();
+        }
+        return this.articles;
     }
 
     public void setArticles(List<Article> articles) {

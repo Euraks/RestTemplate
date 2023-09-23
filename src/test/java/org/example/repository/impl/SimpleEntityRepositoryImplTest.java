@@ -108,4 +108,17 @@ public class SimpleEntityRepositoryImplTest {
         List<SimpleEntity> entities = repository.findAll();
         Assertions.assertEquals( 2, entities.size() );
     }
+
+    @Test
+    void clearAll() {
+        repository.save( new SimpleEntity( "Test1" ) );
+        repository.save( new SimpleEntity( "Test2" ) );
+
+        List<SimpleEntity> entities = repository.findAll();
+        Assertions.assertEquals( 2, entities.size() );
+
+        repository.clearAll();
+
+        Assertions.assertEquals(0, repository.findAll().size() );
+    }
 }
