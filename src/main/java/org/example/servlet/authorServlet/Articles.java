@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,11 +50,34 @@ public class Articles extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<Article> articleList = service.findArticlesAll();
-        ArticleAllOutGoingDTO articleAllOutGoingDTO = ArticleMapper.INSTANCE.mapListToDto( articleList );
-        String jsonString = mapper.writeValueAsString( articleAllOutGoingDTO );
-        response.setContentType( "application/json" );
-        response.setCharacterEncoding( "UTF-8" );
-        response.getWriter().write( "GetAll SimpleEntity UUID:" + jsonString );
+        try {
+            List<AuthorEntity> authorEntityList = service.findAll();
+            String jsonString = mapper.writeValueAsString(authorEntityList);
+            sendSuccessResponse(response, "GetAll AuthorEntity:" + jsonString, HttpServletResponse.SC_OK);
+        } catch (SQLException e) {
+            handleException(response, e, "Failed to fetch all AuthorEntities");
+        } catch (Exception e) {
+            handleException(response, e, "Failed to process GET request");
+        }
+    }
+
+    private void sendSuccessResponse(HttpServletResponse response, String message, int statusCode) throws IOException {
+        writeResponse(response, message, statusCode, "application/json");
+    }
+
+    void handleException(HttpServletResponse response, Exception e, String logMessage) {
+        LOGGER.error(logMessage, e);
+        try {
+            writeResponse(response, "An internal server error occurred.", HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "text/plain");
+        } catch (IOException ioException) {
+            LOGGER.error("Failed to send error response.", ioException);
+        }
+    }
+
+    private void writeResponse(HttpServletResponse response, String message, int statusCode, String contentType) throws IOException {
+        response.setContentType(contentType);
+        response.setCharacterEncoding("UTF-8");
+        response.setStatus(statusCode);
+        response.getWriter().write(message);
     }
 }

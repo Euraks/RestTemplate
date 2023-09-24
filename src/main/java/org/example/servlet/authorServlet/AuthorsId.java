@@ -45,12 +45,12 @@ public class AuthorsId extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try{
-            String id = extractIdFromRequest( request );
-            if (id == null) {
+            String uuid = extractIdFromRequest( request );
+            if (uuid == null) {
                 sendBadRequest( response, "Invalid ID format" );
                 return;
             }
-            processGetRequest( id, response );
+            processGetRequest( uuid, response );
         } catch(Exception e){
             handleException( response, e, "Failed to process GET request" );
         }
@@ -73,12 +73,17 @@ public class AuthorsId extends HttpServlet {
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try{
-            String id = extractIdFromRequest( request );
-            if (id == null) {
-                sendBadRequest( response, "Invalid ID format" );
-                return;
+            String pathInfo = request.getPathInfo();
+            if (pathInfo != null && !pathInfo.isEmpty()) {
+                String[] pathParts = pathInfo.split( "/" );
+                if (pathParts.length > 1) {
+                    UUID entityUUID = UUID.fromString(pathParts[pathParts.length - 1]);
+                    service.delete( entityUUID );
+                    response.setContentType( "application/json" );
+                    response.setCharacterEncoding( "UTF-8" );
+                    response.getWriter().write( "Deleted AuthorEntity UUID:" + entityUUID );
+                }
             }
-            processDeleteRequest( id, response );
         } catch(Exception e){
             handleException( response, e, "Failed to process DELETE request" );
         }
@@ -90,7 +95,7 @@ public class AuthorsId extends HttpServlet {
             return null;
         }
         String[] pathParts = pathInfo.split("/");
-        return pathParts.length > 1 ? pathParts[1] : null;
+        return pathParts.length > 1 ? String.valueOf( UUID.fromString(pathParts[pathParts.length - 1]) ) : null;
     }
 
     private void processGetRequest(String id, HttpServletResponse response) throws IOException {
@@ -145,30 +150,6 @@ public class AuthorsId extends HttpServlet {
         }
     }
 
-    private void processDeleteRequest(String id, HttpServletResponse response) throws IOException {
-        setResponseDefaults(response);
-
-        UUID uuid;
-        try {
-            uuid = UUID.fromString(id);
-        } catch (IllegalArgumentException e) {
-            sendBadRequest(response, "Invalid UUID format");
-            return;
-        }
-
-        try {
-            if (service.delete(uuid)) {
-                response.getWriter().write("Author deleted successfully");
-                LOGGER.info("Successfully deleted Author with UUID: {}", id);
-            } else {
-                sendNotFound(response);
-            }
-        } catch (Exception e) {
-            LOGGER.error("Failed to delete AuthorEntity with UUID: {}", id, e);
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        }
-    }
-
     private void sendBadRequest(HttpServletResponse response, String message) throws IOException {
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         response.getWriter().write(message);
@@ -180,6 +161,7 @@ public class AuthorsId extends HttpServlet {
     }
 
     private void setResponseDefaults(HttpServletResponse response) {
+        response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
     }

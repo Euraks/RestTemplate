@@ -59,7 +59,7 @@ public class SimplesId extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) {
         try{
             String pathInfo = request.getPathInfo();
             if (pathInfo != null && !pathInfo.isEmpty()) {

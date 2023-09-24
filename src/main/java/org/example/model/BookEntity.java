@@ -1,5 +1,6 @@
 package org.example.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -31,7 +32,10 @@ public class BookEntity {
     }
 
     public List<TagEntity> getTagEntities() {
-        return tagEntities;
+        if (this.tagEntities == null) {
+            this.tagEntities = new ArrayList<>();
+        }
+        return this.tagEntities;
     }
 
     public void setTagEntities(List<TagEntity> tagEntities) {

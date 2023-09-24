@@ -11,6 +11,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -20,6 +21,7 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,46 +34,48 @@ public class SimplesIdTest {
 
     @Container
     public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>( "postgres:13.1" )
-            .withDatabaseName( "testcontainers" )
-            .withUsername( "testcontainers" )
-            .withPassword( "testcontainers" )
+            .withDatabaseName( "test-db" )
+            .withUsername( "test" )
+            .withPassword( "test" )
             .withInitScript( "db.sql" );
 
     private SimplesId servlet;
-    private ConnectionManager connectionManager;
 
     @BeforeEach
-    public void setUp() throws SQLException {
-        connectionManager = mock( ConnectionManager.class );
-        when( connectionManager.getConnection() ).thenReturn( postgreSQLContainer.createConnection( "" ) );
-        servlet = new SimplesId( connectionManager );
+    void setUp() {
+        ConnectionManager testConnectionManager = new ConnectionManager() {
+            @Override
+            public Connection getConnection() throws SQLException {
+                return postgreSQLContainer.createConnection( "" );
+            }
+        };
+
+        servlet = new SimplesId( testConnectionManager );
+    }
+
+    @AfterEach
+    public void tearDown() {
+        postgreSQLContainer.stop();
     }
 
     @Test
-    void testDefaultConstructor() {
-        SimplesId defaultServlet = new SimplesId();
+    void testDefaultConstructor() throws Exception {
+        postgreSQLContainer.start();
 
-        ConnectionManager connectionManager = getFieldValue( defaultServlet, "connectionManager", ConnectionManager.class );
-        assertNotNull( connectionManager, "connectionManager should be initialized" );
+        Simples servlet = new Simples();
 
-        Repository<SimpleEntity, UUID> repository = getFieldValue( defaultServlet, "repository", Repository.class );
-        assertNotNull( repository, "repository should be initialized" );
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        StringWriter stringWriter = new StringWriter();
+        Mockito.when(response.getWriter()).thenReturn(new PrintWriter(stringWriter));
 
-        Service<SimpleEntity, UUID> service = getFieldValue( defaultServlet, "service", Service.class );
-        assertNotNull( service, "service should be initialized" );
+        servlet.doGet(request, response);
+
+        Assertions.assertFalse(stringWriter.toString().isEmpty(), "Response body should not be empty");
+        Mockito.verify(response).setStatus(HttpServletResponse.SC_OK);
+
+        postgreSQLContainer.stop();
     }
-
-    @SuppressWarnings("unchecked")
-    private <T> T getFieldValue(Object object, String fieldName, Class<T> clazz) {
-        try{
-            Field field = object.getClass().getDeclaredField( fieldName );
-            field.setAccessible( true );
-            return (T) field.get( object );
-        } catch(Exception e){
-            throw new RuntimeException( "Failed to get the value of the field: " + fieldName, e );
-        }
-    }
-
 
     @Test
     void testDoGet() throws Exception {
@@ -172,12 +176,5 @@ public class SimplesIdTest {
         verify(mockResponse).setCharacterEncoding("UTF-8");
         verify(mockResponse).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         verify(mockWriter).write("An internal server error occurred.");
-    }
-
-
-
-    @AfterEach
-    public void tearDown() {
-        reset( connectionManager );
     }
 }

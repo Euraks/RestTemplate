@@ -3,7 +3,6 @@ package org.example.repository.impl;
 import org.example.db.ConnectionManager;
 import org.example.model.Article;
 import org.example.model.AuthorEntity;
-import org.example.model.SimpleEntity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,8 +15,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 
 @Testcontainers
