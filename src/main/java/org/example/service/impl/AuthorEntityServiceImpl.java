@@ -69,7 +69,7 @@ public class AuthorEntityServiceImpl implements AuthorEntityService {
     }
 
     @Override
-    public Repository<AuthorEntity, UUID> getRepository() {
+    public AuthorEntityRepository<AuthorEntity, UUID> getRepository() {
         return this.repository;
     }
 
