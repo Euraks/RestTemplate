@@ -3,7 +3,6 @@ package org.example.servlet.authorServlet;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,9 +14,6 @@ import org.example.repository.AuthorEntityRepository;
 import org.example.repository.impl.AuthorEntityRepositoryImpl;
 import org.example.service.Service;
 import org.example.service.impl.AuthorEntityServiceImpl;
-import org.example.servlet.dto.AuthorEntityDTO.AuthorEntityOutGoingDTO;
-import org.example.servlet.dto.AuthorEntityDTO.AuthorEntityUpdateDTO;
-import org.example.servlet.dto.AuthorEntityDTO.mapper.AuthorEntityMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,10 +23,9 @@ import java.sql.SQLException;
 import java.util.Optional;
 import java.util.UUID;
 
-
 @WebServlet(name = "AuthorsId", value = "/authors/*")
 public class AuthorsId extends HttpServlet {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Authors.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger( AuthorsId.class );
     private ObjectMapper mapper = new ObjectMapper();
 
     private final ConnectionManager connectionManager;
@@ -48,33 +43,45 @@ public class AuthorsId extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String id = extractIdFromRequest(request);
-        if (id == null) {
-            sendBadRequest(response, "Invalid ID format");
-            return;
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try{
+            String id = extractIdFromRequest( request );
+            if (id == null) {
+                sendBadRequest( response, "Invalid ID format" );
+                return;
+            }
+            processGetRequest( id, response );
+        } catch(Exception e){
+            handleException( response, e, "Failed to process GET request" );
         }
-        processGetRequest(id, response);
     }
 
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String id = extractIdFromRequest(request);
-        if (id == null) {
-            sendBadRequest(response, "Invalid ID format");
-            return;
+        try{
+            String id = extractIdFromRequest( request );
+            if (id == null) {
+                sendBadRequest( response, "Invalid ID format" );
+                return;
+            }
+            processPutRequest( id, request, response );
+        } catch(Exception e){
+            handleException( response, e, "Failed to process PUT request" );
         }
-        processPutRequest(id, request, response);
     }
 
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String id = extractIdFromRequest(request);
-        if (id == null) {
-            sendBadRequest(response, "Invalid ID format");
-            return;
+        try{
+            String id = extractIdFromRequest( request );
+            if (id == null) {
+                sendBadRequest( response, "Invalid ID format" );
+                return;
+            }
+            processDeleteRequest( id, response );
+        } catch(Exception e){
+            handleException( response, e, "Failed to process DELETE request" );
         }
-        processDeleteRequest(id, response);
     }
 
     private String extractIdFromRequest(HttpServletRequest request) {
@@ -92,19 +99,19 @@ public class AuthorsId extends HttpServlet {
         UUID uuid;
         try {
             uuid = UUID.fromString(id);
-        } catch (IllegalArgumentException e) {
-            sendBadRequest(response, "Invalid UUID format");
+        } catch(IllegalArgumentException e){
+            sendBadRequest( response, "Invalid UUID format" );
             return;
         }
 
-        Optional<AuthorEntity> authorEntityOpt = service.findById(uuid);
+        Optional<AuthorEntity> authorEntityOpt = service.findById( uuid );
         if (authorEntityOpt.isEmpty()) {
-            sendNotFound(response);
+            sendNotFound( response );
             return;
         }
-        AuthorEntityOutGoingDTO authorEntityOutGoingDTO = AuthorEntityMapper.INSTANCE.map(authorEntityOpt.get());
-        String jsonString = mapper.writeValueAsString(authorEntityOutGoingDTO);
-        response.getWriter().write(jsonString);
+        AuthorEntity authorEntity = authorEntityOpt.get();
+        String jsonString = mapper.writeValueAsString( authorEntity );
+        response.getWriter().write( jsonString );
     }
 
     private void processPutRequest(String id, HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -118,34 +125,24 @@ public class AuthorsId extends HttpServlet {
             return;
         }
 
-        StringBuilder sb = getStringFromRequest(request);
-        AuthorEntityUpdateDTO authorEntityUpdateDTO;
+        StringBuilder sb = getStringFromRequest( request );
+        AuthorEntity authorEntity;
         try {
-            authorEntityUpdateDTO = mapper.readValue(sb.toString(), AuthorEntityUpdateDTO.class);
+            authorEntity = mapper.readValue( sb.toString(), AuthorEntity.class );
         } catch (JsonProcessingException e) {
             sendBadRequest(response, "Invalid JSON format");
             return;
         }
 
-        AuthorEntity updateAuthorEntity = AuthorEntityMapper.INSTANCE.map(authorEntityUpdateDTO);
+        authorEntity.setUuid( uuid );
 
-        Optional<AuthorEntity> newAuthorEntityOpt = service.findById(uuid);
-        if (newAuthorEntityOpt.isEmpty()) {
-            sendNotFound(response);
-            return;
-        }
-        AuthorEntity newAuthorEntity = newAuthorEntityOpt.get();
-        newAuthorEntity.setAuthorName(updateAuthorEntity.getAuthorName());
-        newAuthorEntity.setArticleList(updateAuthorEntity.getArticleList());
-
-        try {
-            service.save(newAuthorEntity);
+        try{
+            service.save( authorEntity );
+            response.getWriter().write( "Author updated successfully" );
         } catch (SQLException e) {
             LOGGER.error("Failed to save AuthorEntity", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            return;
         }
-        response.getWriter().write("Author updated successfully");
     }
 
     private void processDeleteRequest(String id, HttpServletResponse response) throws IOException {
@@ -189,12 +186,21 @@ public class AuthorsId extends HttpServlet {
 
     private StringBuilder getStringFromRequest(HttpServletRequest request) throws IOException {
         StringBuilder sb = new StringBuilder();
-        try (BufferedReader reader = request.getReader()) {
+        try (BufferedReader reader = request.getReader()){
             String line;
             while ((line = reader.readLine()) != null) {
-                sb.append(line);
+                sb.append( line );
             }
         }
         return sb;
     }
+
+    private void handleException(HttpServletResponse response, Exception e, String logMessage) throws IOException {
+        LOGGER.error( logMessage, e );
+        response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+        response.setContentType( "text/plain" );
+        response.setCharacterEncoding( "UTF-8" );
+        response.getWriter().write( "An internal server error occurred." );
+    }
+
 }

@@ -21,6 +21,11 @@ public class AuthorEntity {
 
     public void setUuid(UUID uuid) {
         this.uuid = uuid;
+        if (articleList!=null){
+            for (Article article:articleList) {
+                article.setAuthor_uuid( uuid );
+            }
+        }
     }
 
     public String getAuthorName() {

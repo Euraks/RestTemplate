@@ -45,7 +45,7 @@ public class Simples extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) {
         try{
             List<SimpleEntity> simpleEntityList = service.findAll();
             String jsonString = mapper.writeValueAsString( simpleEntityList );
