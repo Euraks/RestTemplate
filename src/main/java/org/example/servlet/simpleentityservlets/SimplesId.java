@@ -167,4 +167,8 @@ public class SimplesId extends HttpServlet {
         response.setStatus( statusCode );
         response.getWriter().write( message );
     }
+
+    protected void setService(Service<SimpleEntity, UUID> service) {
+        this.service = service;
+    }
 }

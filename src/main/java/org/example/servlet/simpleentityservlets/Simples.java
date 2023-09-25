@@ -63,7 +63,7 @@ public class Simples extends HttpServlet {
             String json = readRequestBody( request ).toString();
             SimpleEntity simpleEntity = mapper.readValue( json, SimpleEntity.class );
             service.save( simpleEntity );
-            sendSuccessResponse( response, "Added SimpleEntity UUID:" + simpleEntity.getUuid(), HttpServletResponse.SC_CREATED );
+            sendSuccessResponse( response, "Added SimpleEntity UUID:" + simpleEntity.getUuid(), HttpServletResponse.SC_OK );
         } catch(SQLException e){
             handleException( response, e, "Failed to save the SimpleEntity" );
         } catch(Exception e){

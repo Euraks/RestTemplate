@@ -1,127 +1,193 @@
 package org.example.servlet.bookTagServlet;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.example.db.ConnectionManager;
+import org.example.db.HikariCPDataSource;
 import org.example.model.BookEntity;
+import org.example.model.TagEntity;
 import org.example.repository.Repository;
-
+import org.example.repository.impl.BookRepositoryImpl;
+import org.example.repository.impl.TagRepositoryImpl;
 import org.example.service.Service;
-
-import org.example.servlet.dto.BookTagDTO.BookOutGoingDTO;
-import org.example.servlet.dto.BookTagDTO.BookUpdateDTO;
-import org.example.servlet.dto.BookTagDTO.mapper.BookMapper;
+import org.example.service.impl.BookServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Optional;
 import java.util.UUID;
-//
-//
-//@WebServlet(name = "BookId", value = "/books/*")
-//public class BookId extends HttpServlet {
-//
-//    private static final Logger LOGGER = LoggerFactory.getLogger( BookId.class );
-//
-//    ObjectMapper mapper = new ObjectMapper();
-//    private final Repository<BookEntity,UUID> repository = new BookRepositoryImpl();
-//    private final Service<BookEntity, UUID> service = new BookServiceImpl( repository );
-//
-//    @Override
-//    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        String pathInfo = request.getPathInfo();
-//        if (pathInfo != null && !pathInfo.isEmpty()) {
-//            String[] pathParts = pathInfo.split( "/" );
-//            if (pathParts.length > 1) {
-//                UUID entityUUID = UUID.fromString(pathParts[pathParts.length - 1]);
-//                BookEntity bookEntity = service.findById( entityUUID );
-//                BookOutGoingDTO bookOutGoingDTO = BookMapper.INSTANCE.map( bookEntity );
-//                String jsonString = mapper.writeValueAsString( bookOutGoingDTO );
-//                response.setContentType( "application/json" );
-//                response.setCharacterEncoding( "UTF-8" );
-//                response.getWriter().write( "Get BookEntity UUID:" + jsonString );
-//                return;
-//            }
-//        }
-//    }
-//
-//    @Override
-//    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
-//        String pathInfo = request.getPathInfo();
-//        if (pathInfo != null && !pathInfo.isEmpty()) {
-//            String[] pathParts = pathInfo.split( "/" );
-//            if (pathParts.length > 1) {
-//                StringBuilder sb = getStringFromRequest( request );
-//                UUID authorUUID = UUID.fromString(pathParts[pathParts.length - 1]);
-//                String json = sb.toString();
-//
-//                ObjectMapper objectMapper = new ObjectMapper();
-//                BookUpdateDTO bookUpdateDTO = objectMapper.readValue( json, BookUpdateDTO.class );
-//
-//                BookEntity updateBookEntity = BookMapper.INSTANCE.map( bookUpdateDTO );
-//                BookEntity newBookEntity = service.findById( authorUUID );
-//                newBookEntity.setBookText( updateBookEntity.getBookText() );
-//                newBookEntity.setTagEntities( updateBookEntity.getTagEntities() );
-//                try{
-//                    service.save( newBookEntity );
-//                } catch(SQLException e){
-//                    e.printStackTrace();
-//                }
-//                response.setContentType( "application/json" );
-//                response.setCharacterEncoding( "UTF-8" );
-//                response.getWriter().write( "Updated BookEntity UUID:" + json );
-//                return;
-//            }
-//        }
-//    }
-//
-//
-//    private StringBuilder getStringFromRequest(HttpServletRequest request) throws IOException {
-//        StringBuilder sb = new StringBuilder();
-//        String line;
-//        try (BufferedReader reader = request.getReader()){
-//            while ((line = reader.readLine()) != null) {
-//                sb.append( line );
-//            }
-//        }
-//        return sb;
-//    }
-//
-//    @Override
-//    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
-//        String pathInfo = request.getPathInfo();
-//
-//        setResponseDefaults(response);
-//
-//        if (pathInfo != null && !pathInfo.isEmpty()) {
-//            String[] pathParts = pathInfo.split("/");
-//            if (pathParts.length > 1) {
-//                UUID bookUUID = UUID.fromString(pathParts[pathParts.length - 1]);
-//                if (service.delete(bookUUID)) {
-//                    response.getWriter().write("Delete BookEntity UUID:" + bookUUID);
-//
-//                } else {
-//                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-//                    response.getWriter().write("BookEntity with UUID:" + bookUUID + " not found");
-//
-//                }
-//                return;
-//            }
-//        }
-//
-//        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-//        response.getWriter().write("ID is required for deletion");
-//
-//    }
-//
-//    private void setResponseDefaults(HttpServletResponse response) {
-//        response.setContentType("application/json");
-//        response.setCharacterEncoding("UTF-8");
-//    }
-//
-//}
+
+@WebServlet(name = "BookId", value = "/books/*")
+public class BookId extends HttpServlet {
+    private static final Logger LOGGER = LoggerFactory.getLogger( Books.class );
+    private ObjectMapper mapper = new ObjectMapper();
+
+    private final ConnectionManager connectionManager;
+    private final Repository<BookEntity, UUID> bookRepository;
+    private final Repository<TagEntity, UUID> tagRepository;
+    private Service<BookEntity, UUID> service;
+
+    public BookId() {
+        this.connectionManager = new HikariCPDataSource();
+        this.tagRepository = new TagRepositoryImpl( connectionManager );
+        this.bookRepository = new BookRepositoryImpl( connectionManager, tagRepository );
+        this.service = new BookServiceImpl( bookRepository );
+    }
+
+    public BookId(ConnectionManager connectionManager, Repository<TagEntity, UUID> tagRepository) {
+        this.connectionManager = connectionManager;
+        this.bookRepository = new BookRepositoryImpl( connectionManager, tagRepository );
+        this.tagRepository = tagRepository;
+        this.service = new BookServiceImpl( bookRepository );
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try{
+            String uuid = extractIdFromRequest( request );
+            if (uuid == null) {
+                sendBadRequest( response, "Invalid ID format" );
+                return;
+            }
+            processGetRequest( uuid, response );
+        } catch(Exception e){
+            handleException( response, e, "Failed to process GET request" );
+        }
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try{
+            String id = extractIdFromRequest( request );
+            if (id == null) {
+                sendBadRequest( response, "Invalid ID format" );
+                return;
+            }
+            processPutRequest( id, request, response );
+        } catch(Exception e){
+            handleException( response, e, "Failed to process PUT request" );
+        }
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try{
+            String pathInfo = request.getPathInfo();
+            if (pathInfo != null && !pathInfo.isEmpty()) {
+                String[] pathParts = pathInfo.split( "/" );
+                if (pathParts.length > 1) {
+                    UUID entityUUID = UUID.fromString( pathParts[pathParts.length - 1] );
+                    service.delete( entityUUID );
+                    response.setContentType( "application/json" );
+                    response.setCharacterEncoding( "UTF-8" );
+                    response.getWriter().write( "Deleted BookEntity UUID:" + entityUUID );
+                }
+            }
+        } catch(Exception e){
+            handleException( response, e, "Failed to process DELETE request" );
+        }
+    }
+
+    private String extractIdFromRequest(HttpServletRequest request) {
+        String pathInfo = request.getPathInfo();
+        if (pathInfo == null || pathInfo.isEmpty()) {
+            return null;
+        }
+        String[] pathParts = pathInfo.split( "/" );
+        return pathParts.length > 1 ? String.valueOf( UUID.fromString( pathParts[pathParts.length - 1] ) ) : null;
+    }
+
+    private void processGetRequest(String id, HttpServletResponse response) throws IOException {
+        setResponseDefaults( response );
+
+        UUID uuid;
+        try{
+            uuid = UUID.fromString( id );
+        } catch(IllegalArgumentException e){
+            sendBadRequest( response, "Invalid UUID format" );
+            return;
+        }
+
+        Optional<BookEntity> bookEntityOpt = service.findById( uuid );
+        if (bookEntityOpt.isEmpty()) {
+            sendNotFound( response );
+            return;
+        }
+        BookEntity bookEntity = bookEntityOpt.get();
+        String jsonString = mapper.writeValueAsString( bookEntity );
+        response.getWriter().write( jsonString );
+    }
+
+    private void processPutRequest(String id, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        setResponseDefaults( response );
+
+        UUID uuid;
+        try{
+            uuid = UUID.fromString( id );
+        } catch(IllegalArgumentException e){
+            sendBadRequest( response, "Invalid UUID format" );
+            return;
+        }
+
+        StringBuilder sb = getStringFromRequest( request );
+        BookEntity bookEntity;
+        try{
+            bookEntity = mapper.readValue( sb.toString(), BookEntity.class );
+        } catch(JsonProcessingException e){
+            sendBadRequest( response, "Invalid JSON format" );
+            return;
+        }
+
+        bookEntity.setUuid( uuid );
+
+        try{
+            service.save( bookEntity );
+            response.getWriter().write( "BookEntity updated successfully" );
+        } catch(SQLException e){
+            LOGGER.error( "Failed to save BookEntity", e );
+            response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+        }
+    }
+
+    private void sendBadRequest(HttpServletResponse response, String message) throws IOException {
+        response.setStatus( HttpServletResponse.SC_BAD_REQUEST );
+        response.getWriter().write( message );
+    }
+
+    private void sendNotFound(HttpServletResponse response) throws IOException {
+        response.setStatus( HttpServletResponse.SC_NOT_FOUND );
+        response.getWriter().write( "BookEntity not found" );
+    }
+
+    private void setResponseDefaults(HttpServletResponse response) {
+        response.setStatus( HttpServletResponse.SC_OK );
+        response.setContentType( "application/json" );
+        response.setCharacterEncoding( "UTF-8" );
+    }
+
+    private StringBuilder getStringFromRequest(HttpServletRequest request) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader reader = request.getReader()){
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append( line );
+            }
+        }
+        return sb;
+    }
+
+    private void handleException(HttpServletResponse response, Exception e, String logMessage) throws IOException {
+        LOGGER.error( logMessage, e );
+        response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+        response.setContentType( "text/plain" );
+        response.setCharacterEncoding( "UTF-8" );
+        response.getWriter().write( "An internal server error occurred." );
+    }
+}

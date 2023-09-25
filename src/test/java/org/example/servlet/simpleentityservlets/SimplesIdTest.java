@@ -7,14 +7,10 @@ import org.example.model.SimpleEntity;
 import org.example.repository.Repository;
 import org.example.service.Service;
 import org.example.service.impl.SimpleServiceImpl;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.BufferedReader;
 import java.io.PrintWriter;
@@ -23,44 +19,38 @@ import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
-@Testcontainers
-public class SimplesIdTest {
-
-    @Container
-    public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>( "postgres:13.1" )
-            .withDatabaseName( "test-db" )
-            .withUsername( "test" )
-            .withPassword( "test" )
-            .withInitScript( "db.sql" );
+class SimplesIdTest {
 
     private SimplesId servlet;
+    private Service<SimpleEntity, UUID> mockedService;
+    private Repository<SimpleEntity, UUID> mockedRepository;
+    private ConnectionManager mockedConnectionManager;
+    private Connection mockedConnection;
 
     @BeforeEach
-    void setUp() {
-        ConnectionManager testConnectionManager = new ConnectionManager() {
-            @Override
-            public Connection getConnection() throws SQLException {
-                return postgreSQLContainer.createConnection( "" );
-            }
-        };
+    void setUp() throws SQLException {
+        mockedService = Mockito.mock( Service.class );
+        mockedRepository = Mockito.mock( Repository.class );
+        mockedConnectionManager = Mockito.mock( ConnectionManager.class );
+        mockedConnection = Mockito.mock( Connection.class );
 
-        servlet = new SimplesId( testConnectionManager );
-    }
+        when( mockedService.getRepository() ).thenReturn( mockedRepository );
+        when( mockedRepository.save( any() ) ).thenReturn( Optional.empty() );
+        when( mockedRepository.findAll() ).thenReturn( Collections.emptyList() );
+        when( mockedConnectionManager.getConnection() ).thenReturn( mockedConnection );
 
-    @AfterEach
-    public void tearDown() {
-        postgreSQLContainer.stop();
+        servlet = new SimplesId( mockedConnectionManager );
+        servlet.setService( mockedService );
     }
 
     @Test
     void testDefaultConstructor() throws Exception {
-        postgreSQLContainer.start();
 
         Simples servlet = new Simples();
 
@@ -74,7 +64,6 @@ public class SimplesIdTest {
         Assertions.assertFalse(stringWriter.toString().isEmpty(), "Response body should not be empty");
         Mockito.verify(response).setStatus(HttpServletResponse.SC_OK);
 
-        postgreSQLContainer.stop();
     }
 
     @Test
@@ -159,7 +148,7 @@ public class SimplesIdTest {
     }
 
     @Test
-    public void testHandleExceptionViaDoGet() throws Exception {
+    void testHandleExceptionViaDoGet() throws Exception {
 
         HttpServletRequest mockRequest = mock(HttpServletRequest.class);
         HttpServletResponse mockResponse = mock(HttpServletResponse.class);

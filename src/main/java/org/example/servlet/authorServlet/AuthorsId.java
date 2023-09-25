@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.example.db.ConnectionManager;
 import org.example.db.HikariCPDataSource;
 import org.example.model.AuthorEntity;
+import org.example.model.SimpleEntity;
 import org.example.repository.AuthorEntityRepository;
 import org.example.repository.impl.AuthorEntityRepositoryImpl;
 import org.example.service.Service;
@@ -183,6 +184,14 @@ public class AuthorsId extends HttpServlet {
         response.setContentType( "text/plain" );
         response.setCharacterEncoding( "UTF-8" );
         response.getWriter().write( "An internal server error occurred." );
+    }
+
+    protected void setService(Service<AuthorEntity, UUID> service) {
+        this.service = service;
+    }
+
+    protected void setMapper(ObjectMapper mapper) {
+        this.mapper = mapper;
     }
 
 }

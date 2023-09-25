@@ -5,6 +5,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.db.ConnectionManager;
 import org.example.model.AuthorEntity;
+import org.example.repository.AuthorEntityRepository;
+import org.example.repository.Repository;
+import org.example.service.AuthorEntityService;
 import org.example.service.Service;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -18,43 +21,39 @@ import java.io.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.startsWith;
+import static org.mockito.Mockito.when;
 
 class AuthorsTest {
 
-    @Container
-    public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>( "postgres:13.1" )
-            .withDatabaseName( "test-db" )
-            .withUsername( "test" )
-            .withPassword( "test" )
-            .withInitScript( "db.sql" );
-
     private Authors servlet;
+    private Service<AuthorEntity, UUID> mockedService;
+    private Repository<AuthorEntity, UUID> mockedRepository;
+    private ConnectionManager mockedConnectionManager;
+    private Connection mockedConnection;
 
     @BeforeEach
-    void setUp() {
-        ConnectionManager testConnectionManager = new ConnectionManager() {
-            @Override
-            public Connection getConnection() throws SQLException {
-                return postgreSQLContainer.createConnection( "" );
-            }
-        };
+    void setUp() throws SQLException {
+        mockedService = Mockito.mock( AuthorEntityService.class );
+        mockedRepository = Mockito.mock( AuthorEntityRepository.class );
+        mockedConnectionManager = Mockito.mock( ConnectionManager.class );
+        mockedConnection = Mockito.mock( Connection.class );
 
-        servlet = new Authors( testConnectionManager );
+        when( mockedService.getRepository() ).thenReturn( mockedRepository );
+        when( mockedRepository.save( any() ) ).thenReturn( Optional.empty() );
+        when( mockedRepository.findAll() ).thenReturn( Collections.emptyList() );
+        when( mockedConnectionManager.getConnection() ).thenReturn( mockedConnection );
 
-        postgreSQLContainer.start();
-    }
-
-    @AfterEach
-    void tearDown() {
-        postgreSQLContainer.stop();
+        servlet = new Authors( mockedConnectionManager );
+        servlet.setService( mockedService );
     }
 
     @Test
     void testDefaultConstructor() throws Exception {
-        postgreSQLContainer.start();
 
         Authors servlet = new Authors();
 
@@ -69,7 +68,6 @@ class AuthorsTest {
 
         Mockito.verify(response).setStatus(HttpServletResponse.SC_OK);
 
-        postgreSQLContainer.stop();
     }
 
     @Test

@@ -4,63 +4,54 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.db.ConnectionManager;
 import org.example.model.AuthorEntity;
-import org.example.model.SimpleEntity;
+import org.example.repository.AuthorEntityRepository;
+import org.example.repository.Repository;
+import org.example.service.AuthorEntityService;
+import org.example.service.Service;
 import org.example.service.impl.AuthorEntityServiceImpl;
-import org.example.service.impl.SimpleServiceImpl;
 import org.example.servlet.simpleentityservlets.SimplesId;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 
 import java.io.*;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verify;
 
 
 class AuthorsIdTest {
 
-    @Container
-    public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>( "postgres:13.1" )
-            .withDatabaseName( "testcontainers" )
-            .withUsername( "testcontainers" )
-            .withPassword( "testcontainers" )
-            .withInitScript( "db.sql" );
-
     private AuthorsId servlet;
+    private Service<AuthorEntity, UUID> mockedService;
+    private Repository<AuthorEntity, UUID> mockedRepository;
+    private ConnectionManager mockedConnectionManager;
+    private Connection mockedConnection;
 
     @BeforeEach
-    void setUp() {
-        ConnectionManager testConnectionManager = new ConnectionManager() {
-            @Override
-            public Connection getConnection() throws SQLException {
-                return postgreSQLContainer.createConnection( "" );
-            }
-        };
+    void setUp() throws SQLException {
+        mockedService = Mockito.mock( AuthorEntityService.class );
+        mockedRepository = Mockito.mock( AuthorEntityRepository.class );
+        mockedConnectionManager = Mockito.mock( ConnectionManager.class );
+        mockedConnection = Mockito.mock( Connection.class );
 
-        servlet = new AuthorsId( testConnectionManager );
+        when( mockedService.getRepository() ).thenReturn( mockedRepository );
+        when( mockedRepository.save( any() ) ).thenReturn( Optional.empty() );
+        when( mockedRepository.findAll() ).thenReturn( Collections.emptyList() );
+        when( mockedConnectionManager.getConnection() ).thenReturn( mockedConnection );
 
-        postgreSQLContainer.start();
-    }
-
-    @AfterEach
-    void tearDown() {
-        postgreSQLContainer.stop();
+        servlet = new AuthorsId( mockedConnectionManager );
+        servlet.setService( mockedService );
     }
 
     @Test
     void testDefaultConstructor() throws Exception {
-        postgreSQLContainer.start();
-
         AuthorsId servlet = new AuthorsId();
 
         HttpServletRequest request = Mockito.mock( HttpServletRequest.class );
@@ -73,8 +64,6 @@ class AuthorsIdTest {
 
         Assertions.assertFalse( stringWriter.toString().isEmpty(), "Response body should not be empty" );
         Mockito.verify( response ).setStatus( HttpServletResponse.SC_OK );
-
-        postgreSQLContainer.stop();
     }
 
     @Test
