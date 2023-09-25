@@ -3,7 +3,6 @@ package org.example.service.impl;
 import org.example.model.Article;
 import org.example.model.AuthorEntity;
 import org.example.repository.AuthorEntityRepository;
-import org.example.repository.Repository;
 import org.example.service.AuthorEntityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

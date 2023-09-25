@@ -1,7 +1,7 @@
 package org.example.service.impl;
 
 import org.example.model.TagEntity;
-import org.example.repository.impl.TagRepositoryImpl;
+import org.example.repository.Repository;
 import org.example.service.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +16,9 @@ public class TagServiceImpl implements Service<TagEntity, UUID> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( TagServiceImpl.class );
 
-    private final TagRepositoryImpl repository;
+    private final Repository<TagEntity, UUID> repository;
 
-    public TagServiceImpl(TagRepositoryImpl repository) {
+    public TagServiceImpl(Repository<TagEntity, UUID> repository) {
         this.repository = repository;
     }
 
@@ -64,7 +64,7 @@ public class TagServiceImpl implements Service<TagEntity, UUID> {
     }
 
     @Override
-    public TagRepositoryImpl getRepository() {
+    public Repository<TagEntity, UUID> getRepository() {
         return this.repository;
     }
 }

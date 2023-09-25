@@ -1,6 +1,7 @@
 package org.example.service.impl;
 
 import org.example.model.TagEntity;
+import org.example.repository.Repository;
 import org.example.repository.impl.TagRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -127,7 +128,7 @@ class TagServiceImplTest {
 
     @Test
     void testGetRepository() {
-        TagRepositoryImpl serviceRepository = tagService.getRepository();
+        Repository<TagEntity, UUID> serviceRepository = tagService.getRepository();
 
         assertNotNull(serviceRepository);
         assertEquals(repository, serviceRepository);
