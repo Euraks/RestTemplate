@@ -7,16 +7,14 @@ import org.example.db.ConnectionManager;
 import org.example.model.BookEntity;
 import org.example.model.TagEntity;
 import org.example.repository.Repository;
+import org.example.repository.impl.BookRepositoryImpl;
 import org.example.repository.impl.TagRepositoryImpl;
 import org.example.service.Service;
-import org.junit.jupiter.api.AfterEach;
+import org.example.service.impl.BookServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.BufferedReader;
 import java.io.PrintWriter;
@@ -25,47 +23,42 @@ import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.startsWith;
+import static org.mockito.Mockito.when;
 
-@Testcontainers
 class BooksTest {
 
-    @Container
-    public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>( "postgres:13.1" )
-            .withDatabaseName( "test-db" )
-            .withUsername( "test" )
-            .withPassword( "test" )
-            .withInitScript( "db.sql" );
 
     private Books servlet;
-    private Repository<TagEntity,UUID> tagRepository;
+    private Service<BookEntity, UUID> mockedService;
+    private Repository<BookEntity, UUID> mockedRepository;
+    private Repository<TagEntity, UUID> mockedTagRepository;
+    private ConnectionManager mockedConnectionManager;
+    private Connection mockedConnection;
 
     @BeforeEach
-    void setUp() {
-        ConnectionManager testConnectionManager = new ConnectionManager() {
-            @Override
-            public Connection getConnection() throws SQLException {
-                return postgreSQLContainer.createConnection( "" );
-            }
-        };
+    void setUp() throws SQLException {
+        mockedService = Mockito.mock( BookServiceImpl.class );
+        mockedRepository = Mockito.mock( BookRepositoryImpl.class );
+        mockedTagRepository = Mockito.mock( TagRepositoryImpl.class );
+        mockedConnectionManager = Mockito.mock( ConnectionManager.class );
+        mockedConnection = Mockito.mock( Connection.class );
 
-        tagRepository = new TagRepositoryImpl( testConnectionManager );
-        servlet = new Books( testConnectionManager,tagRepository );
+        when( mockedService.getRepository() ).thenReturn( mockedRepository );
+        when( mockedRepository.save( any() ) ).thenReturn( Optional.empty() );
+        when( mockedRepository.findAll() ).thenReturn( Collections.emptyList() );
+        when( mockedConnectionManager.getConnection() ).thenReturn( mockedConnection );
 
-        postgreSQLContainer.start();
-    }
-
-    @AfterEach
-    void tearDown() {
-        postgreSQLContainer.stop();
+        servlet = new Books( mockedConnectionManager, mockedTagRepository );
+        servlet.setService( mockedService );
     }
 
     @Test
     void testDefaultConstructor() throws Exception {
-        postgreSQLContainer.start();
-
         Books servlet = new Books();
 
         HttpServletRequest request = Mockito.mock( HttpServletRequest.class );
@@ -78,8 +71,6 @@ class BooksTest {
         Assertions.assertFalse( stringWriter.toString().isEmpty(), "Response body should not be empty" );
 
         Mockito.verify( response ).setStatus( HttpServletResponse.SC_OK );
-
-        postgreSQLContainer.stop();
     }
 
     @Test
