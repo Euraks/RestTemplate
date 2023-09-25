@@ -1,7 +1,6 @@
 package org.example.repository.mapper;
 
 import org.example.model.Article;
-import org.example.model.AuthorEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -18,7 +17,7 @@ public interface ArticleResultSetMapper {
     default Article map(ResultSet resultSet) throws SQLException {
         Article article = new Article();
         article.setUuid( (UUID) resultSet.getObject( "uuid" ) );
-        article.setAuthor_uuid( (UUID) resultSet.getObject( "author_id" ) );
+        article.setAuthorUuid( (UUID) resultSet.getObject( "author_id" ) );
         article.setText( resultSet.getString( "text" ) );
         return article;
     }

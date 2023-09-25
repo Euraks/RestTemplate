@@ -37,7 +37,7 @@ public interface AuthorEntityMapper {
             if (article.getUuid()==null){
                 article.setUuid( UUID.randomUUID() );
             }
-            article.setAuthor_uuid( authorEntity.getUuid() );
+            article.setAuthorUuid( authorEntity.getUuid() );
             articles.add( article );
         }
         authorEntity.setArticleList( articles );

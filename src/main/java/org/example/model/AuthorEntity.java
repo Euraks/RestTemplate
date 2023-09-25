@@ -23,7 +23,7 @@ public class AuthorEntity {
         this.uuid = uuid;
         if (articleList!=null){
             for (Article article:articleList) {
-                article.setAuthor_uuid( uuid );
+                article.setAuthorUuid( uuid );
             }
         }
     }
@@ -50,8 +50,7 @@ public class AuthorEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof AuthorEntity)) return false;
-        AuthorEntity that = (AuthorEntity) o;
+        if (!(o instanceof AuthorEntity that)) return false;
         return Objects.equals( getAuthorName(), that.getAuthorName() ) && Objects.equals( getArticleList(), that.getArticleList() );
     }
 

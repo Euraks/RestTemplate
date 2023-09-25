@@ -1,4 +1,4 @@
-package org.example.servlet.bookTagServlet;
+package org.example.servlet.booktagservlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.annotation.WebServlet;

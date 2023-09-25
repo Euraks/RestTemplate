@@ -1,4 +1,4 @@
-package org.example.servlet.bookTagServlet;
+package org.example.servlet.booktagservlet;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,13 +8,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.db.ConnectionManager;
 import org.example.db.HikariCPDataSource;
-import org.example.model.BookEntity;
 import org.example.model.TagEntity;
 import org.example.repository.Repository;
-import org.example.repository.impl.BookRepositoryImpl;
 import org.example.repository.impl.TagRepositoryImpl;
 import org.example.service.Service;
-import org.example.service.impl.BookServiceImpl;
+import org.example.service.impl.TagServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,62 +21,58 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Optional;
 import java.util.UUID;
-
-@WebServlet(name = "BookId", value = "/books/*")
-public class BookId extends HttpServlet {
-    private static final Logger LOGGER = LoggerFactory.getLogger( Books.class );
+@WebServlet(name = "TagsId", value = "/tags/*")
+public class TagsId extends HttpServlet {
+    private static final Logger LOGGER = LoggerFactory.getLogger( TagsId.class );
     private ObjectMapper mapper = new ObjectMapper();
 
     private final ConnectionManager connectionManager;
-    private final Repository<BookEntity, UUID> bookRepository;
     private final Repository<TagEntity, UUID> tagRepository;
-    private Service<BookEntity, UUID> service;
+    private Service<TagEntity, UUID> service;
 
-    public BookId() {
+    public TagsId() {
         this.connectionManager = new HikariCPDataSource();
         this.tagRepository = new TagRepositoryImpl( connectionManager );
-        this.bookRepository = new BookRepositoryImpl( connectionManager, tagRepository );
-        this.service = new BookServiceImpl( bookRepository );
+        this.service = new TagServiceImpl( tagRepository );
     }
 
-    public BookId(ConnectionManager connectionManager, Repository<TagEntity, UUID> tagRepository) {
+    public TagsId(ConnectionManager connectionManager, Repository<TagEntity, UUID> tagRepository) {
         this.connectionManager = connectionManager;
-        this.bookRepository = new BookRepositoryImpl( connectionManager, tagRepository );
         this.tagRepository = tagRepository;
-        this.service = new BookServiceImpl( bookRepository );
+        this.service = new TagServiceImpl( tagRepository );
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try{
+        try {
             String uuid = extractIdFromRequest( request );
             if (uuid == null) {
                 sendBadRequest( response, "Invalid ID format" );
                 return;
             }
             processGetRequest( uuid, response );
-        } catch(Exception e){
+        } catch (Exception e) {
             handleException( response, e, "Failed to process GET request" );
         }
     }
 
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try{
+        try {
             String id = extractIdFromRequest( request );
             if (id == null) {
                 sendBadRequest( response, "Invalid ID format" );
                 return;
             }
             processPutRequest( id, request, response );
-        } catch(Exception e){
+        } catch (Exception e) {
             handleException( response, e, "Failed to process PUT request" );
         }
     }
 
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try{
+        try {
             String pathInfo = request.getPathInfo();
             if (pathInfo != null && !pathInfo.isEmpty()) {
                 String[] pathParts = pathInfo.split( "/" );
@@ -87,10 +81,11 @@ public class BookId extends HttpServlet {
                     service.delete( entityUUID );
                     response.setContentType( "application/json" );
                     response.setCharacterEncoding( "UTF-8" );
-                    response.getWriter().write( "Deleted BookEntity UUID:" + entityUUID );
+                    response.getWriter().write( "Deleted TagEntity UUID:" + entityUUID );
+                    response.setStatus( HttpServletResponse.SC_OK );
                 }
             }
-        } catch(Exception e){
+        } catch (Exception e) {
             handleException( response, e, "Failed to process DELETE request" );
         }
     }
@@ -108,20 +103,20 @@ public class BookId extends HttpServlet {
         setResponseDefaults( response );
 
         UUID uuid;
-        try{
+        try {
             uuid = UUID.fromString( id );
-        } catch(IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             sendBadRequest( response, "Invalid UUID format" );
             return;
         }
 
-        Optional<BookEntity> bookEntityOpt = service.findById( uuid );
-        if (bookEntityOpt.isEmpty()) {
+        Optional<TagEntity> tagEntityOpt = service.findById( uuid );
+        if (tagEntityOpt.isEmpty()) {
             sendNotFound( response );
             return;
         }
-        BookEntity bookEntity = bookEntityOpt.get();
-        String jsonString = mapper.writeValueAsString( bookEntity );
+        TagEntity tagEntity = tagEntityOpt.get();
+        String jsonString = mapper.writeValueAsString( tagEntity );
         response.getWriter().write( jsonString );
     }
 
@@ -129,29 +124,29 @@ public class BookId extends HttpServlet {
         setResponseDefaults( response );
 
         UUID uuid;
-        try{
+        try {
             uuid = UUID.fromString( id );
-        } catch(IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             sendBadRequest( response, "Invalid UUID format" );
             return;
         }
 
         StringBuilder sb = getStringFromRequest( request );
-        BookEntity bookEntity;
-        try{
-            bookEntity = mapper.readValue( sb.toString(), BookEntity.class );
-        } catch(JsonProcessingException e){
+        TagEntity tagEntity;
+        try {
+            tagEntity = mapper.readValue( sb.toString(), TagEntity.class );
+        } catch (JsonProcessingException e) {
             sendBadRequest( response, "Invalid JSON format" );
             return;
         }
 
-        bookEntity.setUuid( uuid );
+        tagEntity.setUuid( uuid );
 
-        try{
-            service.save( bookEntity );
-            response.getWriter().write( "BookEntity updated successfully" );
-        } catch(SQLException e){
-            LOGGER.error( "Failed to save BookEntity", e );
+        try {
+            service.save( tagEntity );
+            response.getWriter().write( "TagEntity updated successfully" );
+        } catch (SQLException e) {
+            LOGGER.error( "Failed to save TagEntity", e );
             response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
         }
     }
@@ -163,7 +158,7 @@ public class BookId extends HttpServlet {
 
     private void sendNotFound(HttpServletResponse response) throws IOException {
         response.setStatus( HttpServletResponse.SC_NOT_FOUND );
-        response.getWriter().write( "BookEntity not found" );
+        response.getWriter().write( "TagEntity not found" );
     }
 
     private void setResponseDefaults(HttpServletResponse response) {
@@ -174,7 +169,7 @@ public class BookId extends HttpServlet {
 
     private StringBuilder getStringFromRequest(HttpServletRequest request) throws IOException {
         StringBuilder sb = new StringBuilder();
-        try (BufferedReader reader = request.getReader()){
+        try (BufferedReader reader = request.getReader()) {
             String line;
             while ((line = reader.readLine()) != null) {
                 sb.append( line );
@@ -189,5 +184,9 @@ public class BookId extends HttpServlet {
         response.setContentType( "text/plain" );
         response.setCharacterEncoding( "UTF-8" );
         response.getWriter().write( "An internal server error occurred." );
+    }
+
+    protected void setService(Service<TagEntity, UUID> service) {
+        this.service = service;
     }
 }

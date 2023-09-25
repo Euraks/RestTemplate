@@ -1,24 +1,19 @@
-package org.example.servlet.bookTagServlet;
+package org.example.servlet.booktagservlet;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.db.ConnectionManager;
-import org.example.model.AuthorEntity;
 import org.example.model.BookEntity;
 import org.example.model.TagEntity;
 import org.example.repository.Repository;
+import org.example.repository.impl.BookRepositoryImpl;
 import org.example.repository.impl.TagRepositoryImpl;
-import org.example.service.impl.AuthorEntityServiceImpl;
+import org.example.service.Service;
 import org.example.service.impl.BookServiceImpl;
-import org.example.servlet.authorServlet.AuthorsId;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.BufferedReader;
 import java.io.PrintWriter;
@@ -27,49 +22,41 @@ import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@Testcontainers
 class BookIdTest {
-
-    @Container
-    public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>( "postgres:13.1" )
-            .withDatabaseName( "test-db" )
-            .withUsername( "test" )
-            .withPassword( "test" )
-            .withInitScript( "db.sql" );
-
     private BookId servlet;
-    private Repository<TagEntity, UUID> tagRepository;
+    private Service<BookEntity, UUID> mockedService;
+    private Repository<BookEntity, UUID> mockedRepository;
+    private Repository<TagEntity, UUID> mockedTagRepository;
+    private ConnectionManager mockedConnectionManager;
+    private Connection mockedConnection;
 
     @BeforeEach
-    void setUp() {
-        ConnectionManager testConnectionManager = new ConnectionManager() {
-            @Override
-            public Connection getConnection() throws SQLException {
-                return postgreSQLContainer.createConnection( "" );
-            }
-        };
+    void setUp() throws SQLException {
+        mockedService = Mockito.mock( BookServiceImpl.class );
+        mockedRepository = Mockito.mock( BookRepositoryImpl.class );
+        mockedTagRepository = Mockito.mock( TagRepositoryImpl.class );
+        mockedConnectionManager = Mockito.mock( ConnectionManager.class );
+        mockedConnection = Mockito.mock( Connection.class );
 
-        tagRepository = new TagRepositoryImpl( testConnectionManager );
-        servlet = new BookId( testConnectionManager, tagRepository );
+        when( mockedService.getRepository() ).thenReturn( mockedRepository );
+        when( mockedRepository.save( any() ) ).thenReturn( Optional.empty() );
+        when( mockedRepository.findAll() ).thenReturn( Collections.emptyList() );
+        when( mockedConnectionManager.getConnection() ).thenReturn( mockedConnection );
 
-        postgreSQLContainer.start();
+        servlet = new BookId( mockedConnectionManager, mockedTagRepository );
+        servlet.setService( mockedService );
     }
 
-    @AfterEach
-    void tearDown() {
-        postgreSQLContainer.stop();
-    }
-
-    @Test
+   @Test
     void testDefaultConstructor() throws Exception {
-        postgreSQLContainer.start();
-
         BookId servlet = new BookId();
 
         HttpServletRequest request = Mockito.mock( HttpServletRequest.class );
@@ -83,8 +70,6 @@ class BookIdTest {
         Assertions.assertFalse( stringWriter.toString().isEmpty(), "Response body should not be empty" );
 
         Mockito.verify( response ).setStatus( HttpServletResponse.SC_OK );
-
-        postgreSQLContainer.stop();
     }
 
     @Test
@@ -120,7 +105,6 @@ class BookIdTest {
         StringWriter stringWriter = new StringWriter();
         Mockito.when( response.getWriter() ).thenReturn( new PrintWriter( stringWriter ) );
 
-        // Replace 'validUUID' with a valid UUID string
         String validUUID = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
         Mockito.when( request.getPathInfo() ).thenReturn( "/" + validUUID );
 
@@ -140,7 +124,6 @@ class BookIdTest {
         String validUUID = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
         Mockito.when( request.getPathInfo() ).thenReturn( "/books/" + validUUID );
 
-        // Replace 'validJson' with a valid JSON request body
         String validJson = "{\"bookText\": \"Updated Book Text\", \"tagEntities\": []}";
         BufferedReader bufferedReader = new BufferedReader( new StringReader( validJson ) );
         Mockito.when( request.getReader() ).thenReturn( bufferedReader );
@@ -169,6 +152,27 @@ class BookIdTest {
 
         Assertions.assertTrue( stringWriter.toString().contains( "An internal server error occurred." ), "Response should indicate invalid UUID format" );
         Mockito.verify( response ).setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+    }
+
+    @Test
+    void testDoDelete() throws Exception {
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        Mockito.when(response.getWriter()).thenReturn(printWriter);
+
+        String validUUID = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+        Mockito.when(request.getPathInfo()).thenReturn("/books/" + validUUID);
+
+        UUID uuid = UUID.fromString(validUUID);
+        when(mockedService.delete(uuid)).thenReturn(true);
+
+        servlet.doDelete(request, response);
+
+        Assertions.assertFalse(stringWriter.toString().isEmpty(), "Response body should not be empty");
+        Mockito.verify(response).setStatus(HttpServletResponse.SC_OK);
+        Assertions.assertTrue( stringWriter.toString().contains( "Deleted BookEntity UUID:" ) );
     }
 
 

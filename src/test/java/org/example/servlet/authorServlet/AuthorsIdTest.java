@@ -111,21 +111,21 @@ class AuthorsIdTest {
         StringWriter stringWriter = new StringWriter();
         PrintWriter writer = new PrintWriter( stringWriter );
         when( mockResponse.getWriter() ).thenReturn( writer );
-        when( mockRequest.getPathInfo() ).thenReturn( "/authors/" + testUUID.toString() );
+        when( mockRequest.getPathInfo() ).thenReturn( "/authors/" + testUUID );
 
         testPutMethod( testUUID, mockRequest, mockResponse, stringWriter );
         testUpdateMethod( testUUID, mockRequest, mockResponse, stringWriter );
     }
 
     private void testUpdateMethod(UUID testUUID, HttpServletRequest mockRequest, HttpServletResponse mockResponse, StringWriter stringWriter) throws IOException {
-        String inputJson = "{\n" +
+        String inputJson = "{    \n" +
                 "    \"authorName\": \"Update authorName\",\n" +
                 "    \"articleList\": [\n" +
                 "        {\n" +
-                "            \"uuid\": \"866e2781-a445-487d-813c-edbcd4f299f7\",\n" +
-                "            \"author_uuid\": \"" + testUUID + "\",\n" +
-                "            \"text\": \"Update articleText\"\n" +
-                "        }\n" +
+                "            \"uuid\": \"c2333a41-2f37-4b03-93de-7b07f3e20432\",\n" +
+                "            \"authorUuid\": \"91719588-9d20-48c9-8198-a65fb04ef1dc\",\n" +
+                "            \"text\": \"New Article\"\n" +
+                "        }        \n" +
                 "    ]\n" +
                 "}";
         when( mockRequest.getReader() ).thenReturn( new BufferedReader( new StringReader( inputJson ) ) );
@@ -141,7 +141,7 @@ class AuthorsIdTest {
                 "    \"articleList\": [\n" +
                 "        {\n" +
                 "            \"uuid\": \"866e2781-a445-487d-813c-edbcd4f299f7\",\n" +
-                "            \"author_uuid\": \"" + testUUID + "\",\n" +
+                "            \"authorUuid\": \"" + testUUID + "\",\n" +
                 "            \"text\": \"Create articleText\"\n" +
                 "        }\n" +
                 "    ]\n" +

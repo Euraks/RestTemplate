@@ -44,8 +44,7 @@ public class TagEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof TagEntity)) return false;
-        TagEntity tagEntity = (TagEntity) o;
+        if (!(o instanceof TagEntity tagEntity)) return false;
         return Objects.equals( getTagName(), tagEntity.getTagName() );
     }
 

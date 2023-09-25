@@ -27,37 +27,27 @@ import java.util.UUID;
 @WebServlet(name = "SimplesId", value = "/simples/*")
 public class SimplesId extends HttpServlet {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger( SimplesId.class );
-    private ObjectMapper mapper = new ObjectMapper();
+    private static final String APPLICATION_JSON = "application/json";
+    private static final String UTF_8 = "UTF-8";
 
-    private final ConnectionManager connectionManager;
-    private final Repository<SimpleEntity, UUID> repository;
-    private Service<SimpleEntity, UUID> service;
+    private static final Logger LOGGER = LoggerFactory.getLogger( SimplesId.class );
+    private final ObjectMapper mapper = new ObjectMapper();
+
+    private final transient ConnectionManager connectionManager;
+    private final transient Repository<SimpleEntity, UUID> repository;
+    private transient Service<SimpleEntity, UUID> service;
 
     public SimplesId() {
-        this.connectionManager = instantiateConnectionManager();
-        this.repository = instantiateRepository( this.connectionManager );
-        this.service = instantiateService( repository );
+        this.connectionManager = new HikariCPDataSource();
+        this.repository = new SimpleEntityRepositoryImpl( connectionManager );
+        this.service = new SimpleServiceImpl( repository );
     }
 
     public SimplesId(ConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
-        this.repository = instantiateRepository( this.connectionManager );
-        this.service = instantiateService( repository );
+        this.repository = new SimpleEntityRepositoryImpl( connectionManager );
+        this.service = new SimpleServiceImpl( repository );
     }
-
-    private ConnectionManager instantiateConnectionManager() {
-        return new HikariCPDataSource();
-    }
-
-    private Repository<SimpleEntity, UUID> instantiateRepository(ConnectionManager connectionManager) {
-        return new SimpleEntityRepositoryImpl( connectionManager );
-    }
-
-    private Service<SimpleEntity, UUID> instantiateService(Repository<SimpleEntity, UUID> repository) {
-        return new SimpleServiceImpl( repository );
-    }
-
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
         try{
@@ -72,8 +62,8 @@ public class SimplesId extends HttpServlet {
                         SimpleEntity simpleEntity = optionalSimpleEntity.get();
                         SimpleEntityOutGoingDTO simpleEntityOutGoingDTO = SimpleDtoMapper.INSTANCE.map( simpleEntity );
                         String jsonString = mapper.writeValueAsString( simpleEntityOutGoingDTO );
-                        response.setContentType( "application/json" );
-                        response.setCharacterEncoding( "UTF-8" );
+                        response.setContentType( APPLICATION_JSON );
+                        response.setCharacterEncoding( UTF_8 );
                         response.getWriter().write( "Get SimpleEntity UUID:" + jsonString );
                     } else {
                         response.setStatus( HttpServletResponse.SC_NOT_FOUND );
@@ -106,8 +96,8 @@ public class SimplesId extends HttpServlet {
                         SimpleEntity newSimpleEntity = optionalNewSimpleEntity.get();
                         newSimpleEntity.setDescription( updateSimpleEntity.getDescription() );
                         service.save( newSimpleEntity );
-                        response.setContentType( "application/json" );
-                        response.setCharacterEncoding( "UTF-8" );
+                        response.setContentType( APPLICATION_JSON );
+                        response.setCharacterEncoding( UTF_8 );
                         response.getWriter().write( "Updated SimpleEntity UUID:" + json );
                     } else {
                         response.setStatus( HttpServletResponse.SC_NOT_FOUND );
@@ -129,10 +119,10 @@ public class SimplesId extends HttpServlet {
             if (pathInfo != null && !pathInfo.isEmpty()) {
                 String[] pathParts = pathInfo.split( "/" );
                 if (pathParts.length > 1) {
-                    UUID entityUUID = UUID.fromString(pathParts[pathParts.length - 1]);
+                    UUID entityUUID = UUID.fromString( pathParts[pathParts.length - 1] );
                     service.delete( entityUUID );
-                    response.setContentType( "application/json" );
-                    response.setCharacterEncoding( "UTF-8" );
+                    response.setContentType( APPLICATION_JSON );
+                    response.setCharacterEncoding( UTF_8 );
                     response.getWriter().write( "Deleted SimpleEntity UUID:" + entityUUID );
                 }
             }
@@ -155,17 +145,17 @@ public class SimplesId extends HttpServlet {
     private void handleException(HttpServletResponse response, Exception e, String logMessage) {
         LOGGER.error( logMessage, e );
         try{
-            writeResponse( response, "An internal server error occurred.", HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "application/json" );
+            writeResponse( response );
         } catch(IOException ioException){
             LOGGER.error( "Failed to send error response.", ioException );
         }
     }
 
-    private void writeResponse(HttpServletResponse response, String message, int statusCode, String contentType) throws IOException {
-        response.setContentType( contentType );
-        response.setCharacterEncoding( "UTF-8" );
-        response.setStatus( statusCode );
-        response.getWriter().write( message );
+    private void writeResponse(HttpServletResponse response) throws IOException {
+        response.setContentType( SimplesId.APPLICATION_JSON );
+        response.setCharacterEncoding( UTF_8 );
+        response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+        response.getWriter().write( "An internal server error occurred." );
     }
 
     protected void setService(Service<SimpleEntity, UUID> service) {

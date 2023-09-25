@@ -8,22 +8,23 @@ import org.slf4j.LoggerFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class HikariCPDataSource implements ConnectionManager {
+public class HikariCPDataSource implements ConnectionManager, Serializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(HikariCPDataSource.class);
-
-    private final HikariDataSource ds;
+    private final transient HikariDataSource dataSource;
 
     public HikariCPDataSource() {
         HikariConfig config = initializeConfig();
-        this.ds = new HikariDataSource(config);
+        assert config != null;
+        this.dataSource = new HikariDataSource(config);
     }
 
-    protected HikariCPDataSource(HikariDataSource ds) {
-        this.ds = ds;
+    protected HikariCPDataSource(HikariDataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     private HikariConfig initializeConfig() {
@@ -43,11 +44,10 @@ public class HikariCPDataSource implements ConnectionManager {
     @Override
     public Connection getConnection() {
         try {
-            return ds.getConnection();
+            return dataSource.getConnection();
         } catch (SQLException e) {
             LOGGER.error("Failed to get connection", e);
             return null;
         }
     }
 }
-

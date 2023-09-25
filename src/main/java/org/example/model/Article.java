@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public class Article {
     private UUID uuid;
-    private UUID author_uuid;
+    private UUID authorUuid;
     private String text;
 
     public Article() {
@@ -20,12 +20,12 @@ public class Article {
         this.text = text;
     }
 
-    public UUID getAuthor_uuid() {
-        return author_uuid;
+    public UUID getAuthorUuid() {
+        return authorUuid;
     }
 
-    public void setAuthor_uuid(UUID author_uuid) {
-        this.author_uuid = author_uuid;
+    public void setAuthorUuid(UUID uuid) {
+        this.authorUuid = uuid;
     }
 
     public UUID getUuid() {
@@ -47,8 +47,7 @@ public class Article {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Article)) return false;
-        Article article = (Article) o;
+        if (!(o instanceof Article article)) return false;
         return Objects.equals( getText(), article.getText() );
     }
 
@@ -61,7 +60,7 @@ public class Article {
     public String toString() {
         return "Article{" +
                 "uuid=" + uuid +
-                ", author_uuid=" + author_uuid +
+                ", author_uuid=" + authorUuid +
                 ", text='" + text + '\'' +
                 '}';
     }

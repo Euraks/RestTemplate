@@ -37,8 +37,7 @@ public class SimpleEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof SimpleEntity)) return false;
-        SimpleEntity that = (SimpleEntity) o;
+        if (!(o instanceof SimpleEntity that)) return false;
         return Objects.equals( getDescription(), that.getDescription() );
     }
 

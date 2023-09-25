@@ -37,11 +37,11 @@ class ArticleTest {
         String text = "Another sample text";
 
         article.setUuid( uuid );
-        article.setAuthor_uuid( authorUuid );
+        article.setAuthorUuid( authorUuid );
         article.setText( text );
 
         assertEquals( uuid, article.getUuid() );
-        assertEquals( authorUuid, article.getAuthor_uuid() );
+        assertEquals( authorUuid, article.getAuthorUuid() );
         assertEquals( text, article.getText() );
     }
 
@@ -71,7 +71,7 @@ class ArticleTest {
         UUID authorUuid = UUID.randomUUID();
         String text = "Sample text for toString";
         Article article = new Article( uuid, text );
-        article.setAuthor_uuid( authorUuid );
+        article.setAuthorUuid( authorUuid );
 
         String expectedString = "Article{" +
                 "uuid=" + uuid +

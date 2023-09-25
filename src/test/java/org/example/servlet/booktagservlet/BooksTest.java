@@ -1,4 +1,4 @@
-package org.example.servlet.bookTagServlet;
+package org.example.servlet.booktagservlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,7 +31,6 @@ import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.when;
 
 class BooksTest {
-
 
     private Books servlet;
     private Service<BookEntity, UUID> mockedService;

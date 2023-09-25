@@ -45,8 +45,7 @@ public class BookEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof BookEntity)) return false;
-        BookEntity that = (BookEntity) o;
+        if (!(o instanceof BookEntity that)) return false;
         return Objects.equals( getBookText(), that.getBookText() );
     }
 
