@@ -1,4 +1,5 @@
 package org.example.repository.impl;
+
 import org.example.db.ConnectionManager;
 import org.example.model.BookEntity;
 import org.example.model.TagEntity;
@@ -14,16 +15,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-
 public class TagRepositoryImpl implements Repository<TagEntity, UUID> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TagRepositoryImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger( TagRepositoryImpl.class );
 
-    private static final String FIND_BY_ID_SQL = "SELECT * FROM tagentity WHERE uuid = ?";
-    private static final String DELETE_BY_ID_SQL = "DELETE FROM tagentity WHERE uuid = ?";
+    private static final String FIND_BY_ID_SQL = "SELECT * FROM TagEntity WHERE uuid = ?";
+    private static final String DELETE_BY_ID_SQL = "DELETE FROM TagEntity WHERE uuid = ?";
     private static final String FIND_ALL_SQL = "SELECT * FROM TagEntity";
     private static final String SAVE_TAG_SQL = "INSERT INTO TagEntity (uuid, tagName) VALUES (?, ?) ON CONFLICT (uuid) DO UPDATE SET tagName = EXCLUDED.tagName";
-    private static final String DELETE_ALL_SQL = "DELETE FROM tagentity";
+    private static final String DELETE_ALL_SQL = "DELETE FROM TagEntity";
     private static final String DELETE_FROM_BOOK_TAG_SQL = "DELETE FROM Book_Tag WHERE tag_uuid = ?";
     private static final String SAVE_BOOK_SQL = "INSERT INTO BookEntity (uuid, bookText) VALUES (?, ?) ON CONFLICT (uuid) DO UPDATE SET bookText = EXCLUDED.bookText";
     private static final String INSERT_BOOK_TAG_SQL = "INSERT INTO Book_Tag (book_uuid, tag_uuid) VALUES (?, ?) ON CONFLICT DO NOTHING";

@@ -18,6 +18,7 @@ import java.util.*;
 public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<AuthorEntity, UUID> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( AuthorEntityRepositoryImpl.class );
+    private static final String ERROR_EXECUTING_QUERY = "Error executing query: {}";
 
     private static final String FIND_AUTHOR_BY_ID_SQL = "SELECT uuid, authorName FROM AuthorEntity WHERE uuid = ?";
     private static final String DELETE_AUTHOR_BY_ID_SQL = "DELETE FROM AuthorEntity WHERE  uuid = ?";
@@ -49,7 +50,7 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
                 return Optional.empty();
             }
         } catch(SQLException e){
-            LOGGER.error( "Error executing query: {}", FIND_AUTHOR_BY_ID_SQL, e );
+            LOGGER.error( ERROR_EXECUTING_QUERY, FIND_AUTHOR_BY_ID_SQL, e );
             return Optional.empty();
         }
     }
@@ -68,7 +69,7 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
                 return authors;
             }
         } catch(SQLException e){
-            LOGGER.error( "Error executing query: {}", FIND_ALL_AUTHORS_SQL, e );
+            LOGGER.error( ERROR_EXECUTING_QUERY, FIND_ALL_AUTHORS_SQL, e );
             return Collections.emptyList();
         }
     }
@@ -80,7 +81,7 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
             statement.setObject( 1, uuid );
             return statement.executeUpdate() > 0;
         } catch(SQLException e){
-            LOGGER.error( "Error executing update: {}", DELETE_AUTHOR_BY_ID_SQL, e );
+            LOGGER.error( ERROR_EXECUTING_QUERY, DELETE_AUTHOR_BY_ID_SQL, e );
             return false;
         }
     }
@@ -109,7 +110,7 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
             connection.commit();
             return Optional.of( authorEntity );
         } catch(SQLException e){
-            LOGGER.error( "Error while saving author: {}", authorEntity, e );
+            LOGGER.error( ERROR_EXECUTING_QUERY, SAVE_AUTHOR_SQL, e );
             return Optional.empty();
         }
     }
@@ -126,7 +127,7 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
                 articles.add( article );
             }
         } catch(SQLException e){
-            LOGGER.error( "Error while fetching all articles", e );
+            LOGGER.error( ERROR_EXECUTING_QUERY,"SELECT * FROM Article", e );
         }
         return articles;
     }
@@ -147,7 +148,6 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
             connection.commit();
         } catch(SQLException e){
             LOGGER.error( "Error while clearing AuthorEntity and related entities", e );
-            throw new RuntimeException( e );
         }
     }
 
@@ -170,7 +170,7 @@ public class AuthorEntityRepositoryImpl implements AuthorEntityRepository<Author
                 return articles;
             }
         } catch(SQLException e){
-            LOGGER.error( "Error executing query: {}", FIND_ARTICLES_BY_AUTHOR_ID_SQL, e );
+            LOGGER.error( ERROR_EXECUTING_QUERY, FIND_ARTICLES_BY_AUTHOR_ID_SQL, e );
             return Collections.emptyList();
         }
     }

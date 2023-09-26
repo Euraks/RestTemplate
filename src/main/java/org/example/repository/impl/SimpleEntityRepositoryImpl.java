@@ -13,22 +13,21 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-
 public class SimpleEntityRepositoryImpl implements Repository<SimpleEntity, UUID> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( SimpleEntityRepositoryImpl.class );
 
-    private static final String FIND_BY_ID_SQL = "SELECT uuid, description FROM simpleentity WHERE uuid=?";
-    private static final String DELETE_BY_ID_SQL = "DELETE FROM simpleentity WHERE uuid=?";
-    private static final String FIND_ALL_SQL = "SELECT * FROM simpleentity";
-    private static final String SAVE_SQL = "INSERT INTO simpleentity (uuid, description) VALUES (?, ?) " +
+    private static final String FIND_BY_ID_SQL = "SELECT uuid, description FROM SimpleEntity WHERE uuid=?";
+    private static final String DELETE_BY_ID_SQL = "DELETE FROM SimpleEntity WHERE uuid=?";
+    private static final String FIND_ALL_SQL = "SELECT * FROM SimpleEntity";
+    private static final String SAVE_SQL = "INSERT INTO SimpleEntity (uuid, description) VALUES (?, ?) " +
             "ON CONFLICT (uuid) DO UPDATE SET description = EXCLUDED.description";
-    private final String DELETE_ALL_SQL = "DELETE FROM simpleentity";
+    private static final String DELETE_ALL_SQL = "DELETE FROM SimpleEntity";
 
     private final ConnectionManager connectionManager;
 
-    public SimpleEntityRepositoryImpl(ConnectionManager testConnectionManager) {
-        connectionManager = testConnectionManager;
+    public SimpleEntityRepositoryImpl(ConnectionManager connectionManager) {
+        this.connectionManager = connectionManager;
     }
 
     @Override
@@ -37,11 +36,11 @@ public class SimpleEntityRepositoryImpl implements Repository<SimpleEntity, UUID
              PreparedStatement preparedStatement = connection.prepareStatement( FIND_BY_ID_SQL )){
             preparedStatement.setObject( 1, uuid );
             ResultSet resultSet = preparedStatement.executeQuery();
-            List<SimpleEntity> simpleEntityList = getSimpleEntiysList( resultSet );
+            List<SimpleEntity> simpleEntityList = getSimpleEntitiesList( resultSet );
 
-            return simpleEntityList.isEmpty() ? Optional.empty() : Optional.of(simpleEntityList.get(0));
+            return simpleEntityList.isEmpty() ? Optional.empty() : Optional.of( simpleEntityList.get( 0 ) );
         } catch(SQLException e){
-            LOGGER.error("Error while finding entity by ID: {}", uuid);
+            LOGGER.error( "Error while finding entity by ID: {}", uuid, e );
             return Optional.empty();
         }
     }
@@ -64,14 +63,14 @@ public class SimpleEntityRepositoryImpl implements Repository<SimpleEntity, UUID
         try (Connection connection = connectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement( FIND_ALL_SQL )){
             ResultSet resultSet = preparedStatement.executeQuery();
-            return getSimpleEntiysList( resultSet );
+            return getSimpleEntitiesList( resultSet );
         } catch(SQLException e){
             LOGGER.error( "Error while finding all entities", e );
             return Collections.emptyList();
         }
     }
 
-    private List<SimpleEntity> getSimpleEntiysList(ResultSet resultSet) throws SQLException {
+    private List<SimpleEntity> getSimpleEntitiesList(ResultSet resultSet) throws SQLException {
         List<SimpleEntity> simpleEntityList = new ArrayList<>();
         while (resultSet.next()) {
             SimpleEntity simpleEntity = SimpleResultSetMapper.INSTANCE.map( resultSet );
@@ -87,7 +86,7 @@ public class SimpleEntityRepositoryImpl implements Repository<SimpleEntity, UUID
             preparedStatement.setObject( 1, simpleEntity.getUuid() );
             preparedStatement.setString( 2, simpleEntity.getDescription() );
             preparedStatement.executeUpdate();
-            return Optional.of(simpleEntity);
+            return Optional.of( simpleEntity );
         } catch(SQLException e){
             LOGGER.error( "Error while saving entity: {}", simpleEntity, e );
             return Optional.empty();
@@ -103,8 +102,6 @@ public class SimpleEntityRepositoryImpl implements Repository<SimpleEntity, UUID
 
         } catch (SQLException e) {
             LOGGER.error("Error while clearing all entities", e);
-            throw new RuntimeException("Error while clearing all entities", e);
         }
     }
-
 }

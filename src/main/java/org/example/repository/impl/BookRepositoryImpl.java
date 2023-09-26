@@ -14,10 +14,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-
 public class BookRepositoryImpl implements Repository<BookEntity, UUID> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BookRepositoryImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger( BookRepositoryImpl.class );
+    private static final String ERROR_EXECUTING_QUERY = "Error executing query: {}";
 
     private static final String FIND_BY_ID_SQL = "SELECT * FROM BookEntity WHERE uuid = ?";
     private static final String DELETE_BY_ID_SQL = "DELETE FROM BookEntity WHERE uuid = ?";
@@ -26,11 +26,14 @@ public class BookRepositoryImpl implements Repository<BookEntity, UUID> {
             "LEFT JOIN Book_Tag bt ON b.uuid = bt.book_uuid " +
             "LEFT JOIN TagEntity t ON bt.tag_uuid = t.uuid " +
             "ORDER BY b.uuid";
-    private static final String SAVE_BOOK_SQL = "INSERT INTO BookEntity (uuid, bookText) VALUES (?, ?) ON CONFLICT (uuid) DO UPDATE SET bookText=EXCLUDED.bookText";
+    private static final String SAVE_BOOK_SQL = "INSERT INTO BookEntity (uuid, bookText) VALUES (?, ?)" +
+            " ON CONFLICT (uuid) DO UPDATE SET bookText=EXCLUDED.bookText";
     private static final String DELETE_ALL_SQL = "DELETE FROM BookEntity";
     private static final String DELETE_FROM_BOOK_TAG_SQL = "DELETE FROM Book_Tag WHERE book_uuid = ?";
-    private static final String INSERT_BOOK_TAG_SQL = "INSERT INTO Book_Tag (book_uuid, tag_uuid) VALUES (?, ?) ON CONFLICT DO NOTHING";
-    private static final String FIND_ALL_SQL_FOR_BOOK = "SELECT b.uuid AS book_uuid, b.bookText, t.uuid AS tag_uuid, t.tagName\n" +
+    private static final String INSERT_BOOK_TAG_SQL = "INSERT INTO Book_Tag (book_uuid, tag_uuid) VALUES (?, ?)" +
+            " ON CONFLICT DO NOTHING";
+    private static final String FIND_ALL_SQL_FOR_BOOK =
+            "SELECT b.uuid AS book_uuid, b.bookText, t.uuid AS tag_uuid, t.tagName\n" +
             "FROM BookEntity b\n" +
             "LEFT JOIN Book_Tag bt ON b.uuid = bt.book_uuid\n" +
             "LEFT JOIN TagEntity t ON bt.tag_uuid = t.uuid\n" +
@@ -72,7 +75,7 @@ public class BookRepositoryImpl implements Repository<BookEntity, UUID> {
                 bookEntity.setTagEntities(tagEntities);
             }
         } catch (SQLException e) {
-            LOGGER.error("Error while finding book by ID: {}", uuid, e);
+            LOGGER.error( ERROR_EXECUTING_QUERY, FIND_BY_ID_SQL, e );
         }
         return Optional.ofNullable(bookEntity);
     }
@@ -182,8 +185,6 @@ public class BookRepositoryImpl implements Repository<BookEntity, UUID> {
         }
     }
 
-
-
     @Override
     public void clearAll() {
         try (Connection connection = connectionManager.getConnection();
@@ -191,7 +192,6 @@ public class BookRepositoryImpl implements Repository<BookEntity, UUID> {
             statement.executeUpdate();
         } catch (SQLException e) {
             LOGGER.error("Error while clearing all books", e);
-            throw new RuntimeException("Error while clearing all books", e);
         }
     }
 }
