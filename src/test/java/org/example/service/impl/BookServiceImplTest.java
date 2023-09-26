@@ -56,7 +56,7 @@ class BookServiceImplTest {
     }
 
     @Test
-    void testFindById() {
+    void testFindById() throws SQLException {
         UUID uuid = UUID.randomUUID();
         BookEntity bookEntity = new BookEntity();
         bookEntity.setUuid( uuid );
@@ -93,7 +93,7 @@ class BookServiceImplTest {
     }
 
     @Test
-    void testDeleteBookEntitySuccessfully() {
+    void testDeleteBookEntitySuccessfully() throws SQLException {
         UUID uuid = UUID.randomUUID();
 
         when( repository.deleteById( uuid ) ).thenReturn( true );
@@ -104,7 +104,7 @@ class BookServiceImplTest {
     }
 
     @Test
-    void testDeleteBookEntityNotFound() {
+    void testDeleteBookEntityNotFound() throws SQLException {
         UUID uuid = UUID.randomUUID();
 
         when( repository.deleteById( uuid ) ).thenReturn( false );
@@ -115,7 +115,7 @@ class BookServiceImplTest {
     }
 
     @Test
-    void testDeleteBookEntityWithException() {
+    void testDeleteBookEntityWithException() throws SQLException {
         UUID uuid = UUID.randomUUID();
 
         when(repository.deleteById(uuid)).thenReturn(false);

@@ -57,7 +57,7 @@ class TagServiceImplTest {
     }
 
     @Test
-    void testFindById() {
+    void testFindById() throws SQLException {
         UUID uuid = UUID.randomUUID();
         TagEntity tagEntity = new TagEntity();
         tagEntity.setUuid(uuid);
@@ -94,7 +94,7 @@ class TagServiceImplTest {
     }
 
     @Test
-    void testDeleteTagEntitySuccessfully() {
+    void testDeleteTagEntitySuccessfully() throws SQLException {
         UUID uuid = UUID.randomUUID();
 
         when(repository.deleteById(uuid)).thenReturn(true);
@@ -105,7 +105,7 @@ class TagServiceImplTest {
     }
 
     @Test
-    void testDeleteTagEntityNotFound() {
+    void testDeleteTagEntityNotFound() throws SQLException {
         UUID uuid = UUID.randomUUID();
 
         when(repository.deleteById(uuid)).thenReturn(false);
@@ -116,7 +116,7 @@ class TagServiceImplTest {
     }
 
     @Test
-    void testDeleteTagEntityWithException() {
+    void testDeleteTagEntityWithException() throws SQLException {
         UUID uuid = UUID.randomUUID();
 
         when(repository.deleteById(uuid)).thenThrow(new RuntimeException("Simulated Exception"));

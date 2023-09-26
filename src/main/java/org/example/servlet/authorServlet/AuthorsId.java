@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.example.db.ConnectionManager;
 import org.example.db.HikariCPDataSource;
 import org.example.model.AuthorEntity;
-import org.example.model.SimpleEntity;
 import org.example.repository.AuthorEntityRepository;
 import org.example.repository.impl.AuthorEntityRepositoryImpl;
 import org.example.service.Service;
@@ -99,12 +98,12 @@ public class AuthorsId extends HttpServlet {
         return pathParts.length > 1 ? String.valueOf( UUID.fromString(pathParts[pathParts.length - 1]) ) : null;
     }
 
-    private void processGetRequest(String id, HttpServletResponse response) throws IOException {
-        setResponseDefaults(response);
+    private void processGetRequest(String id, HttpServletResponse response) throws IOException, SQLException {
+        setResponseDefaults( response );
 
         UUID uuid;
-        try {
-            uuid = UUID.fromString(id);
+        try{
+            uuid = UUID.fromString( id );
         } catch(IllegalArgumentException e){
             sendBadRequest( response, "Invalid UUID format" );
             return;

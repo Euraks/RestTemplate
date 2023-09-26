@@ -39,12 +39,12 @@ public class SimpleEntityRepositoryImplTest {
     }
 
     @AfterEach
-    void tearDown() {
+    void tearDown() throws SQLException {
         repository.clearAll();
     }
 
     @Test
-    void testSave() {
+    void testSave() throws SQLException {
         SimpleEntity entity = new SimpleEntity( "Test description" );
         SimpleEntity savedEntity = repository.save( entity ).orElse( null );
         Assertions.assertNotNull( savedEntity );
@@ -58,7 +58,7 @@ public class SimpleEntityRepositoryImplTest {
     }
 
     @Test
-    void testSaveUpdate() {
+    void testSaveUpdate() throws SQLException {
         SimpleEntity entity = new SimpleEntity( "Test description" );
         UUID uuidSavedEntity = entity.getUuid();
 
@@ -78,7 +78,7 @@ public class SimpleEntityRepositoryImplTest {
     }
 
     @Test
-    void testFindById() {
+    void testFindById() throws SQLException {
         SimpleEntity entity = new SimpleEntity( "Test description" );
         repository.save( entity );
 
@@ -89,7 +89,7 @@ public class SimpleEntityRepositoryImplTest {
     }
 
     @Test
-    void testDeleteById() {
+    void testDeleteById() throws SQLException {
         SimpleEntity entity = new SimpleEntity( "Test description" );
         repository.save( entity );
 
@@ -101,7 +101,7 @@ public class SimpleEntityRepositoryImplTest {
     }
 
     @Test
-    void testFindAll() {
+    void testFindAll() throws SQLException {
         repository.save( new SimpleEntity( "Test1" ) );
         repository.save( new SimpleEntity( "Test2" ) );
 
@@ -110,7 +110,7 @@ public class SimpleEntityRepositoryImplTest {
     }
 
     @Test
-    void clearAll() {
+    void clearAll() throws SQLException {
         repository.save( new SimpleEntity( "Test1" ) );
         repository.save( new SimpleEntity( "Test2" ) );
 

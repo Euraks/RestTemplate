@@ -33,7 +33,7 @@ public class TagServiceImpl implements Service<TagEntity, UUID> {
     }
 
     @Override
-    public Optional<TagEntity> findById(UUID uuid) {
+    public Optional<TagEntity> findById(UUID uuid) throws SQLException {
         return repository.findById( uuid );
     }
 

@@ -42,7 +42,7 @@ class BookRepositoryImplTest {
     }
 
     @AfterEach
-    void tearDown() {
+    void tearDown() throws SQLException {
         repository.clearAll();
     }
 

@@ -58,7 +58,7 @@ class AuthorEntityServiceImplTest {
     }
 
     @Test
-    void testFindById() {
+    void testFindById() throws SQLException {
         UUID uuid = UUID.randomUUID();
         AuthorEntity authorEntity = new AuthorEntity();
         authorEntity.setUuid( uuid );
@@ -95,7 +95,7 @@ class AuthorEntityServiceImplTest {
     }
 
     @Test
-    void testDeleteAuthorEntitySuccessfully() {
+    void testDeleteAuthorEntitySuccessfully() throws SQLException {
         UUID uuid = UUID.randomUUID();
 
         when( repository.deleteById( uuid ) ).thenReturn( true );
@@ -106,7 +106,7 @@ class AuthorEntityServiceImplTest {
     }
 
     @Test
-    void testDeleteAuthorEntityNotFound() {
+    void testDeleteAuthorEntityNotFound() throws SQLException {
         UUID uuid = UUID.randomUUID();
 
         when( repository.deleteById( uuid ) ).thenReturn( false );
@@ -117,7 +117,7 @@ class AuthorEntityServiceImplTest {
     }
 
     @Test
-    void testDeleteAuthorEntityWithException() {
+    void testDeleteAuthorEntityWithException() throws SQLException {
         UUID uuid = UUID.randomUUID();
 
         when( repository.deleteById( uuid ) ).thenThrow( new RuntimeException( "Simulated Exception" ) );
@@ -136,7 +136,7 @@ class AuthorEntityServiceImplTest {
     }
 
     @Test
-    void testFindArticlesAll() {
+    void testFindArticlesAll() throws SQLException {
         List<Article> articles = Collections.singletonList( new Article() );
 
         when( repository.findArticlesAll() ).thenReturn( articles );

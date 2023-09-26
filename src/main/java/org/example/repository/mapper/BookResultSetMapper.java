@@ -1,7 +1,6 @@
 package org.example.repository.mapper;
 
 import org.example.model.BookEntity;
-import org.example.model.TagEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

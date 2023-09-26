@@ -99,7 +99,7 @@ public class TagsId extends HttpServlet {
         return pathParts.length > 1 ? String.valueOf( UUID.fromString( pathParts[pathParts.length - 1] ) ) : null;
     }
 
-    private void processGetRequest(String id, HttpServletResponse response) throws IOException {
+    private void processGetRequest(String id, HttpServletResponse response) throws IOException, SQLException {
         setResponseDefaults( response );
 
         UUID uuid;

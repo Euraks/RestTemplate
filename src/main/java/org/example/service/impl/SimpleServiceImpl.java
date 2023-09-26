@@ -35,10 +35,9 @@ public class SimpleServiceImpl implements Service<SimpleEntity, UUID> {
     }
 
     @Override
-    public Optional<SimpleEntity> findById(UUID uuid) {
+    public Optional<SimpleEntity> findById(UUID uuid) throws SQLException {
         return repository.findById( uuid );
     }
-
 
     @Override
     public List<SimpleEntity> findAll() {

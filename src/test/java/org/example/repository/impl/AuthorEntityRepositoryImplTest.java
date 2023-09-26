@@ -18,7 +18,7 @@ import java.util.UUID;
 
 
 @Testcontainers
-class AuthorEntityRepositoryImplTest {
+class AuthorEntityRepositoryImplTest  {
     @Container
     public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>( "postgres:13.1" )
             .withDatabaseName( "test-db" )
@@ -40,12 +40,12 @@ class AuthorEntityRepositoryImplTest {
     }
 
     @AfterEach
-    void tearDown() {
+    void tearDown() throws SQLException {
         repository.clearAll();
     }
 
     @Test
-    void testFindById() {
+    void testFindById() throws SQLException {
         AuthorEntity entity = new AuthorEntity(  );
         entity.setAuthorName( "Test AuthorName" );
         Article article = new Article();
@@ -61,7 +61,7 @@ class AuthorEntityRepositoryImplTest {
     }
 
     @Test
-    void testFindAll() {
+    void testFindAll() throws SQLException {
         repository.save( new AuthorEntity(  ) );
         repository.save( new AuthorEntity(  ) );
 
@@ -71,7 +71,7 @@ class AuthorEntityRepositoryImplTest {
     }
 
     @Test
-    void testDeleteById() {
+    void testDeleteById() throws SQLException {
         AuthorEntity entity = new AuthorEntity(  );
         entity.setAuthorName( "Test AuthorName" );
         Article article = new Article();
@@ -87,7 +87,7 @@ class AuthorEntityRepositoryImplTest {
     }
 
     @Test
-    void testSave() {
+    void testSave() throws SQLException {
         AuthorEntity entity = new AuthorEntity(  );
         entity.setAuthorName( "Test AuthorName" );
         Article article = new Article();
@@ -106,7 +106,7 @@ class AuthorEntityRepositoryImplTest {
     }
 
     @Test
-    void testUpdate() {
+    void testUpdate() throws SQLException {
         AuthorEntity entity = new AuthorEntity(  );
         entity.setAuthorName( "Test AuthorName" );
         Article article = new Article();
@@ -141,7 +141,7 @@ class AuthorEntityRepositoryImplTest {
     }
 
     @Test
-    void findArticlesAll() {
+    void findArticlesAll() throws SQLException {
         AuthorEntity entity = new AuthorEntity(  );
         entity.setAuthorName( "Test AuthorName" );
         Article article = new Article();
@@ -159,7 +159,7 @@ class AuthorEntityRepositoryImplTest {
     }
 
     @Test
-    void clearAll() {
+    void clearAll() throws SQLException {
         repository.save( new AuthorEntity(  ) );
         repository.save( new AuthorEntity(  ) );
 

@@ -37,7 +37,7 @@ public class AuthorEntityServiceImpl implements AuthorEntityService {
     }
 
     @Override
-    public Optional<AuthorEntity> findById(UUID uuid) {
+    public Optional<AuthorEntity> findById(UUID uuid) throws SQLException {
         return repository.findById( uuid );
     }
 
@@ -73,7 +73,7 @@ public class AuthorEntityServiceImpl implements AuthorEntityService {
     }
 
     @Override
-    public List<Article> findArticlesAll() {
+    public List<Article> findArticlesAll() throws SQLException {
         return repository.findArticlesAll();
     }
 }

@@ -44,7 +44,7 @@ class SimpleServiceImplTest {
     }
 
     @Test
-    void testFindById() {
+    void testFindById() throws SQLException {
         UUID uuid = UUID.randomUUID();
         SimpleEntity entity = new SimpleEntity();
         entity.setUuid(uuid);
@@ -78,7 +78,7 @@ class SimpleServiceImplTest {
     }
 
     @Test
-    void testDelete() {
+    void testDelete() throws SQLException {
         UUID uuid = UUID.randomUUID();
         when(mockRepository.deleteById(uuid)).thenReturn(true);
 
@@ -89,7 +89,7 @@ class SimpleServiceImplTest {
     }
 
     @Test
-    void testDeleteException() {
+    void testDeleteException() throws SQLException {
         UUID uuid = UUID.randomUUID();
         when(mockRepository.deleteById(uuid)).thenThrow(new RuntimeException("Delete error"));
 

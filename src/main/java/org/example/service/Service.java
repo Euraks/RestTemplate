@@ -8,7 +8,7 @@ public interface Service<T,K> {
 
     Optional<T> save(T t) throws SQLException;
 
-    Optional<T> findById(K k);
+    Optional<T> findById(K k) throws SQLException;
 
     List<T> findAll() throws SQLException;
 
