@@ -13,7 +13,6 @@ public interface ArticleResultSetMapper {
 
     ArticleResultSetMapper INSTANCE = Mappers.getMapper( ArticleResultSetMapper.class );
 
-
     default Article map(ResultSet resultSet) throws SQLException {
         Article article = new Article();
         article.setUuid( (UUID) resultSet.getObject( "uuid" ) );

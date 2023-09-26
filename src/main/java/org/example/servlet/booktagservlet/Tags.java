@@ -12,9 +12,9 @@ import org.example.repository.Repository;
 import org.example.repository.impl.TagRepositoryImpl;
 import org.example.service.Service;
 import org.example.service.impl.TagServiceImpl;
-import org.example.servlet.dto.BookTagDTO.TagAllOutGoingDTO;
-import org.example.servlet.dto.BookTagDTO.TagIncomingDTO;
-import org.example.servlet.dto.BookTagDTO.mapper.TagMapper;
+import org.example.servlet.dto.booktagDTO.TagAllOutGoingDTO;
+import org.example.servlet.dto.booktagDTO.TagIncomingDTO;
+import org.example.servlet.dto.booktagDTO.mapper.TagMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +33,7 @@ public class Tags extends HttpServlet {
 
     private final ConnectionManager connectionManager;
     private final Repository<TagEntity, UUID> tagRepository;
-    private Service<TagEntity, UUID> service;
+    private transient Service<TagEntity, UUID> service;
 
     public Tags() {
         this.connectionManager = new HikariCPDataSource();

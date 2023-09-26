@@ -1,128 +1,94 @@
 package org.example.servlet.simpleentityservlets;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.model.SimpleEntity;
-import org.example.repository.Repository;
 import org.example.service.Service;
-import org.example.servlet.simpleentityservlets.Simples;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.example.db.ConnectionManager;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 class SimplesTest {
 
+    @InjectMocks
     private Simples servlet;
-    private Service<SimpleEntity, UUID> mockedService;
-    private Repository<SimpleEntity, UUID> mockedRepository;
-    private ConnectionManager mockedConnectionManager;
-    private Connection mockedConnection;
+
+    @Mock
+    private Service<SimpleEntity, UUID> service;
+
+    @Mock
+    private HttpServletRequest request;
+
+    @Mock
+    private HttpServletResponse response;
+
+    @Mock
+    private BufferedReader reader;
+
+    private StringWriter stringWriter;
+    private PrintWriter writer;
 
     @BeforeEach
-    void setUp() throws SQLException {
-        mockedService = Mockito.mock(Service.class);
-        mockedRepository = Mockito.mock(Repository.class);
-        mockedConnectionManager = Mockito.mock(ConnectionManager.class);
-        mockedConnection = Mockito.mock(Connection.class);
+    void setUp() throws IOException {
+        MockitoAnnotations.openMocks(this);
 
-        when(mockedService.getRepository()).thenReturn(mockedRepository);
-        when(mockedRepository.save(any())).thenReturn(Optional.empty());
-        when(mockedRepository.findAll()).thenReturn(Collections.emptyList());
-        when(mockedConnectionManager.getConnection()).thenReturn(mockedConnection);
+        stringWriter = new StringWriter();
+        writer = new PrintWriter(stringWriter);
+        when(response.getWriter()).thenReturn(writer);
 
-        servlet = new Simples(mockedConnectionManager);
-        servlet.setService(mockedService);
+        servlet.setService(service);
+        servlet.setMapper(new ObjectMapper());
     }
 
     @Test
-    void testDefaultConstructor() throws Exception {
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter writer = new PrintWriter(stringWriter);
+    void testDoGet() throws  SQLException {
+        SimpleEntity entity = new SimpleEntity();
+        entity.setUuid(UUID.randomUUID());
+        entity.setDescription("TestDescription");
 
-        when(response.getWriter()).thenReturn(writer);
+        when(service.findAll()).thenReturn(Collections.singletonList(entity));
 
         servlet.doGet(request, response);
 
-        verify(response).setStatus(HttpServletResponse.SC_OK);
+        writer.flush();
+        assertTrue(stringWriter.toString().contains("TestDescription"));
+        assertTrue(stringWriter.toString().contains("GetAll SimpleEntity:"));
     }
 
     @Test
-    void testDoPost() throws Exception {
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter writer = new PrintWriter(stringWriter);
-
-        when(response.getWriter()).thenReturn(writer);
-
-        String validJson = "{\"uuid\": \"f47ac10b-58cc-4372-a567-0e02b2c3d479\", \"description\": \"description\"}";
-        BufferedReader bufferedReader = new BufferedReader(new StringReader(validJson));
-        when(request.getReader()).thenReturn(bufferedReader);
+    void testDoPost() throws IOException {
+        when(request.getReader()).thenReturn(reader);
+        when(reader.readLine()).thenReturn("{\"description\":\"TestDescription\"}", null);
 
         servlet.doPost(request, response);
 
-        verify(response).setStatus(HttpServletResponse.SC_OK);
+        writer.flush();
+        assertTrue(stringWriter.toString().contains("Added SimpleEntity UUID"));
     }
 
     @Test
-    void testDoPostSavesSimpleEntity() throws Exception {
-        String validJson = "{\"description\": \"New Simple Postman23232\"}";
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter writer = new PrintWriter(stringWriter);
-
-        when(response.getWriter()).thenReturn(writer);
-        BufferedReader bufferedReader = new BufferedReader(new StringReader(validJson));
-        when(request.getReader()).thenReturn(bufferedReader);
+    void testDoPostSQLException() throws IOException, SQLException {
+        when(request.getReader()).thenReturn(reader);
+        when(reader.readLine()).thenReturn("{\"uuid\":\"550e8400-e29b-41d4-a716-446655440000\",\"description\":\"TestDescription\"}", null);
+        doThrow(new SQLException("Simulated SQL Exception")).when(service).save(any());
 
         servlet.doPost(request, response);
 
-        verify(response).setStatus(HttpServletResponse.SC_OK);
-    }
-
-    @Test
-    void testDoPostUpdateSimpleEntity() throws Exception {
-        String validJson = "{\"uuid\": \"f47ac10b-58cc-4372-a567-0e02b2c3d479\", \"description\": \"Update description\"}";
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter writer = new PrintWriter(stringWriter);
-
-        when(response.getWriter()).thenReturn(writer);
-        BufferedReader bufferedReader = new BufferedReader(new StringReader(validJson));
-        when(request.getReader()).thenReturn(bufferedReader);
-
-        servlet.doPost(request, response);
-
-        verify(response).setStatus(HttpServletResponse.SC_OK);
-    }
-
-    @Test
-    void testSendSuccessResponseViaDoGet() throws Exception {
-        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
-        HttpServletResponse mockResponse = mock(HttpServletResponse.class);
-        PrintWriter mockWriter = mock(PrintWriter.class);
-
-        when(mockedService.findAll()).thenReturn(Collections.emptyList());
-        when(mockResponse.getWriter()).thenReturn(mockWriter);
-
-        servlet.doGet(mockRequest, mockResponse);
-
-        verify(mockResponse).setStatus(HttpServletResponse.SC_OK);
+        writer.flush();
+        assertTrue(stringWriter.toString().contains("An internal server error occurred."));
     }
 }

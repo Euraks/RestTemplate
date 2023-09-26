@@ -14,9 +14,9 @@ import org.example.repository.impl.BookRepositoryImpl;
 import org.example.repository.impl.TagRepositoryImpl;
 import org.example.service.Service;
 import org.example.service.impl.BookServiceImpl;
-import org.example.servlet.dto.BookTagDTO.BookAllOutGoingDTO;
-import org.example.servlet.dto.BookTagDTO.BookIncomingDTO;
-import org.example.servlet.dto.BookTagDTO.mapper.BookMapper;
+import org.example.servlet.dto.booktagDTO.BookAllOutGoingDTO;
+import org.example.servlet.dto.booktagDTO.BookIncomingDTO;
+import org.example.servlet.dto.booktagDTO.mapper.BookMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ public class Books extends HttpServlet {
     private final ConnectionManager connectionManager;
     private final Repository<BookEntity, UUID> bookRepository;
     private final Repository<TagEntity, UUID> tagRepository;
-    private Service<BookEntity, UUID> service;
+    private transient Service<BookEntity, UUID> service;
 
     public Books() {
         this.connectionManager = new HikariCPDataSource();

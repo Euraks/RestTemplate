@@ -26,13 +26,17 @@ import java.util.UUID;
 
 @WebServlet(name = "BookId", value = "/books/*")
 public class BookId extends HttpServlet {
+
+    private static final String APPLICATION_JSON = "application/json";
+    private static final String UTF_8 = "UTF-8";
     private static final Logger LOGGER = LoggerFactory.getLogger( BookId.class );
+
     private final ObjectMapper mapper = new ObjectMapper();
 
     private final ConnectionManager connectionManager;
     private final Repository<BookEntity, UUID> bookRepository;
     private final Repository<TagEntity, UUID> tagRepository;
-    private Service<BookEntity, UUID> service;
+    private transient Service<BookEntity, UUID> service;
 
     public BookId() {
         this.connectionManager = new HikariCPDataSource();
@@ -85,8 +89,8 @@ public class BookId extends HttpServlet {
                 if (pathParts.length > 1) {
                     UUID entityUUID = UUID.fromString( pathParts[pathParts.length - 1] );
                     service.delete( entityUUID );
-                    response.setContentType( "application/json" );
-                    response.setCharacterEncoding( "UTF-8" );
+                    response.setContentType( APPLICATION_JSON );
+                    response.setCharacterEncoding( UTF_8 );
                     response.getWriter().write( "Deleted BookEntity UUID:" + entityUUID );
                     response.setStatus( HttpServletResponse.SC_OK );
                 }
@@ -169,8 +173,8 @@ public class BookId extends HttpServlet {
 
     private void setResponseDefaults(HttpServletResponse response) {
         response.setStatus( HttpServletResponse.SC_OK );
-        response.setContentType( "application/json" );
-        response.setCharacterEncoding( "UTF-8" );
+        response.setContentType( APPLICATION_JSON );
+        response.setCharacterEncoding( UTF_8 );
     }
 
     private StringBuilder getStringFromRequest(HttpServletRequest request) throws IOException {
@@ -188,7 +192,7 @@ public class BookId extends HttpServlet {
         LOGGER.error( logMessage, e );
         response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
         response.setContentType( "text/plain" );
-        response.setCharacterEncoding( "UTF-8" );
+        response.setCharacterEncoding( UTF_8 );
         response.getWriter().write( "An internal server error occurred." );
     }
 

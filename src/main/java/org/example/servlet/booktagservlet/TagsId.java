@@ -23,8 +23,9 @@ import java.util.Optional;
 import java.util.UUID;
 @WebServlet(name = "TagsId", value = "/tags/*")
 public class TagsId extends HttpServlet {
+
     private static final Logger LOGGER = LoggerFactory.getLogger( TagsId.class );
-    private ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     private final ConnectionManager connectionManager;
     private final Repository<TagEntity, UUID> tagRepository;

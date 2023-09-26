@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-public interface Service<T,K> {
+public interface Service<T,K>  {
 
     Optional<T> save(T t) throws SQLException;
 
@@ -12,7 +12,7 @@ public interface Service<T,K> {
 
     List<T> findAll() throws SQLException;
 
-    boolean delete(K k);
+    boolean delete(K k) throws SQLException;
 
     Object getRepository();
 }

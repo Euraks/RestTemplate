@@ -4,14 +4,16 @@ import org.example.db.ConnectionManager;
 import org.example.model.SimpleEntity;
 import org.example.repository.Repository;
 import org.example.repository.mapper.SimpleResultSetMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 public class SimpleEntityRepositoryImpl implements Repository<SimpleEntity, UUID> {
 
     private static final String FIND_BY_ID_SQL = "SELECT uuid, description FROM SimpleEntity WHERE uuid=?";

@@ -12,9 +12,9 @@ import org.example.repository.Repository;
 import org.example.repository.impl.SimpleEntityRepositoryImpl;
 import org.example.service.Service;
 import org.example.service.impl.SimpleServiceImpl;
-import org.example.servlet.dto.SimpleEntityDTO.SimpleEntityOutGoingDTO;
-import org.example.servlet.dto.SimpleEntityDTO.SimpleEntityUpdateDTO;
-import org.example.servlet.dto.SimpleEntityDTO.mapper.SimpleDtoMapper;
+import org.example.servlet.dto.simpleentityDTO.SimpleEntityOutGoingDTO;
+import org.example.servlet.dto.simpleentityDTO.SimpleEntityUpdateDTO;
+import org.example.servlet.dto.simpleentityDTO.mapper.SimpleDtoMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

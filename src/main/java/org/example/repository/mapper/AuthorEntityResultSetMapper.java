@@ -13,7 +13,6 @@ public interface AuthorEntityResultSetMapper {
 
     AuthorEntityResultSetMapper INSTANCE = Mappers.getMapper( AuthorEntityResultSetMapper.class );
 
-
     default AuthorEntity map(ResultSet resultSet) throws SQLException {
         AuthorEntity authorEntity = new AuthorEntity();
         authorEntity.setUuid( (UUID) resultSet.getObject( "uuid" ) );

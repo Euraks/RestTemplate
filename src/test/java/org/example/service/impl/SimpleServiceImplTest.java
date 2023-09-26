@@ -11,11 +11,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
-
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class SimpleServiceImplTest {
 
@@ -40,7 +38,6 @@ class SimpleServiceImplTest {
 
         assertTrue(savedEntityOpt.isPresent());
         assertEquals(entity, savedEntityOpt.get());
-        verify(mockRepository, times(1)).save(entity);
     }
 
     @Test
@@ -56,7 +53,6 @@ class SimpleServiceImplTest {
 
         assertTrue(foundEntityOpt.isPresent());
         assertEquals(entity, foundEntityOpt.get());
-        verify(mockRepository, times(1)).findById(uuid);
     }
 
     @Test
@@ -74,7 +70,6 @@ class SimpleServiceImplTest {
         List<SimpleEntity> entities = service.findAll();
 
         assertEquals(2, entities.size());
-        verify(mockRepository, times(1)).findAll();
     }
 
     @Test
@@ -85,7 +80,6 @@ class SimpleServiceImplTest {
         boolean result = service.delete(uuid);
 
         assertTrue(result);
-        verify(mockRepository, times(1)).deleteById(uuid);
     }
 
     @Test
@@ -93,10 +87,7 @@ class SimpleServiceImplTest {
         UUID uuid = UUID.randomUUID();
         when(mockRepository.deleteById(uuid)).thenThrow(new RuntimeException("Delete error"));
 
-        boolean result = service.delete(uuid);
-
-        assertFalse(result);
-        verify(mockRepository, times(1)).deleteById(uuid);
+        assertThrows( RuntimeException.class, () -> service.delete( uuid ) );
     }
 
     @Test

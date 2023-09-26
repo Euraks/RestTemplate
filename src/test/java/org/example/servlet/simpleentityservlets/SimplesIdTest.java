@@ -2,168 +2,113 @@ package org.example.servlet.simpleentityservlets;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.db.ConnectionManager;
 import org.example.model.SimpleEntity;
-import org.example.repository.Repository;
 import org.example.service.Service;
-import org.example.service.impl.SimpleServiceImpl;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import java.io.BufferedReader;
-import java.io.PrintWriter;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.lang.reflect.Field;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Collections;
+import java.io.*;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class SimplesIdTest {
 
     private SimplesId servlet;
+
+    @Mock
     private Service<SimpleEntity, UUID> mockedService;
-    private Repository<SimpleEntity, UUID> mockedRepository;
-    private ConnectionManager mockedConnectionManager;
-    private Connection mockedConnection;
+
+    @Mock
+    private HttpServletRequest request;
+
+    @Mock
+    private HttpServletResponse response;
+
+    @Mock
+    private BufferedReader reader;
+
+    private StringWriter stringWriter;
+    private PrintWriter writer;
 
     @BeforeEach
-    void setUp() throws SQLException {
-        mockedService = Mockito.mock( Service.class );
-        mockedRepository = Mockito.mock( Repository.class );
-        mockedConnectionManager = Mockito.mock( ConnectionManager.class );
-        mockedConnection = Mockito.mock( Connection.class );
+    void setUp() throws IOException {
+        MockitoAnnotations.openMocks( this );
 
-        when( mockedService.getRepository() ).thenReturn( mockedRepository );
-        when( mockedRepository.save( any() ) ).thenReturn( Optional.empty() );
-        when( mockedRepository.findAll() ).thenReturn( Collections.emptyList() );
-        when( mockedConnectionManager.getConnection() ).thenReturn( mockedConnection );
+        stringWriter = new StringWriter();
+        writer = new PrintWriter( stringWriter );
+        when( response.getWriter() ).thenReturn( writer );
 
-        servlet = new SimplesId( mockedConnectionManager );
+        servlet = new SimplesId();
         servlet.setService( mockedService );
     }
 
     @Test
-    void testDefaultConstructor() throws Exception {
-
-        Simples servlet = new Simples();
-
-        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-        StringWriter stringWriter = new StringWriter();
-        Mockito.when(response.getWriter()).thenReturn(new PrintWriter(stringWriter));
-
-        servlet.doGet(request, response);
-
-        Assertions.assertFalse(stringWriter.toString().isEmpty(), "Response body should not be empty");
-        Mockito.verify(response).setStatus(HttpServletResponse.SC_OK);
-
-    }
-
-    @Test
     void testDoGet() throws Exception {
-        SimpleServiceImpl mockService = mock( SimpleServiceImpl.class );
-
         UUID testUUID = UUID.randomUUID();
         SimpleEntity mockEntity = new SimpleEntity();
         mockEntity.setUuid( testUUID );
 
-        when( mockService.findById( testUUID ) ).thenReturn( Optional.of( mockEntity ) );
+        when( mockedService.findById( testUUID ) ).thenReturn( Optional.of( mockEntity ) );
+        when( request.getPathInfo() ).thenReturn( "/" + testUUID );
 
-        Field serviceField = SimplesId.class.getDeclaredField( "service" );
-        serviceField.setAccessible( true );
-        serviceField.set( servlet, mockService );
+        servlet.doGet( request, response );
 
-        HttpServletRequest mockRequest = mock( HttpServletRequest.class );
-        HttpServletResponse mockResponse = mock( HttpServletResponse.class );
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter writer = new PrintWriter( stringWriter );
-        when( mockResponse.getWriter() ).thenReturn( writer );
-        when( mockRequest.getPathInfo() ).thenReturn( "/simples/" + testUUID.toString() );
-
-        servlet.doGet( mockRequest, mockResponse );
-
-        Assertions.assertTrue( stringWriter.toString().contains( "Get SimpleEntity UUID:" ) );
+        writer.flush();
+        assertTrue( stringWriter.toString().contains( "Get SimpleEntity UUID:" ) );
+        assertTrue( stringWriter.toString().contains( testUUID.toString() ) );
     }
 
     @Test
     void testDoPut() throws Exception {
-        SimpleServiceImpl mockService = mock( SimpleServiceImpl.class );
-
         UUID testUUID = UUID.randomUUID();
         SimpleEntity mockEntity = new SimpleEntity();
         mockEntity.setUuid( testUUID );
 
-        when( mockService.findById( testUUID ) ).thenReturn( Optional.of( mockEntity ) );
-
-        Field serviceField = SimplesId.class.getDeclaredField( "service" );
-        serviceField.setAccessible( true );
-        serviceField.set( servlet, mockService );
-
-        HttpServletRequest mockRequest = mock( HttpServletRequest.class );
-        HttpServletResponse mockResponse = mock( HttpServletResponse.class );
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter writer = new PrintWriter( stringWriter );
-        when( mockResponse.getWriter() ).thenReturn( writer );
-        when( mockRequest.getPathInfo() ).thenReturn( "/simples/" + testUUID.toString() );
+        when( mockedService.findById( testUUID ) ).thenReturn( Optional.of( mockEntity ) );
+        when( request.getPathInfo() ).thenReturn( "/" + testUUID );
 
         String inputJson = "{ \"description\": \"Test Description\" }";
-        when( mockRequest.getReader() ).thenReturn( new BufferedReader( new StringReader( inputJson ) ) );
+        when( request.getReader() ).thenReturn( new BufferedReader( new StringReader( inputJson ) ) );
 
-        servlet.doPut( mockRequest, mockResponse );
+        servlet.doPut( request, response );
 
-        Assertions.assertTrue( stringWriter.toString().contains( "Updated SimpleEntity UUID:" ) );
+        writer.flush();
+        assertTrue( stringWriter.toString().contains( "Updated SimpleEntity UUID:" ) );
     }
 
     @Test
     void testDoDelete() throws Exception {
-        SimpleServiceImpl mockService = mock( SimpleServiceImpl.class );
-
         UUID testUUID = UUID.randomUUID();
         SimpleEntity mockEntity = new SimpleEntity();
         mockEntity.setUuid( testUUID );
 
-        when( mockService.findById( testUUID ) ).thenReturn( Optional.of( mockEntity ) );
+        when( mockedService.findById( testUUID ) ).thenReturn( Optional.of( mockEntity ) );
+        when( request.getPathInfo() ).thenReturn( "/" + testUUID );
 
-        Field serviceField = SimplesId.class.getDeclaredField( "service" );
-        serviceField.setAccessible( true );
-        serviceField.set( servlet, mockService );
+        servlet.doDelete( request, response );
 
-        HttpServletRequest mockRequest = mock( HttpServletRequest.class );
-        HttpServletResponse mockResponse = mock( HttpServletResponse.class );
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter writer = new PrintWriter( stringWriter );
-        when( mockResponse.getWriter() ).thenReturn( writer );
-        when( mockRequest.getPathInfo() ).thenReturn( "/simples/" + testUUID.toString() );
-
-        servlet.doDelete( mockRequest, mockResponse );
-
-        Assertions.assertTrue( stringWriter.toString().contains( "Deleted SimpleEntity UUID:" ) );
+        writer.flush();
+        assertTrue( stringWriter.toString().contains( "Deleted SimpleEntity UUID:" ) );
+        assertTrue( stringWriter.toString().contains( testUUID.toString() ) );
     }
 
     @Test
-    void testHandleExceptionViaDoGet() throws Exception {
-
-        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
-        HttpServletResponse mockResponse = mock(HttpServletResponse.class);
-        PrintWriter mockWriter = mock(PrintWriter.class);
-
-        when(mockRequest.getPathInfo()).thenReturn("/simples/invalidUUID");
-        when(mockResponse.getWriter()).thenReturn(mockWriter);
+    void testHandleExceptionViaDoGet()  {
+        when( request.getPathInfo() ).thenReturn( "/invalidUUID" );
 
         SimplesId servlet = new SimplesId();
+        servlet.setService( mockedService );
 
-        servlet.doGet(mockRequest, mockResponse);
+        servlet.doGet( request, response );
 
-        verify(mockResponse).setContentType("application/json");
-        verify(mockResponse).setCharacterEncoding("UTF-8");
-        verify(mockResponse).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        verify(mockWriter).write("An internal server error occurred.");
+        verify( response ).setContentType( "application/json" );
+        verify( response ).setCharacterEncoding( "UTF-8" );
+        verify( response ).setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
     }
 }

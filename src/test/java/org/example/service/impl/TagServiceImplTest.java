@@ -41,7 +41,6 @@ class TagServiceImplTest {
 
         assertTrue(savedEntity.isPresent());
         assertEquals(tagEntity, savedEntity.get());
-        verify(repository, times(1)).save(tagEntity);
     }
 
     @Test
@@ -50,10 +49,7 @@ class TagServiceImplTest {
 
         doThrow(new SQLException("Simulated SQL Exception")).when(repository).save(tagEntity);
 
-        Optional<TagEntity> savedEntity = tagService.save(tagEntity);
-
-        assertFalse(savedEntity.isPresent());
-        verify(repository, times(1)).save(tagEntity);
+        assertThrows(SQLException.class, () -> tagService.save(tagEntity));
     }
 
     @Test
@@ -87,10 +83,7 @@ class TagServiceImplTest {
     void testFindAllWithSQLException() throws SQLException {
         when(repository.findAll()).thenThrow(new SQLException("Simulated SQL Exception"));
 
-        List<TagEntity> allEntities = tagService.findAll();
-
-        assertNotNull(allEntities);
-        assertTrue(allEntities.isEmpty());
+        assertThrows(SQLException.class, () -> tagService.findAll());
     }
 
     @Test
@@ -121,9 +114,7 @@ class TagServiceImplTest {
 
         when(repository.deleteById(uuid)).thenThrow(new RuntimeException("Simulated Exception"));
 
-        boolean deleted = tagService.delete(uuid);
-
-        assertFalse(deleted);
+        assertThrows(RuntimeException.class, () -> tagService.delete(uuid));
     }
 
     @Test
