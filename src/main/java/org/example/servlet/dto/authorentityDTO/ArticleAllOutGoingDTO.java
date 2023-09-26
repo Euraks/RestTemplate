@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ArticleAllOutGoingDTO {
+
     List<Article> articles;
 
     public List<Article> getArticles() {

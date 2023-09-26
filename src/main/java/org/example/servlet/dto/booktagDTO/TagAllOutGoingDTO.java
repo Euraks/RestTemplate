@@ -5,6 +5,7 @@ import org.example.model.TagEntity;
 import java.util.List;
 
 public class TagAllOutGoingDTO {
+
     List<TagEntity> tagEntities;
 
     public List<TagEntity> getTagEntities() {

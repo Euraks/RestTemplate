@@ -22,9 +22,6 @@ public interface SimpleDtoMapper {
 
     SimpleEntity map(SimpleEntityUpdateDTO simpleEntityUpdateDTO);
 
-
-
-
     default SimpleEntityAllOutGoingDTO mapListToDto(List<SimpleEntity> simpleEntityList){
         SimpleEntityAllOutGoingDTO simpleEntityAllOutGoingDTO = new SimpleEntityAllOutGoingDTO();
         simpleEntityAllOutGoingDTO.setSimpleEntityList( simpleEntityList );

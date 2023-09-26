@@ -5,6 +5,7 @@ import org.example.model.TagEntity;
 import java.util.List;
 
 public class BookIncomingDTO {
+
     private String bookText;
     private List<TagEntity> tagEntities;
 

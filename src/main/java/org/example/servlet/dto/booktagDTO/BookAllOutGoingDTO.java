@@ -5,6 +5,7 @@ import org.example.model.BookEntity;
 import java.util.List;
 
 public class BookAllOutGoingDTO {
+
     List<BookEntity> bookEntities;
 
     public List<BookEntity> getBookEntities() {

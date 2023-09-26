@@ -3,6 +3,7 @@ package org.example.servlet.dto.simpleentityDTO;
 import java.util.UUID;
 
 public class SimpleEntityOutGoingDTO {
+
     private UUID uuid;
     private String description;
 

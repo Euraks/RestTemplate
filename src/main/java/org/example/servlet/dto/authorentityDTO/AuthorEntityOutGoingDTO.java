@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class AuthorEntityOutGoingDTO {
+
     private UUID uuid;
     private String authorName;
     private List<Article> articleList;

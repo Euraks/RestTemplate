@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class BookOutGoingDTO {
+
     private UUID uuid;
     private String bookText;
     private List<TagEntity> tagEntities;

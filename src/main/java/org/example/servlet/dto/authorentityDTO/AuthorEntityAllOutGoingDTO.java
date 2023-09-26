@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AuthorEntityAllOutGoingDTO {
+
     private List<AuthorEntity> authorEntityList;
 
     public List<AuthorEntity> getAuthorEntityList() {

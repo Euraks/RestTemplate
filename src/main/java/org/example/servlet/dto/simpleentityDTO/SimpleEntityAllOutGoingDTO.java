@@ -5,6 +5,7 @@ import org.example.model.SimpleEntity;
 import java.util.List;
 
 public class SimpleEntityAllOutGoingDTO {
+
     private List<SimpleEntity> simpleEntityList;
 
     public List<SimpleEntity> getSimpleEntityList() {

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface Repository<T, K> extends Serializable {
+
     Optional<T> findById(K k) throws SQLException;
 
     boolean deleteById(K k) throws SQLException;
