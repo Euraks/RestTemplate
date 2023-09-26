@@ -31,6 +31,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class BookIdTest {
+
     private BookId servlet;
     private Service<BookEntity, UUID> mockedService;
     private Repository<BookEntity, UUID> mockedRepository;

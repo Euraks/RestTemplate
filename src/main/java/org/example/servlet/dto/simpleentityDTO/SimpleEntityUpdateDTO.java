@@ -3,7 +3,7 @@ package org.example.servlet.dto.simpleentityDTO;
 import java.util.UUID;
 
 public class SimpleEntityUpdateDTO {
-    
+
     private UUID uuid;
     private String description;
 

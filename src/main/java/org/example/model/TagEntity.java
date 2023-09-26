@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class TagEntity {
+
     private UUID uuid;
     private String tagName;
     private List<BookEntity> bookEntities;

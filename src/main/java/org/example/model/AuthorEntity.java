@@ -7,6 +7,7 @@ import java.util.UUID;
 
 
 public class AuthorEntity {
+
     private UUID uuid;
     private String authorName;
     private List<Article> articleList;

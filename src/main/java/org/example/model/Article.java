@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class Article {
+
     private UUID uuid;
     private UUID authorUuid;
     private String text;

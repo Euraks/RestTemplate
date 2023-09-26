@@ -26,6 +26,7 @@ import static org.mockito.Mockito.when;
 
 
 class ArticlesTest {
+
     private Authors servlet;
     private Service<AuthorEntity, UUID> mockedService;
     private Repository<AuthorEntity, UUID> mockedRepository;

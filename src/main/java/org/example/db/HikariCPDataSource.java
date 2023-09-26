@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class HikariCPDataSource implements ConnectionManager, Serializable {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(HikariCPDataSource.class);
     private final transient HikariDataSource dataSource;
 

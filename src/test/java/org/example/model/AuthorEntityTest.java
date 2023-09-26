@@ -98,7 +98,7 @@ class AuthorEntityTest extends Throwable {
     }
 
     @Test
-    public void testToString() {
+    void testToString() {
         AuthorEntity author = new AuthorEntity();
         UUID expectedUuid = UUID.randomUUID();
         author.setUuid(expectedUuid);
