@@ -58,8 +58,6 @@ class BookIdTest {
 
    @Test
     void testDefaultConstructor() throws Exception {
-        BookId servlet = new BookId();
-
         HttpServletRequest request = Mockito.mock( HttpServletRequest.class );
         HttpServletResponse response = Mockito.mock( HttpServletResponse.class );
         StringWriter stringWriter = new StringWriter();

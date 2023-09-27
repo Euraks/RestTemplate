@@ -48,8 +48,6 @@ class AuthorsIdTest {
 
     @Test
     void testDefaultConstructor() throws Exception {
-        AuthorsId servlet = new AuthorsId();
-
         HttpServletRequest request = Mockito.mock( HttpServletRequest.class );
         HttpServletResponse response = Mockito.mock( HttpServletResponse.class );
         StringWriter stringWriter = new StringWriter();
@@ -177,15 +175,12 @@ class AuthorsIdTest {
 
     @Test
     void testHandleExceptionViaDoGet() throws Exception {
-
         HttpServletRequest mockRequest = mock(HttpServletRequest.class);
         HttpServletResponse mockResponse = mock(HttpServletResponse.class);
         PrintWriter mockWriter = mock(PrintWriter.class);
 
         when(mockRequest.getPathInfo()).thenReturn("/authors/invalidUUID");
         when(mockResponse.getWriter()).thenReturn(mockWriter);
-
-        SimplesId servlet = new SimplesId();
 
         servlet.doGet(mockRequest, mockResponse);
 

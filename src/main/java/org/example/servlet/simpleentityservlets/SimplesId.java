@@ -31,7 +31,7 @@ public class SimplesId extends HttpServlet {
     private static final String UTF_8 = "UTF-8";
 
     private static final Logger LOGGER = LoggerFactory.getLogger( SimplesId.class );
-    private final ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper mapper = new ObjectMapper();
 
     private final transient ConnectionManager connectionManager;
     private final transient Repository<SimpleEntity, UUID> repository;
@@ -160,5 +160,9 @@ public class SimplesId extends HttpServlet {
 
     protected void setService(Service<SimpleEntity, UUID> service) {
         this.service = service;
+    }
+
+    protected void setMapper(ObjectMapper mapper) {
+        this.mapper = mapper;
     }
 }

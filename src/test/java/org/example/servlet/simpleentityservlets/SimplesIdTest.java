@@ -1,11 +1,13 @@
 package org.example.servlet.simpleentityservlets;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.model.SimpleEntity;
 import org.example.service.Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -19,6 +21,7 @@ import static org.mockito.Mockito.when;
 
 class SimplesIdTest {
 
+    @InjectMocks
     private SimplesId servlet;
 
     @Mock
@@ -38,14 +41,14 @@ class SimplesIdTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        MockitoAnnotations.openMocks( this );
+        MockitoAnnotations.openMocks(this);
 
         stringWriter = new StringWriter();
-        writer = new PrintWriter( stringWriter );
-        when( response.getWriter() ).thenReturn( writer );
+        writer = new PrintWriter(stringWriter);
+        when(response.getWriter()).thenReturn(writer);
 
-        servlet = new SimplesId();
-        servlet.setService( mockedService );
+        servlet.setService(mockedService);
+        servlet.setMapper(new ObjectMapper());
     }
 
     @Test
@@ -102,7 +105,6 @@ class SimplesIdTest {
     void testHandleExceptionViaDoGet()  {
         when( request.getPathInfo() ).thenReturn( "/invalidUUID" );
 
-        SimplesId servlet = new SimplesId();
         servlet.setService( mockedService );
 
         servlet.doGet( request, response );

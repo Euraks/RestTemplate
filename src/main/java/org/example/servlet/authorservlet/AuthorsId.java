@@ -184,7 +184,7 @@ public class AuthorsId extends HttpServlet {
     private void handleException(HttpServletResponse response, Exception e, String logMessage) throws IOException {
         LOGGER.error( logMessage, e );
         response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
-        response.setContentType( "text/plain" );
+        response.setContentType( APPLICATION_JSON );
         response.setCharacterEncoding( UTF_8 );
         response.getWriter().write( "An internal server error occurred." );
     }

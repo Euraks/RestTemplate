@@ -58,8 +58,6 @@ class BooksTest {
 
     @Test
     void testDefaultConstructor() throws Exception {
-        Books servlet = new Books();
-
         HttpServletRequest request = Mockito.mock( HttpServletRequest.class );
         HttpServletResponse response = Mockito.mock( HttpServletResponse.class );
         StringWriter stringWriter = new StringWriter();
@@ -217,7 +215,6 @@ class BooksTest {
 
         Mockito.when( mockResponse.getWriter() ).thenReturn( mockWriter );
 
-        Books servlet = new Books();
         servlet.setService( mockService );
 
         servlet.doGet( mockRequest, mockResponse );

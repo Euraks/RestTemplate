@@ -51,9 +51,6 @@ class ArticlesTest {
 
     @Test
     void testDefaultConstructor() throws Exception {
-
-        Articles servlet = new Articles();
-
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         StringWriter stringWriter = new StringWriter();

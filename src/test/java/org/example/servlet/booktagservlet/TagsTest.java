@@ -48,8 +48,6 @@ class TagsTest {
 
     @Test
     void testDefaultConstructor() throws Exception {
-        Tags servlet = new Tags();
-
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         StringWriter stringWriter = new StringWriter();

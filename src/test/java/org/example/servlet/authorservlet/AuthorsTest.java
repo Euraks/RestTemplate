@@ -51,9 +51,6 @@ class AuthorsTest {
 
     @Test
     void testDefaultConstructor() throws Exception {
-
-        Authors servlet = new Authors();
-
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         StringWriter stringWriter = new StringWriter();
@@ -162,7 +159,6 @@ class AuthorsTest {
 
         Mockito.when(mockResponse.getWriter()).thenReturn(mockWriter);
 
-        Authors servlet = new Authors();
         servlet.setService(mockService);
 
         servlet.doGet(mockRequest, mockResponse);
