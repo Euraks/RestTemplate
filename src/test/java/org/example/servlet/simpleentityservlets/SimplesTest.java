@@ -66,7 +66,7 @@ class SimplesTest {
 
         writer.flush();
         assertTrue(stringWriter.toString().contains("TestDescription"));
-        assertTrue(stringWriter.toString().contains("GetAll SimpleEntity Jenkins:"));
+        assertTrue(stringWriter.toString().contains("GetAll SimpleEntity Jenkins Hello:"));
     }
 
     @Test
