@@ -50,24 +50,13 @@ public class Simples extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
-        LOGGER.info("Hello world");
-        LOGGER.info("Hello world");
-        LOGGER.info("Hello world");
-        LOGGER.info("Hello world");
-        LOGGER.info("Hello world");
-        LOGGER.info("Hello world");
-        LOGGER.info("Hello world");
-        LOGGER.info("Hello world");
-        LOGGER.info("Hello world");
-        LOGGER.info("Hello world");
-        LOGGER.info("Hello world");
         try {
             List<SimpleEntity> simpleEntityList = service.findAll();
             SimpleEntityAllOutGoingDTO simpleEntityAllOutGoingDTO = SimpleDtoMapper.INSTANCE.mapListToDto(simpleEntityList);
             String jsonString = mapper.writeValueAsString(simpleEntityAllOutGoingDTO);
             response.setContentType(APPLICATION_JSON);
             response.setCharacterEncoding(UTF_8);
-            response.getWriter().write("GetAll SimpleEntity:" + jsonString);
+            response.getWriter().write("GetAll SimpleEntity Jenkins Hello:" + jsonString);
         } catch (SQLException e) {
             handleException(response, e, "Failed to fetch all SimpleEntities");
         } catch (Exception e) {
