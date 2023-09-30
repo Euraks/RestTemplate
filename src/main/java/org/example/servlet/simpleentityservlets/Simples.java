@@ -56,7 +56,7 @@ public class Simples extends HttpServlet {
             String jsonString = mapper.writeValueAsString(simpleEntityAllOutGoingDTO);
             response.setContentType(APPLICATION_JSON);
             response.setCharacterEncoding(UTF_8);
-            response.getWriter().write("GetAll SimpleEntity Jenkins Hello:" + jsonString);
+            response.getWriter().write("GetAll SimpleEntity Jenkins:" + jsonString);
         } catch (SQLException e) {
             handleException(response, e, "Failed to fetch all SimpleEntities");
         } catch (Exception e) {
